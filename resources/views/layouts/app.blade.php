@@ -73,5 +73,6 @@
     
     <!-- App Script -->
     <script src="{{ asset('admin_assets/js/hope-ui.js') }}" defer></script>
+    @yield('scripts')
 </body>
 </html>

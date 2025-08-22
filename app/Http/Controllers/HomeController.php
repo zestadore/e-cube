@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Auth;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -23,6 +23,34 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        switch (Auth::user()->role) {
+            case 'admin':
+                return redirect('/admin');
+                break;
+            case 'super_admin':
+                return redirect('/super_admin');
+                break;
+            case 'employee':
+                return redirect('/employee');
+                break;
+            case 'employer':
+                return redirect('/employer');
+                break;
+            default:
+                return redirect('/select-option');
+                break;
+        }
+    }
+
+    public function chooseType(){
+        return view('choose_type');
+    }
+
+    public function registerAsJobSeeker(){
+        dd('register_as_job_seeker');
+    }
+
+    public function registerAsEmployer(){
+        dd('register_as_employer');
     }
 }
