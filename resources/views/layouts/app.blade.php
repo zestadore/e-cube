@@ -13,7 +13,6 @@
     <!-- Library / Plugin Css Build -->
     <link rel="stylesheet" href="{{ asset('admin_assets/css/core/libs.min.css') }}" />
     
-    
     <!-- Hope Ui Design System Css -->
     <link rel="stylesheet" href="{{ asset('admin_assets/css/hope-ui.min.css') }}?v=2.0.0" />
     
@@ -42,7 +41,15 @@
     <!-- loader END -->
     
     <div class="wrapper">
-        @yield('content')
+        @auth
+            @include('layouts.side_menu')
+        @endauth
+        <main class="main-content">
+            @auth
+                @include('layouts.top_menu')
+            @endauth
+            @yield('content')
+        </main>
     </div>
     <!-- Library Bundle Script -->
     <script src="{{ asset('admin_assets/js/core/libs.min.js') }}"></script>

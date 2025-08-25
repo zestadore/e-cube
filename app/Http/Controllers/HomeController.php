@@ -28,7 +28,7 @@ class HomeController extends Controller
                 return redirect('/admin');
                 break;
             case 'super_admin':
-                return redirect('/super_admin');
+                return redirect()->route('admin.dashboard');
                 break;
             case 'employee':
                 return redirect('/employee');
@@ -40,6 +40,10 @@ class HomeController extends Controller
                 return redirect('/select-option');
                 break;
         }
+    }
+
+    public function adminDashboard(){
+        return view('admin.dashboard.index');
     }
 
     public function chooseType(){
