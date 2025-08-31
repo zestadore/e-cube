@@ -29,7 +29,7 @@
     <link rel="stylesheet" href="{{ asset('admin_assets/css/rtl.min.css') }}"/>
 
     <!-- Scripts -->
-    
+    @yield('styles')
 </head>
 <body class=" " data-bs-spy="scroll" data-bs-target="#elements-section" data-bs-offset="0" tabindex="0">
     <!-- loader Start -->
