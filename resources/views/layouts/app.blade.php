@@ -42,7 +42,9 @@
     
     <div class="wrapper">
         @auth
-            @include('layouts.side_menu')
+            @if (!empty(Auth::user()->role))
+                @include('layouts.side_menu')
+            @endif
         @endauth
         <main class="main-content">
             @auth
@@ -72,9 +74,6 @@
     
     <!-- Slider-tab Script -->
     <script src="{{ asset('admin_assets/js/plugins/slider-tabs.js') }}"></script>
-    
-    <!-- Form Wizard Script -->
-    <script src="{{ asset('admin_assets/js/plugins/form-wizard.js') }}"></script>
     
     <!-- AOS Animation Plugin-->
     

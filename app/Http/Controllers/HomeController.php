@@ -51,7 +51,7 @@ class HomeController extends Controller
     }
 
     public function registerAsJobSeeker(){
-        dd('register_as_job_seeker');
+        return view('users.registration.candidate');
     }
 
     public function registerAsEmployer(){

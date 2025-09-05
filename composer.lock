@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5e92612beb06b30c7e211f6c7d09ccfa",
+    "content-hash": "dd8aba2137e6b0b5c102ec25973f5c8b",
     "packages": [
         {
             "name": "brick/math",
@@ -588,6 +588,63 @@
                 }
             ],
             "time": "2025-03-06T22:45:56+00:00"
+        },
+        {
+            "name": "erag/locationerag",
+            "version": "v1.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/eramitgupta/LocationErag.git",
+                "reference": "ffd1346cd76c428dd4409bbeb58bbc313c790255"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/eramitgupta/LocationErag/zipball/ffd1346cd76c428dd4409bbeb58bbc313c790255",
+                "reference": "ffd1346cd76c428dd4409bbeb58bbc313c790255",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.0.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "LocationErag\\LocationEragServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "LocationErag\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Er Amit Gupta",
+                    "email": "info.eramitgupta@gmail.com"
+                }
+            ],
+            "description": "A simple package to get location data using Indian PIN codes, optimized for Laravel 10.x and 11.x",
+            "homepage": "https://github.com/eramitgupta/locationerag",
+            "keywords": [
+                "Pincode",
+                "geolocation",
+                "india",
+                "indian pincode location",
+                "laravel",
+                "location",
+                "location finder"
+            ],
+            "support": {
+                "issues": "https://github.com/eramitgupta/LocationErag/issues",
+                "source": "https://github.com/eramitgupta/LocationErag/tree/v1.8"
+            },
+            "time": "2024-10-20T12:01:17+00:00"
         },
         {
             "name": "fruitcake/php-cors",
