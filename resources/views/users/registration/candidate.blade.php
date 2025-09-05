@@ -30,7 +30,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                         </svg>
                                     </div>
-                                    <span class="dark-wizard">Personal</span>
+                                    <span class="dark-wizard">Address</span>
                                 </a>
                             </li>
                             <li id="payment" class="mb-2 col-lg-3 col-md-6 text-start">
@@ -147,43 +147,97 @@
                                 
                                 
                             </div>
+                            <p> </p>
                             <button type="button" name="next" class="btn btn-primary next action-button float-end" value="Next" >Next</button>
                         </fieldset>
                         <fieldset>
                             <div class="form-card text-start">
                                 <div class="row">
                                 <div class="col-7">
-                                    <h3 class="mb-4">Personal Information:</h3>
+                                    <h3 class="mb-4">Address Information:</h3>
                                 </div>
                                 <div class="col-5">
                                     <h2 class="steps">Step 2 - 4</h2>
                                 </div>
                                 </div>
+                                
+                                <!-- Permanent Address Section -->
                                 <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="form-label">First Name: *</label>
-                                        <input type="text" class="form-control" name="fname" placeholder="First Name" />
+                                    <div class="col-12">
+                                        <h4 class="mb-3">Permanent Address</h4>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <x-InputBox class="form-control {{ $errors->has('permanent_address_1') ? ' is-invalid' : '' }}" title="Address Line 1" name="permanent_address_1" id="permanent_address_1" type="text" required="True"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <x-InputBox class="form-control {{ $errors->has('permanent_address_2') ? ' is-invalid' : '' }}" title="Address Line 2" name="permanent_address_2" id="permanent_address_2" type="text" required="False"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <x-InputBox class="form-control {{ $errors->has('permanent_landmark') ? ' is-invalid' : '' }}" title="Landmark" name="permanent_landmark" id="permanent_landmark" type="text" required="False"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <x-InputBox class="form-control {{ $errors->has('permanent_city') ? ' is-invalid' : '' }}" title="City" name="permanent_city" id="permanent_city" type="text" required="True"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <x-InputBox class="form-control {{ $errors->has('permanent_state') ? ' is-invalid' : '' }}" title="State" name="permanent_state" id="permanent_state" type="text" required="True"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <x-InputBox class="form-control {{ $errors->has('permanent_zip') ? ' is-invalid' : '' }}" title="Pincode" name="permanent_zip" id="permanent_zip" type="text" required="True"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <x-InputBox class="form-control {{ $errors->has('permanent_country') ? ' is-invalid' : '' }}" title="Country" name="permanent_country" id="permanent_country" type="text" required="True" value="India"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <x-InputBox class="form-control {{ $errors->has('permanent_police_station') ? ' is-invalid' : '' }}" title="Police Station" name="permanent_police_station" id="permanent_police_station" type="text" required="True"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <x-InputBox class="form-control {{ $errors->has('permanent_panchayat_municipality') ? ' is-invalid' : '' }}" title="Panchayat/Municipality" name="permanent_panchayat_municipality" id="permanent_panchayat_municipality" type="text" required="True"/>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="form-label">Last Name: *</label>
-                                        <input type="text" class="form-control" name="lname" placeholder="Last Name" />
+                                
+                                <div class="row mt-4">
+                                    <div class="col-12">
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" id="same_as_permanent" name="same_as_permanent">
+                                            <label class="form-check-label" for="same_as_permanent">
+                                                Present address same as permanent address
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="form-label">Contact No.: *</label>
-                                        <input type="text" class="form-control" name="phno" placeholder="Contact No." />
+                                
+                                <!-- Present Address Section -->
+                                <div class="row" id="present_address_section">
+                                    <div class="col-12">
+                                        <h4 class="mb-3">Present Address</h4>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="form-label">Alternate Contact No.: *</label>
-                                        <input type="text" class="form-control" name="phno_2" placeholder="Alternate Contact No." />
+                                    <div class="col-md-6">
+                                        <x-InputBox class="form-control {{ $errors->has('present_address_1') ? ' is-invalid' : '' }}" title="Address Line 1" name="present_address_1" id="present_address_1" type="text" required="True"/>
                                     </div>
-                                </div>
+                                    <div class="col-md-6">
+                                        <x-InputBox class="form-control {{ $errors->has('present_address_2') ? ' is-invalid' : '' }}" title="Address Line 2" name="present_address_2" id="present_address_2" type="text" required="False"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <x-InputBox class="form-control {{ $errors->has('present_landmark') ? ' is-invalid' : '' }}" title="Landmark" name="present_landmark" id="present_landmark" type="text" required="False"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <x-InputBox class="form-control {{ $errors->has('present_city') ? ' is-invalid' : '' }}" title="City" name="present_city" id="present_city" type="text" required="True"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <x-InputBox class="form-control {{ $errors->has('present_state') ? ' is-invalid' : '' }}" title="State" name="present_state" id="present_state" type="text" required="True"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <x-InputBox class="form-control {{ $errors->has('present_zip') ? ' is-invalid' : '' }}" title="Pincode" name="present_zip" id="present_zip" type="text" required="True"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <x-InputBox class="form-control {{ $errors->has('present_country') ? ' is-invalid' : '' }}" title="Country" name="present_country" id="present_country" type="text" required="True" value="India"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <x-InputBox class="form-control {{ $errors->has('present_police_station') ? ' is-invalid' : '' }}" title="Police Station" name="present_police_station" id="present_police_station" type="text" required="True"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <x-InputBox class="form-control {{ $errors->has('present_panchayat_municipality') ? ' is-invalid' : '' }}" title="Panchayat/Municipality" name="present_panchayat_municipality" id="present_panchayat_municipality" type="text" required="True"/>
+                                    </div>
                                 </div>
                             </div>
                             <button type="button" name="next" class="btn btn-primary next action-button float-end" value="Next" >Next</button>
@@ -272,6 +326,7 @@
 
                 }
                 if(n==2){
+                    saveAddressDetails();
                     document.getElementById("account").classList.add("done");
                     document.getElementById("personal").classList.add("done");
                     document.getElementById("payment").classList.add("active");
@@ -318,10 +373,54 @@
                     nextBtnFunction(-1);
                 })
             });
+            
+            // Handle same as permanent address checkbox
+            const sameAsPermanentCheckbox = document.getElementById('same_as_permanent');
+            if (sameAsPermanentCheckbox) {
+                sameAsPermanentCheckbox.addEventListener('change', function() {
+                    const presentAddressSection = document.getElementById('present_address_section');
+                    
+                    if (this.checked) {
+                        // Copy values from permanent address to present address
+                        $('#present_address_1').val($('#permanent_address_1').val());
+                        $('#present_address_2').val($('#permanent_address_2').val());
+                        $('#present_landmark').val($('#permanent_landmark').val());
+                        $('#present_city').val($('#permanent_city').val());
+                        $('#present_state').val($('#permanent_state').val());
+                        $('#present_zip').val($('#permanent_zip').val());
+                        $('#present_country').val($('#permanent_country').val());
+                        $('#present_police_station').val($('#permanent_police_station').val());
+                        $('#present_panchayat_municipality').val($('#permanent_panchayat_municipality').val());
+                        
+                        // Hide present address section
+                        presentAddressSection.style.display = 'none';
+                    } else {
+                        // Show present address section
+                        presentAddressSection.style.display = 'flex';
+                        
+                        // Clear present address fields
+                        $('#present_address_1').val('');
+                        $('#present_address_2').val('');
+                        $('#present_landmark').val('');
+                        $('#present_city').val('');
+                        $('#present_state').val('');
+                        $('#present_zip').val('');
+                        $('#present_country').val('India');
+                        $('#present_police_station').val('');
+                        $('#present_panchayat_municipality').val('');
+                    }
+                });
+            }
         })()
 
         function saveBasicDetails(){
             let data = $('#addForm').serialize();
+            // Add your AJAX code here to save basic details
+        }
+        
+        function saveAddressDetails(){
+            // Add your AJAX code here to save address details
+            // This function will be called when moving from address step to next step
         }
     </script>
 @endsection
