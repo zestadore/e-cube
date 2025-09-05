@@ -17,6 +17,7 @@ Route::middleware(['auth'])->group(function () {
     Route::group(['as'=>'admin.','prefix' => 'admin'], function () {
         Route::get('/', [App\Http\Controllers\HomeController::class, 'adminDashboard'])->name('dashboard');
         Route::resource('industry', App\Http\Controllers\Admin\IndustryController::class);
+        Route::resource('qualification', App\Http\Controllers\Admin\QualificationController::class);
     });
 });
 
