@@ -251,7 +251,7 @@
                             <div class="form-card text-start">
                                 <div class="row">
                                     <div class="col-7">
-                                        <h3 class="mb-4">Qualifications / Skills:</h3>
+                                        <h3 class="mb-4">Qualifications:</h3>
                                     </div>
                                     <div class="col-5">
                                         <h2 class="steps">Step 3 - 4</h2>
@@ -324,6 +324,78 @@
                                 </div>
                                 
                             </div>
+                            
+                            <div class="row mt-4">
+                                <div class="col-7">
+                                    <h3 class="mb-4">Skills:</h3>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered" id="skills_table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Skill</th>
+                                                    <th>University/School</th>
+                                                    <th>From Year</th>
+                                                    <th>To Year</th>
+                                                    <th>Percentage of Marks</th>
+                                                    <th>Upload Certificate</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="skill-row">
+                                                    <td>
+                                                        <select name="skills[0][skill]" class="form-control form-select skill" required>
+                                                            <option value="">Select Skill</option>
+                                                            @foreach($skills as $skill)
+                                                                <option value="{{ $skill->id }}">{{ $skill->skill }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" name="skills[0][university]" class="form-control" placeholder="University/School" required>
+                                                    </td>
+                                                    <td>
+                                                        <select name="skills[0][from_year]" class="form-control form-select" required>
+                                                            <option value="">Select Year</option>
+                                                            @for($i = date('Y'); $i >= date('Y')-50; $i--)
+                                                                <option value="{{ $i }}">{{ $i }}</option>
+                                                            @endfor
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <select name="skills[0][to_year]" class="form-control form-select" required>
+                                                            <option value="">Select Year</option>
+                                                            @for($i = date('Y'); $i >= date('Y')-50; $i--)
+                                                                <option value="{{ $i }}">{{ $i }}</option>
+                                                            @endfor
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" name="skills[0][percentage]" class="form-control" placeholder="Percentage" min="0" max="100" step="0.01" required>
+                                                    </td>
+                                                    <td>
+                                                        <input type="file" name="skills[0][certificate]" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                                                    </td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-success btn-sm add-skill-row">
+                                                            <i class="fa fa-plus"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-danger btn-sm remove-skill-row" style="display: none;">
+                                                            <i class="fa fa-minus"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            
                             <button type="button" name="next" class="btn btn-primary next action-button float-end" value="Submit" >Submit</button>
                             <button type="button" name="previous" class="btn btn-dark previous action-button-previous float-end me-1" value="Previous" >Previous</button>
                         </fieldset>
@@ -569,6 +641,72 @@
                 }
             });
             
+            // Validate skills fields
+            $('.skill-row').each(function(index) {
+                const rowNum = index + 1;
+                const skill = $(this).find('[name^="skills"][name$="[skill]"]').val();
+                const university = $(this).find('[name^="skills"][name$="[university]"]').val();
+                const fromYear = $(this).find('[name^="skills"][name$="[from_year]"]').val();
+                const toYear = $(this).find('[name^="skills"][name$="[to_year]"]').val();
+                const percentage = $(this).find('[name^="skills"][name$="[percentage]"]').val();
+                const certificate = $(this).find('[name^="skills"][name$="[certificate]"]')[0];
+                
+                if (!skill) {
+                    alert('Please select Skill for row ' + rowNum);
+                    isValid = false;
+                    return false;
+                }
+                if (!university) {
+                    alert('Please enter University/School for row ' + rowNum);
+                    isValid = false;
+                    return false;
+                }
+                if (!fromYear) {
+                    alert('Please select From Year for row ' + rowNum);
+                    isValid = false;
+                    return false;
+                }
+                if (!toYear) {
+                    alert('Please select To Year for row ' + rowNum);
+                    isValid = false;
+                    return false;
+                }
+                if (parseInt(fromYear) > parseInt(toYear)) {
+                    alert('From Year cannot be greater than To Year in row ' + rowNum);
+                    isValid = false;
+                    return false;
+                }
+                if (!percentage) {
+                    alert('Please enter Percentage of Marks for row ' + rowNum);
+                    isValid = false;
+                    return false;
+                } else if (isNaN(percentage) || parseFloat(percentage) < 0 || parseFloat(percentage) > 100) {
+                    alert('Percentage of Marks must be a number between 0 and 100 for row ' + rowNum);
+                    isValid = false;
+                    return false;
+                }
+                
+                // Check if file is selected and validate file type
+                if (certificate && certificate.files && certificate.files.length > 0) {
+                    const file = certificate.files[0];
+                    const validTypes = ['.pdf', '.jpg', '.jpeg', '.png', '.doc', '.docx'];
+                    const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+                    
+                    if (!validTypes.includes(fileExt)) {
+                        alert('Invalid file type for certificate in row ' + rowNum + '. Allowed types: PDF, JPG, JPEG, PNG, DOC, DOCX');
+                        isValid = false;
+                        return false;
+                    }
+                    
+                    // Check file size (max 5MB)
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert('Certificate file size exceeds 5MB limit in row ' + rowNum);
+                        isValid = false;
+                        return false;
+                    }
+                }
+            });
+            
             if (isValid) {
                 // Add your AJAX code here to save qualification details
                 var formData = new FormData($('#form-wizard1')[0]);
@@ -588,11 +726,9 @@
                         <td>
                             <select name="qualifications[${rowCount}][qualification]" class="form-control form-select qualification" required>
                                 <option value="">Select Qualification</option>
-                                <option value="High School">High School</option>
-                                <option value="Intermediate">Intermediate</option>
-                                <option value="Bachelor's">Bachelor's</option>
-                                <option value="Master's">Master's</option>
-                                <option value="PhD">PhD</option>
+                                @foreach($qualifications as $qualification)
+                                    <option value="{{ $qualification->id }}">{{ $qualification->degree }}</option>
+                                @endforeach
                             </select>
                         </td>
                         <td>
@@ -671,6 +807,92 @@
                     rows.find('.remove-qualification-row').show();
                 }
             }
+            
+            // Skills Add More Functionality
+            // Add new skill row
+            $(document).on('click', '.add-skill-row', function() {
+                var rowCount = $('#skills_table tbody tr').length;
+                var newRow = `
+                    <tr class="skill-row">
+                        <td>
+                            <select name="skills[${rowCount}][skill]" class="form-control form-select skill" required>
+                                <option value="">Select Skill</option>
+                                @foreach($skills as $skill)
+                                    <option value="{{ $skill->id }}">{{ $skill->skill }}</option>
+                                @endforeach
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" name="skills[${rowCount}][university]" class="form-control" placeholder="University/School" required>
+                        </td>
+                        <td>
+                            <select name="skills[${rowCount}][from_year]" class="form-control form-select" required>
+                                <option value="">Select Year</option>
+                                ${generateYearOptions()}
+                            </select>
+                        </td>
+                        <td>
+                            <select name="skills[${rowCount}][to_year]" class="form-control form-select" required>
+                                <option value="">Select Year</option>
+                                ${generateYearOptions()}
+                            </select>
+                        </td>
+                        <td>
+                            <input type="number" name="skills[${rowCount}][percentage]" class="form-control" placeholder="Percentage" min="0" max="100" step="0.01" required>
+                        </td>
+                        <td>
+                            <input type="file" name="skills[${rowCount}][certificate]" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-success btn-sm add-skill-row">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm remove-skill-row">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                $('#skills_table tbody').append(newRow);
+                reindexSkillRows();
+                updateSkillDeleteButtonVisibility();
+            });
+            
+            // Remove skill row
+            $(document).on('click', '.remove-skill-row', function() {
+                $(this).closest('tr').remove();
+                reindexSkillRows();
+                updateSkillDeleteButtonVisibility();
+            });
+            
+            // Function to reindex skill rows after deletion
+            function reindexSkillRows() {
+                $('#skills_table tbody tr').each(function(index) {
+                    $(this).find('select, input').each(function() {
+                        var name = $(this).attr('name');
+                        if (name) {
+                            var newName = name.replace(/skills\[(\d+)\]/, `skills[${index}]`);
+                            $(this).attr('name', newName);
+                        }
+                    });
+                });
+            }
+            
+            // Function to update skill delete button visibility
+            function updateSkillDeleteButtonVisibility() {
+                var rows = $('#skills_table tbody tr');
+                if (rows.length === 1) {
+                    // If only one row, hide the delete button
+                    rows.find('.remove-skill-row').hide();
+                } else {
+                    // If multiple rows, show all delete buttons
+                    rows.find('.remove-skill-row').show();
+                }
+            }
+            
+            // Initialize delete buttons visibility
+            updateDeleteButtonVisibility();
+            updateSkillDeleteButtonVisibility();
         });
     </script>
 @endsection
