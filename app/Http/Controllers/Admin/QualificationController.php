@@ -14,7 +14,7 @@ class QualificationController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = Qualification::with('user')->latest();
+            $data = Qualification::latest();
             $search = $request->search;
             if ($search) {
                 $data->where('degree', 'like', '%' . $search . '%');
