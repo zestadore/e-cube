@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('styles')
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+@endsection
+
 @section('content')
     <div>
         <div class="row container justify-content-center" style="width: 100% !important;">                
@@ -11,7 +15,7 @@
                     </div>
                     </div>
                     <div class="card-body">
-                    <form id="form-wizard1" class="mt-3 text-center">
+                    <form id="form-wizard1" class="mt-3 text-center" enctype="multipart/form-data">
                         <ul id="top-tab-list" class="p-0 row list-inline">
                             <li class="mb-2 col-lg-3 col-md-6 text-start active" id="account">
                                 <a href="javascript:void();">
@@ -41,7 +45,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                                         </svg>
                                     </div>
-                                    <span class="dark-wizard">Image</span>
+                                    <span class="dark-wizard">Skills</span>
                                 </a>
                             </li>
                             <li id="confirm" class="mb-2 col-lg-3 col-md-6 text-start">
@@ -246,21 +250,79 @@
                         <fieldset>
                             <div class="form-card text-start">
                                 <div class="row">
-                                <div class="col-7">
-                                    <h3 class="mb-4">Image Upload:</h3>
+                                    <div class="col-7">
+                                        <h3 class="mb-4">Qualifications / Skills:</h3>
+                                    </div>
+                                    <div class="col-5">
+                                        <h2 class="steps">Step 3 - 4</h2>
+                                    </div>
                                 </div>
-                                <div class="col-5">
-                                    <h2 class="steps">Step 3 - 4</h2>
+                                
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered" id="qualification_table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Qualification</th>
+                                                        <th>University/School</th>
+                                                        <th>From Year</th>
+                                                        <th>To Year</th>
+                                                        <th>Percentage of Marks</th>
+                                                        <th>Upload Certificate</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <select name="qualifications[0][qualification]" class="form-control form-select qualification" required>
+                                                                <option value="">Select Qualification</option>
+                                                                @foreach($qualifications as $qualification)
+                                                                    <option value="{{ $qualification->id }}">{{ $qualification->degree }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" name="qualifications[0][university]" class="form-control" placeholder="University/School" required>
+                                                        </td>
+                                                        <td>
+                                                            <select name="qualifications[0][from_year]" class="form-control form-select" required>
+                                                                <option value="">Select Year</option>
+                                                                @for($i = date('Y'); $i >= date('Y')-50; $i--)
+                                                                    <option value="{{ $i }}">{{ $i }}</option>
+                                                                @endfor
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <select name="qualifications[0][to_year]" class="form-control form-select" required>
+                                                                <option value="">Select Year</option>
+                                                                @for($i = date('Y'); $i >= date('Y')-50; $i--)
+                                                                    <option value="{{ $i }}">{{ $i }}</option>
+                                                                @endfor
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <input type="number" name="qualifications[0][percentage]" class="form-control" placeholder="Percentage" min="0" max="100" step="0.01" required>
+                                                        </td>
+                                                        <td>
+                                            <input type="file" name="qualifications[0][certificate]" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                                        </td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-success btn-sm add-qualification-row">
+                                                                <i class="fa fa-plus"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-danger btn-sm remove-qualification-row" style="display: none;">
+                                                                <i class="fa fa-minus"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
                                 </div>
-                                </div>
-                                <div class="form-group">
-                                <label class="form-label">Upload Your Photo:</label>
-                                <input type="file" class="form-control" name="pic" accept="image/*">
-                                </div>
-                                <div class="form-group">
-                                <label class="form-label">Upload Signature Photo:</label>
-                                <input type="file" class="form-control" name="pic-2" accept="image/*">
-                                </div>
+                                
                             </div>
                             <button type="button" name="next" class="btn btn-primary next action-button float-end" value="Submit" >Submit</button>
                             <button type="button" name="previous" class="btn btn-dark previous action-button-previous float-end me-1" value="Previous" >Previous</button>
@@ -360,7 +422,23 @@
             Array.from(nextbtn, (nbtn) => {
                 nbtn.addEventListener('click',function()
                 {
-                    nextBtnFunction(1);
+                    // Check which step we're on and call appropriate save function
+                    if (currentTab === 0) {
+                        // Basic details step
+                        saveBasicDetails();
+                        nextBtnFunction(1);
+                    } else if (currentTab === 1) {
+                        // Address step
+                        saveAddressDetails();
+                        nextBtnFunction(1);
+                    } else if (currentTab === 2) {
+                        // Qualification step
+                        if (saveQualificationDetails()) {
+                            nextBtnFunction(1);
+                        }
+                    } else {
+                        nextBtnFunction(1);
+                    }
                 })
             });
 
@@ -422,5 +500,177 @@
             // Add your AJAX code here to save address details
             // This function will be called when moving from address step to next step
         }
+        
+        function saveQualificationDetails(){
+            // Validate qualification fields
+            let isValid = true;
+            $('.qualification-row').each(function(index) {
+                const rowNum = index + 1;
+                const qualification = $(this).find('[name^="qualifications"][name$="[qualification]"]').val();
+                const university = $(this).find('[name^="qualifications"][name$="[university]"]').val();
+                const fromYear = $(this).find('[name^="qualifications"][name$="[from_year]"]').val();
+                const toYear = $(this).find('[name^="qualifications"][name$="[to_year]"]').val();
+                const percentage = $(this).find('[name^="qualifications"][name$="[percentage]"]').val();
+                const certificate = $(this).find('[name^="qualifications"][name$="[certificate]"]')[0];
+                
+                if (!qualification) {
+                    alert('Please enter Qualification for row ' + rowNum);
+                    isValid = false;
+                    return false;
+                }
+                if (!university) {
+                    alert('Please enter University/School for row ' + rowNum);
+                    isValid = false;
+                    return false;
+                }
+                if (!fromYear) {
+                    alert('Please select From Year for row ' + rowNum);
+                    isValid = false;
+                    return false;
+                }
+                if (!toYear) {
+                    alert('Please select To Year for row ' + rowNum);
+                    isValid = false;
+                    return false;
+                }
+                if (parseInt(fromYear) > parseInt(toYear)) {
+                    alert('From Year cannot be greater than To Year in row ' + rowNum);
+                    isValid = false;
+                    return false;
+                }
+                if (!percentage) {
+                    alert('Please enter Percentage of Marks for row ' + rowNum);
+                    isValid = false;
+                    return false;
+                } else if (isNaN(percentage) || parseFloat(percentage) < 0 || parseFloat(percentage) > 100) {
+                    alert('Percentage of Marks must be a number between 0 and 100 for row ' + rowNum);
+                    isValid = false;
+                    return false;
+                }
+                
+                // Check if file is selected and validate file type
+                if (certificate && certificate.files && certificate.files.length > 0) {
+                    const file = certificate.files[0];
+                    const validTypes = ['.pdf', '.jpg', '.jpeg', '.png', '.doc', '.docx'];
+                    const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+                    
+                    if (!validTypes.includes(fileExt)) {
+                        alert('Invalid file type for certificate in row ' + rowNum + '. Allowed types: PDF, JPG, JPEG, PNG, DOC, DOCX');
+                        isValid = false;
+                        return false;
+                    }
+                    
+                    // Check file size (max 5MB)
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert('Certificate file size exceeds 5MB limit in row ' + rowNum);
+                        isValid = false;
+                        return false;
+                    }
+                }
+            });
+            
+            if (isValid) {
+                // Add your AJAX code here to save qualification details
+                var formData = new FormData($('#form-wizard1')[0]);
+                // Add AJAX submission code here
+                return true;
+            }
+            return false;
+        }
+        
+        // Qualification Add More Functionality
+        $(document).ready(function() {
+            // Add new qualification row
+            $(document).on('click', '.add-qualification-row', function() {
+                var rowCount = $('#qualification_table tbody tr').length;
+                var newRow = `
+                    <tr class="qualification-row">
+                        <td>
+                            <select name="qualifications[${rowCount}][qualification]" class="form-control form-select qualification" required>
+                                <option value="">Select Qualification</option>
+                                <option value="High School">High School</option>
+                                <option value="Intermediate">Intermediate</option>
+                                <option value="Bachelor's">Bachelor's</option>
+                                <option value="Master's">Master's</option>
+                                <option value="PhD">PhD</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" name="qualifications[${rowCount}][university]" class="form-control" placeholder="University/School" required>
+                        </td>
+                        <td>
+                            <select name="qualifications[${rowCount}][from_year]" class="form-control form-select" required>
+                                <option value="">Select Year</option>
+                                ${generateYearOptions()}
+                            </select>
+                        </td>
+                        <td>
+                            <select name="qualifications[${rowCount}][to_year]" class="form-control form-select" required>
+                                <option value="">Select Year</option>
+                                ${generateYearOptions()}
+                            </select>
+                        </td>
+                        <td>
+                            <input type="number" name="qualifications[${rowCount}][percentage]" class="form-control" placeholder="Percentage" min="0" max="100" step="0.01" required>
+                        </td>
+                        <td>
+                            <input type="file" name="qualifications[${rowCount}][certificate]" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-success btn-sm add-qualification-row">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm remove-qualification-row">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                $('#qualification_table tbody').append(newRow);
+                updateDeleteButtonVisibility();
+            });
+            
+            // Remove qualification row
+            $(document).on('click', '.remove-qualification-row', function() {
+                $(this).closest('tr').remove();
+                reindexQualificationRows();
+                updateDeleteButtonVisibility();
+            });
+            
+            // Function to generate year options
+            function generateYearOptions() {
+                var currentYear = new Date().getFullYear();
+                var options = '';
+                for (var i = currentYear; i >= currentYear - 50; i--) {
+                    options += `<option value="${i}">${i}</option>`;
+                }
+                return options;
+            }
+            
+            // Function to reindex qualification rows after deletion
+            function reindexQualificationRows() {
+                $('#qualification_table tbody tr').each(function(index) {
+                    $(this).find('select, input').each(function() {
+                        var name = $(this).attr('name');
+                        if (name) {
+                            var newName = name.replace(/qualifications\[(\d+)\]/, `qualifications[${index}]`);
+                            $(this).attr('name', newName);
+                        }
+                    });
+                });
+            }
+            
+            // Function to update delete button visibility
+            function updateDeleteButtonVisibility() {
+                var rows = $('#qualification_table tbody tr');
+                if (rows.length === 1) {
+                    // If only one row, hide the delete button
+                    rows.find('.remove-qualification-row').hide();
+                } else {
+                    // If multiple rows, show all delete buttons
+                    rows.find('.remove-qualification-row').show();
+                }
+            }
+        });
     </script>
 @endsection

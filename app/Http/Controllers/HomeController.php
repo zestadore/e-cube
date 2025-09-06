@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 use Auth;
+use App\Models\Qualification;
+use App\Models\ComputerAndOtherSkill;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -51,7 +53,9 @@ class HomeController extends Controller
     }
 
     public function registerAsJobSeeker(){
-        return view('users.registration.candidate');
+        $qualifications = Qualification::get();
+        $skills = ComputerAndOtherSkill::get();
+        return view('users.registration.candidate',compact('qualifications','skills'));
     }
 
     public function registerAsEmployer(){
