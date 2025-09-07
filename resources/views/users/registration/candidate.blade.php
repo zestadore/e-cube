@@ -492,7 +492,7 @@
     </div>
 @endsection
 @section('scripts')
-    
+    <script src="{{ asset('assets/js/basic_details.js') }}?v={{ time() }}"></script>
     <script>
         (function () 
         {
@@ -510,7 +510,6 @@
                     document.getElementById("personal").classList.remove("active");
                 }
                 if(n==1){
-                    saveBasicDetails();
                     document.getElementById("account").classList.add("done");
                     document.getElementById("personal").classList.add("active");
                     document.getElementById("personal").classList.remove("done");
@@ -548,7 +547,27 @@
                 var x = document.getElementsByTagName("fieldset");
                 x[currentTab].style.display = "none";
                 currentTab = currentTab + n;
-                showTab(currentTab);
+                let res=false
+                switch (currentTab) {
+                    case 1:
+                        res=saveBasicDetails();
+                        if(res){
+                            showTab(currentTab);
+                        }else{
+                            currentTab=currentTab-1
+                            showTab(currentTab);
+                        }
+                        break;
+                    case 'prod':
+                        loadProducts();
+                        break;
+                    case 'contact':
+                        showContactForm();
+                        break;
+                    default:
+                        console.warn('unknown page');
+                }
+                // showTab(currentTab);
             }
         
             const nextbtn= document.querySelectorAll('.next')
@@ -558,7 +577,6 @@
                     // Check which step we're on and call appropriate save function
                     if (currentTab === 0) {
                         // Basic details step
-                        saveBasicDetails();
                         nextBtnFunction(1);
                     } else if (currentTab === 1) {
                         // Address step
@@ -624,9 +642,35 @@
             }
         })()
 
-        function saveBasicDetails(){
-            let data = $('#addForm').serialize();
-            // Add your AJAX code here to save basic details
+        async function saveBasicDetails(){
+            let dob=$('#dob').val();
+            let gender=$('#gender').val();
+            let alternate_mobile_number=$('#alternate_mobile_number').val();
+            let alternate_email=$('#alternate_email').val();
+            let whatsapp_number=$('#whatsapp_number').val();
+            let aadhar_number=$('#aadhar_number').val();
+            let pan_number=$('#pan_number').val();
+            let passport_number=$('#passport_number').val();
+            let profession=$('#profession').val();
+            let experience=$('#experience').val();
+            let Job_type=$('#Job_type').val();
+            let differently_abled=$('#differently_abled').val();
+            if(dob && gender && experience && Job_type && differently_abled && aadhar_number){
+                let url="{{route('basic-details.store')}}";
+                let token="{{csrf_token()}}";
+                try {
+                    await updateBasicDetails(dob,gender,alternate_mobile_number,alternate_email,
+                    whatsapp_number,aadhar_number,pan_number,passport_number,profession,
+                    experience,Job_type,differently_abled,url,token);
+                    return true;
+                } catch (xhr) {
+                    alert('Error: ' + (xhr.responseJSON?.message || xhr.statusText));
+                    return false;
+                }
+            }else{
+                alert('Date of Birth, Gender, Experience, Job Type, Differently Abled, Aadhar Number fields are required!');
+                return false;
+            }
         }
         
         function saveAddressDetails(){
