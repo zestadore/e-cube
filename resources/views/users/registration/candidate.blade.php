@@ -55,7 +55,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                         </svg>
                                     </div>
-                                    <span class="dark-wizard">Finish</span>
+                                    <span class="dark-wizard">Experience</span>
                                 </a>
                             </li>
                         </ul>
@@ -402,24 +402,85 @@
                         <fieldset>
                             <div class="form-card">
                                 <div class="row">
-                                <div class="col-7">
-                                    <h3 class="mb-4 text-left">Finish:</h3>
-                                </div>
-                                <div class="col-5">
-                                    <h2 class="steps">Step 4 - 4</h2>
-                                </div>
-                                </div>
-                                <br><br>
-                                <h2 class="text-center text-success"><strong>SUCCESS !</strong></h2>
-                                <br>
-                                <div class="row justify-content-center">
-                                <div class="col-3"> <img src="../../assets/images/pages/img-success.png" class="img-fluid" alt="fit-image"> </div>
+                                    <div class="col-7">
+                                        <h3 class="mb-4 text-left">Experience:</h3>
+                                    </div>
+                                    <div class="col-5">
+                                        <h2 class="steps">Step 4 - 4</h2>
+                                    </div>
                                 </div>
                                 <br><br>
-                                <div class="row justify-content-center">
-                                <div class="text-center col-7">
-                                    <h5 class="text-center purple-text">You Have Successfully Signed Up</h5>
-                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered" id="experiences_table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Industry/Area of Work</th>
+                                                        <th>Roles</th>
+                                                        <th>Name of Company/Institution</th>
+                                                        <th>From Year</th>
+                                                        <th>To Year</th>
+                                                        <th>Duration</th>
+                                                        <th>Upload Experience Certificate</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="experience-row">
+                                                        <td>
+                                                            <select name="experiences[0][industry]" class="form-control form-select industry" required>
+                                                                <option value="">Select Industry</option>
+                                                                @foreach($industries as $industry)
+                                                                    <option value="{{ $industry->id }}">{{ $industry->industry_name }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </td>
+                                                        <td style="width: 100px;">
+                                                            <select name="experiences[0][roles][]" class="form-control form-select roles" multiple required>
+                                                                @foreach($industries as $industry)
+                                                                    <option value="{{ $industry->id }}">{{ $industry->industry_name }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" name="experiences[0][company]" class="form-control" placeholder="Company/Institution Name" required>
+                                                        </td>
+                                                        <td>
+                                                            <select name="experiences[0][from_year]" class="form-control form-select" required>
+                                                                <option value="">Select Year</option>
+                                                                @for($i = date('Y'); $i >= date('Y')-50; $i--)
+                                                                    <option value="{{ $i }}">{{ $i }}</option>
+                                                                @endfor
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <select name="experiences[0][to_year]" class="form-control form-select" required>
+                                                                <option value="">Select Year</option>
+                                                                @for($i = date('Y'); $i >= date('Y')-50; $i--)
+                                                                    <option value="{{ $i }}">{{ $i }}</option>
+                                                                @endfor
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" name="experiences[0][duration]" class="form-control" placeholder="Duration" readonly>
+                                                        </td>
+                                                        <td>
+                                                            <input type="file" name="experiences[0][certificate]" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                                                        </td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-success btn-sm add-experience-row">
+                                                                <i class="fa fa-plus"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-danger btn-sm remove-experience-row" style="display: none;">
+                                                                <i class="fa fa-minus"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </fieldset>
@@ -889,10 +950,117 @@
                     rows.find('.remove-skill-row').show();
                 }
             }
+
+            // Experience Add More Functionality
+            // Add new experience row
+            $(document).on('click', '.add-experience-row', function() {
+                var rowCount = $('#experiences_table tbody tr').length;
+                var newRow = `
+                    <tr class="experience-row">
+                        <td>
+                            <select name="experiences[${rowCount}][industry]" class="form-control form-select industry" required>
+                                <option value="">Select Industry</option>
+                                @foreach($industries as $industry)
+                                    <option value="{{ $industry->id }}">{{ $industry->industry_name }}</option>
+                                @endforeach
+                            </select>
+                        </td>
+                        <td>
+                            <select name="experiences[${rowCount}][roles][]" class="form-control form-select roles" multiple required>
+                                @foreach($industries as $industry)
+                                    <option value="{{ $industry->id }}">{{ $industry->industry_name }}</option>
+                                @endforeach
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" name="experiences[${rowCount}][company]" class="form-control" placeholder="Company/Institution Name" required>
+                        </td>
+                        <td>
+                            <select name="experiences[${rowCount}][from_year]" class="form-control form-select from-year" required>
+                                <option value="">Select Year</option>
+                                ${generateYearOptions()}
+                            </select>
+                        </td>
+                        <td>
+                            <select name="experiences[${rowCount}][to_year]" class="form-control form-select to-year" required>
+                                <option value="">Select Year</option>
+                                ${generateYearOptions()}
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" name="experiences[${rowCount}][duration]" class="form-control duration" placeholder="Duration" readonly>
+                        </td>
+                        <td>
+                            <input type="file" name="experiences[${rowCount}][certificate]" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-success btn-sm add-experience-row">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm remove-experience-row">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                $('#experiences_table tbody').append(newRow);
+                reindexExperienceRows();
+                updateExperienceDeleteButtonVisibility();
+            });
+            
+            // Remove experience row
+            $(document).on('click', '.remove-experience-row', function() {
+                $(this).closest('tr').remove();
+                reindexExperienceRows();
+                updateExperienceDeleteButtonVisibility();
+            });
+            
+            // Calculate duration when from_year or to_year changes
+            $(document).on('change', '.experience-row .from-year, .experience-row .to-year', function() {
+                var row = $(this).closest('tr');
+                var fromYear = parseInt(row.find('.from-year').val());
+                var toYear = parseInt(row.find('.to-year').val());
+                
+                if (!isNaN(fromYear) && !isNaN(toYear)) {
+                    if (toYear >= fromYear) {
+                        var duration = (toYear - fromYear) + 1;
+                        row.find('.duration').val(duration + ' year(s)');
+                    } else {
+                        row.find('.duration').val('');
+                        alert('To Year must be greater than or equal to From Year');
+                    }
+                }
+            });
+            
+            // Function to reindex experience rows after deletion
+            function reindexExperienceRows() {
+                $('#experiences_table tbody tr').each(function(index) {
+                    $(this).find('select, input').each(function() {
+                        var name = $(this).attr('name');
+                        if (name) {
+                            var newName = name.replace(/experiences\[(\d+)\]/, `experiences[${index}]`);
+                            $(this).attr('name', newName);
+                        }
+                    });
+                });
+            }
+            
+            // Function to update experience delete button visibility
+            function updateExperienceDeleteButtonVisibility() {
+                var rows = $('#experiences_table tbody tr');
+                if (rows.length === 1) {
+                    // If only one row, hide the delete button
+                    rows.find('.remove-experience-row').hide();
+                } else {
+                    // If multiple rows, show all delete buttons
+                    rows.find('.remove-experience-row').show();
+                }
+            }
             
             // Initialize delete buttons visibility
             updateDeleteButtonVisibility();
             updateSkillDeleteButtonVisibility();
+            updateExperienceDeleteButtonVisibility();
         });
     </script>
 @endsection
