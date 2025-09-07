@@ -437,7 +437,7 @@
                                                             </select>
                                                         </td>
                                                         <td style="width: 100px;">
-                                                            <select name="experiences[0][roles][]" class="form-control form-select roles" multiple required>
+                                                            <select name="experiences[0][roles][]" style="width: 250px;" class="form-control form-select roles" multiple required>
                                                                 @foreach($industries as $industry)
                                                                     <option value="{{ $industry->id }}">{{ $industry->industry_name }}</option>
                                                                 @endforeach
@@ -966,7 +966,7 @@
                             </select>
                         </td>
                         <td>
-                            <select name="experiences[${rowCount}][roles][]" class="form-control form-select roles" multiple required>
+                            <select name="experiences[${rowCount}][roles][]" style="width: 250px;" class="form-control form-select roles" multiple required>
                                 @foreach($industries as $industry)
                                     <option value="{{ $industry->id }}">{{ $industry->industry_name }}</option>
                                 @endforeach
