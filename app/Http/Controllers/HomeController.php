@@ -62,7 +62,9 @@ class HomeController extends Controller
         $skills = ComputerAndOtherSkill::get();
         $industries = Industry::get();
         $basics=Auth::user()->basics;
-        return view('users.registration.candidate',compact('qualifications','skills','industries','basics'));
+        $presentAddress = Auth::user()->presentAddress;
+        $permanentAddress = Auth::user()->permanentAddress;
+        return view('users.registration.candidate',compact('qualifications','skills','industries','basics','presentAddress','permanentAddress'));
     }
 
     public function registerAsEmployer(){

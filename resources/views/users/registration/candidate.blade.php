@@ -517,10 +517,8 @@
                     document.getElementById("payment").classList.remove("done");
                     document.getElementById("confirm").classList.remove("done");
                     document.getElementById("confirm").classList.remove("active");
-
                 }
                 if(n==2){
-                    saveAddressDetails();
                     document.getElementById("account").classList.add("done");
                     document.getElementById("personal").classList.add("done");
                     document.getElementById("payment").classList.add("active");
@@ -558,8 +556,14 @@
                             showTab(currentTab);
                         }
                         break;
-                    case 'prod':
-                        loadProducts();
+                    case 2:
+                        res=saveAddressDetails();
+                        if(res){
+                            showTab(currentTab);
+                        }else{
+                            currentTab=currentTab-1
+                            showTab(currentTab);
+                        }
                         break;
                     case 'contact':
                         showContactForm();
@@ -580,7 +584,6 @@
                         nextBtnFunction(1);
                     } else if (currentTab === 1) {
                         // Address step
-                        saveAddressDetails();
                         nextBtnFunction(1);
                     } else if (currentTab === 2) {
                         // Qualification step
@@ -673,9 +676,17 @@
             }
         }
         
-        function saveAddressDetails(){
-            // Add your AJAX code here to save address details
-            // This function will be called when moving from address step to next step
+        async function saveAddressDetails(){
+            let url="{{route('save-candidate-address')}}";
+            let token="{{csrf_token()}}";
+            try {
+                await updateAddressDetails(token,url);
+                return true;
+            }catch (xhr) {
+                alert('Error: ' + (xhr.responseJSON?.message || xhr.statusText));
+                return false;
+            }
+                
         }
         
         function saveQualificationDetails(){
@@ -1105,6 +1116,20 @@
             updateDeleteButtonVisibility();
             updateSkillDeleteButtonVisibility();
             updateExperienceDeleteButtonVisibility();
+            prefillBasicDetails('{{$basics?->dob}}', 
+            '{{$basics?->gender}}', '{{$basics?->alternate_mobile_number}}',  '{{$basics?->alternate_email}}', 
+            '{{$basics?->whatsapp_number}}','{{$basics?->aadhar_number}}','{{$basics?->pan_number}}',
+             '{{$basics?->passport_number}}', 
+            '{{$basics?->profession}}',
+             '{{$basics?->experience}}', '{{$basics?->job_type}}', '{{$basics?->differently_abled}}');
+
+
+            prefillAddressDetails('{{$permanentAddress->address_1}}','{{$permanentAddress->address_2}}','{{$permanentAddress->landmark}}','{{$permanentAddress->city}}',
+            '{{$permanentAddress->state}}','{{$permanentAddress->zip}}','{{$permanentAddress->country}}',
+            '{{$permanentAddress->police_station}}','{{$permanentAddress->panchayat_municipality}}','{{$presentAddress?->address_1}}','{{$presentAddress?->address_2}}','{{$presentAddress?->landmark}}',
+            '{{$presentAddress?->city}}','{{$presentAddress?->state}}',
+            '{{$presentAddress?->zip}}','{{$presentAddress?->country}}','{{$presentAddress?->police_station}}',
+            '{{$presentAddress?->panchayat_municipality}}');
         });
     </script>
 @endsection

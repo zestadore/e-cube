@@ -52,4 +52,14 @@ class User extends Authenticatable
     {
         return $this->hasOne(BasicDetails::class, 'user_id', 'id');
     }
+
+    public function presentAddress()
+    {
+        return $this->hasOne(Address::class, 'user_id', 'id')->where('type', 'present_address');
+    }
+
+    public function permanentAddress()
+    {
+        return $this->hasOne(Address::class, 'user_id', 'id')->where('type', 'permenant_address');
+    }
 }
