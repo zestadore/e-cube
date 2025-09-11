@@ -50,6 +50,10 @@ class HomeController extends Controller
     }
 
     public function chooseType(){
+        $basics=Auth::user()->basics;
+        if($basics){
+            return redirect()->route('basic-details.index');
+        }
         return view('choose_type');
     }
 
@@ -57,7 +61,8 @@ class HomeController extends Controller
         $qualifications = Qualification::get();
         $skills = ComputerAndOtherSkill::get();
         $industries = Industry::get();
-        return view('users.registration.candidate',compact('qualifications','skills','industries'));
+        $basics=Auth::user()->basics;
+        return view('users.registration.candidate',compact('qualifications','skills','industries','basics'));
     }
 
     public function registerAsEmployer(){

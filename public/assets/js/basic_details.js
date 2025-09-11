@@ -32,3 +32,29 @@ function updateBasicDetails(dob,
         }
     })
 }
+
+function prefillBasicDetails(dob,
+    gender,
+    alternate_mobile_number,
+    alternate_email,
+    whatsapp_number,
+    aadhar_number,
+    pan_number,
+    passport_number,
+    profession,
+    experience,
+    job_type,
+    differently_abled) {
+    $('#dob').val(dob);
+    $('#gender').val(gender);
+    $('#alternate_mobile_number').val(alternate_mobile_number);
+    $('#alternate_email').val(alternate_email);
+    $('#whatsapp_number').val(whatsapp_number);
+    $('#aadhar_number').val(aadhar_number);
+    $('#pan_number').val(pan_number);
+    $('#passport_number').val(passport_number);
+    $('#profession').val(profession);
+    $('#experience').val(experience);
+    $('#job_type').val(job_type);
+    $('#differently_abled').val(differently_abled);
+}

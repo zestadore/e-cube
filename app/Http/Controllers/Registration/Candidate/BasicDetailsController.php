@@ -29,6 +29,11 @@ class BasicDetailsController extends Controller
             'Job_type' => 'required',
             'differently_abled' => 'required',
         ]);
+        $basicDetails = BasicDetails::where('user_id', Auth::id())->first();
+        if($basicDetails){
+            $basicDetails->update($request->except(['_token']));
+            return response()->json(['status' => true, 'data' => $basicDetails]);
+        }
         $basicDetails = BasicDetails::create($request->except(['_token'])+['user_id' => Auth::id()]);
         return response()->json(['status' => true, 'data' => $basicDetails]);
     }
