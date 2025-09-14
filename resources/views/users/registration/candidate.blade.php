@@ -325,9 +325,12 @@
                                 
                             </div>
                             
-                            <div class="row mt-4">
+                            <div class="row">
                                 <div class="col-7">
-                                    <h3 class="mb-4">Skills:</h3>
+                                    <h3 class="mb-4" style="float:left;">Skills:</h3>
+                                </div>
+                                <div class="col-5">
+                                    <h2 class="steps" style="float:left;">Step 3 - 4</h2>
                                 </div>
                             </div>
                             
