@@ -405,7 +405,7 @@
                         <fieldset>
                             <div class="form-card">
                                 <div class="row">
-                                    <div class="col-7">
+                                    <div class="col-7" style="float:left;">
                                         <h3 class="mb-4 text-left">Experience:</h3>
                                     </div>
                                     <div class="col-5">
@@ -486,6 +486,9 @@
                                     </div>
                                 </div>
                             </div>
+                            <p> </p>
+                            <button type="button" name="next" class="btn btn-primary next action-button float-end" value="Submit" >Submit</button>
+                            <button type="button" name="previous" class="btn btn-dark previous action-button-previous float-end me-1" value="Previous" >Previous</button>
                         </fieldset>
                     </form>
                     </div>
@@ -501,6 +504,8 @@
         window.skillList  = @json($skills);           // [{id:1,skill:'PHP'}, ...]
         window.candQual   = @json($candidateQualifications);
         window.candSkill  = @json($candidateSkills);
+        window.industryList = @json($industries);          // all industries
+        window.candExp      = @json($candidateExperiences); // user's saved rows
         (function () 
         {
             "use strict";
@@ -579,6 +584,13 @@
                                 currentTab--;
                                 showTab(currentTab);
                             });
+                        break;
+                    case 4:   // Experience step
+                        const urlE = "{{route('save-candidate-experience')}}";
+                        const token = $('meta[name="csrf-token"]').attr('content');
+                        updateExperienceDetails(token, urlE)
+                            .then(() => showTab(currentTab))
+                            .catch(() => { currentTab--; showTab(currentTab); });
                         break;
                     default:
                         console.warn('unknown page');
@@ -1012,6 +1024,7 @@
             prefillQualificationsAndSkills(
                 candQual, candSkill          // Collection<CandidateSkill>
             );
+            prefillExperiences(candExp);
         });
     </script>
 @endsection

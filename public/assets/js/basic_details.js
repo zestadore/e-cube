@@ -397,3 +397,163 @@ function updateSkillDeleteButtonVisibility() {
         rows.find('.remove-skill-row').show();
     }
 }
+
+/* ==========  EXPERIENCE  ========== */
+
+function updateExperienceDetails(token, url) {
+    /* ---- skip if user left everything blank ---- */
+    let userStarted = false;
+    $('#experiences_table tbody tr').each(function () {
+        if ($(this).find('select[name*="[industry]"]').val()) {
+            userStarted = true;
+            return false;
+        }
+    });
+    if (!userStarted) return Promise.resolve();
+
+    /* ---- validate ---- */
+    const experiences = [];
+    let isValid = true;
+    $('#experiences_table tbody tr').each(function (idx) {
+        const row = $(this);
+        const exp = {
+            industry : row.find('select[name*="[industry]"]').val(),
+            roles    : row.find('select[name*="[roles][]"]').val(), // array
+            company  : row.find('input[name*="[company]"]').val(),
+            from_year: row.find('select[name*="[from_year]"]').val(),
+            to_year  : row.find('select[name*="[to_year]"]').val(),
+            duration : row.find('input[name*="[duration]"]').val(),
+            certificate: row.find('input[type="file"][name*="[certificate]"]')[0]?.files?.[0] || null
+        };
+
+        if (!exp.industry)  { alert('Select Industry for row '+(idx+1)); isValid=false; return false; }
+        if (!exp.roles || !exp.roles.length) { alert('Select at least one Role for row '+(idx+1)); isValid=false; return false; }
+        if (!exp.company)   { alert('Enter Company for row '+(idx+1)); isValid=false; return false; }
+        if (!exp.from_year) { alert('Select From Year for row '+(idx+1)); isValid=false; return false; }
+        if (!exp.to_year)   { alert('Select To Year for row '+(idx+1)); isValid=false; return false; }
+        if (parseInt(exp.from_year) > parseInt(exp.to_year)) {
+            alert('From Year must be ≤ To Year in row '+(idx+1)); isValid=false; return false;
+        }
+        if (exp.certificate) {
+            const ext = exp.certificate.name.substring(exp.certificate.name.lastIndexOf('.')).toLowerCase();
+            const allowed = ['.pdf','.jpg','.jpeg','.png','.doc','.docx'];
+            if (!allowed.includes(ext)) { alert('Invalid certificate file type in row '+(idx+1)); isValid=false; return false; }
+            if (exp.certificate.size > 5 * 1024 * 1024) { alert('Certificate ≤ 5 MB in row '+(idx+1)); isValid=false; return false; }
+        }
+        experiences.push(exp);
+    });
+    if (!isValid) return Promise.reject('validation failed');
+
+    /* ---- ajax ---- */
+    const fd = new FormData();
+    fd.append('_token', token);
+    experiences.forEach((e, i) => {
+        fd.append(`experiences[${i}][industry]`, e.industry);
+        fd.append(`experiences[${i}][company]`, e.company);
+        fd.append(`experiences[${i}][from_year]`, e.from_year);
+        fd.append(`experiences[${i}][to_year]`, e.to_year);
+        fd.append(`experiences[${i}][duration]`, e.duration);
+        e.roles.forEach(r => fd.append(`experiences[${i}][roles][]`, r));
+        if (e.certificate) fd.append(`experiences[${i}][certificate]`, e.certificate);
+    });
+
+    return $.ajax({
+        url: url,
+        type: 'POST',
+        data: fd,
+        processData: false,
+        contentType: false
+    });
+}
+
+/* -------- prefiller -------- */
+function prefillExperiences(experiences) {
+    const $tbody = $('#experiences_table tbody');
+    $tbody.empty();
+    if (experiences.length) {
+        experiences.forEach((e, idx) => {
+            const roles = JSON.parse(e.role_ids || '[]');
+            $tbody.append(expRowTpl(idx, e.industry_id, roles, e.company, e.from_year, e.to_year, e.duration));
+        });
+    } else {
+        $tbody.append(expRowTpl(0));
+    }
+    updateExperienceDeleteButtonVisibility();
+}
+
+/* -------- row template -------- */
+function expRowTpl(idx, industryId = '', roleIds = [], company = '', fromY = '', toY = '', duration = '') {
+    let indOpts = industryList.map(ind => `<option value="${ind.id}" ${industryId == ind.id ? 'selected' : ''}>${ind.industry_name}</option>`).join('');
+    let yearOpts = '';
+    for (let y = new Date().getFullYear(); y >= new Date().getFullYear() - 50; y--) {
+        yearOpts += `<option value="${y}" ${y == fromY ? 'selected' : ''}>${y}</option>`;
+    }
+    let yearOpts2 = '';
+    for (let y = new Date().getFullYear(); y >= new Date().getFullYear() - 50; y--) {
+        yearOpts2 += `<option value="${y}" ${y == toY ? 'selected' : ''}>${y}</option>`;
+    }
+    return `
+    <tr class="experience-row">
+        <td>
+            <select name="experiences[${idx}][industry]" class="form-control form-select industry" required>
+                <option value="">Select Industry</option>${indOpts}
+            </select>
+        </td>
+        <td>
+            <select name="experiences[${idx}][roles][]" style="width: 250px;" class="form-control form-select roles" multiple required>
+                ${industryList.map(ind => `<option value="${ind.id}" ${roleIds.includes(ind.id) ? 'selected' : ''}>${ind.industry_name}</option>`).join('')}
+            </select>
+        </td>
+        <td><input type="text" name="experiences[${idx}][company]" class="form-control" placeholder="Company/Institution Name" value="${company}" required></td>
+        <td><select name="experiences[${idx}][from_year]" class="form-control form-select from-year" required>${yearOpts}</select></td>
+        <td><select name="experiences[${idx}][to_year]" class="form-control form-select to-year" required>${yearOpts2}</select></td>
+        <td><input type="text" name="experiences[${idx}][duration]" class="form-control duration" placeholder="Duration" value="${duration}" readonly></td>
+        <td><input type="file" name="experiences[${idx}][certificate]" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"></td>
+        <td>
+            <button type="button" class="btn btn-success btn-sm add-experience-row"><i class="fa fa-plus"></i></button>
+            <button type="button" class="btn btn-danger btn-sm remove-experience-row" style="${idx ? '' : 'display:none;'}"><i class="fa fa-minus"></i></button>
+        </td>
+    </tr>`;
+}
+
+/* -------- add / remove / reindex / visibility helpers -------- */
+$(document).on('click', '.add-experience-row', function () {
+    const idx = $('#experiences_table tbody tr').length;
+    $('#experiences_table tbody').append(expRowTpl(idx));
+    updateExperienceDeleteButtonVisibility();
+});
+
+$(document).on('click', '.remove-experience-row', function () {
+    $(this).closest('tr').remove();
+    reindexExperienceRows();
+    updateExperienceDeleteButtonVisibility();
+});
+
+function reindexExperienceRows() {
+    $('#experiences_table tbody tr').each(function (idx) {
+        $(this).find('select, input').each(function () {
+            const name = $(this).attr('name');
+            if (name) {
+                const newName = name.replace(/experiences\[(\d+)\]/, `experiences[${idx}]`);
+                $(this).attr('name', newName);
+            }
+        });
+    });
+}
+
+function updateExperienceDeleteButtonVisibility() {
+    const rows = $('#experiences_table tbody tr');
+    rows.find('.remove-experience-row').toggle(rows.length > 1);
+}
+
+/* auto-calculate duration when years change */
+$(document).on('change', '.experience-row .from-year, .experience-row .to-year', function () {
+    const row = $(this).closest('tr');
+    const from = parseInt(row.find('.from-year').val());
+    const to   = parseInt(row.find('.to-year').val());
+    if (!isNaN(from) && !isNaN(to) && to >= from) {
+        row.find('.duration').val((to - from + 1) + ' year(s)');
+    } else {
+        row.find('.duration').val('');
+    }
+});

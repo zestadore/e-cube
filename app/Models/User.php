@@ -72,4 +72,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(CandidateSkill::class, 'user_id', 'id');
     }
+
+    public function experiences()
+    {
+        return $this->hasMany(CandidateExperience::class, 'user_id', 'id');
+    }
 }

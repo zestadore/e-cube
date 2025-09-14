@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Registration\Candidate;
 use App\Http\Controllers\Controller;
 use App\Models\BasicDetails;
 use App\Models\Address;
-use App\Models\CandidateQualification, CandidateSkill;
+use App\Models\CandidateQualification, CandidateSkill, CandidateExperience;
 use Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -215,6 +215,56 @@ class BasicDetailsController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['message' => 'Failed to save skills', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function saveExperience(Request $request)
+    {
+        if (!$request->has('experiences') || !is_array($request->experiences)) {
+            return response()->json(['message' => 'No experiences to save']);
+        }
+
+        $request->validate([
+            'experiences'                 => 'required|array|min:1',
+            'experiences.*.industry'      => 'required|exists:industries,id',
+            'experiences.*.roles'         => 'required|array|min:1',
+            'experiences.*.roles.*'       => 'exists:industries,id', // or your roles table
+            'experiences.*.company'       => 'required|string|max:255',
+            'experiences.*.from_year'     => 'required|digits:4|integer|min:1900|max:'.date('Y'),
+            'experiences.*.to_year'       => 'required|digits:4|integer|min:1900|max:'.date('Y'),
+            'experiences.*.duration'      => 'nullable|string|max:50',
+            'experiences.*.certificate'   => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:5120',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            DB::table('candidate_experiences')->where('user_id', Auth::user()->id)->delete();
+
+            foreach ($request->experiences as $e) {
+                $path = null;
+                if (!empty($e['certificate']) && $request->hasFile("experiences.*.certificate")) {
+                    $path = $e['certificate']->store('candidate/experiences', 'public');
+                }
+
+                DB::table('candidate_experiences')->insert([
+                    'user_id'     => Auth::user()->id,
+                    'industry_id' => $e['industry'],
+                    'role_ids'    => json_encode($e['roles']),
+                    'company'     => $e['company'],
+                    'from_year'   => $e['from_year'],
+                    'to_year'     => $e['to_year'],
+                    'duration'    => $e['duration'] ?? null,
+                    'certificate' => $path,
+                    'created_at'  => now(),
+                    'updated_at'  => now(),
+                ]);
+            }
+
+            DB::commit();
+            return response()->json(['message' => 'Experience saved successfully']);
+        } catch (\Exception $ex) {
+            DB::rollBack();
+            return response()->json(['message' => 'Failed to save experience', 'error' => $ex->getMessage()], 500);
         }
     }
 
