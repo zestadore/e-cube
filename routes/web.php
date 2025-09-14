@@ -15,6 +15,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/register-as-employer', [App\Http\Controllers\HomeController::class, 'registerAsEmployer'])->name('recruiter.register');
     Route::resource('basic-details', App\Http\Controllers\Registration\Candidate\BasicDetailsController::class);
     Route::post('candidate-address', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'saveAddress'])->name('save-candidate-address');
+    Route::post('candidate-qualifications', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'saveQualifications'])->name('save-candidate-qualification');
+    Route::post('candidate-skills', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'saveSkills'])->name('save-candidate-skill');
     Route::group(['as'=>'admin.','prefix' => 'admin'], function () {
         Route::get('/', [App\Http\Controllers\HomeController::class, 'adminDashboard'])->name('dashboard');
         Route::resource('industry', App\Http\Controllers\Admin\IndustryController::class);

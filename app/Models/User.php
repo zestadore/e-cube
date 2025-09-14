@@ -62,4 +62,14 @@ class User extends Authenticatable
     {
         return $this->hasOne(Address::class, 'user_id', 'id')->where('type', 'permenant_address');
     }
+
+    public function qualifications()
+    {
+        return $this->hasMany(CandidateQualification::class, 'user_id', 'id');
+    }
+
+    public function skills()
+    {
+        return $this->hasMany(CandidateSkill::class, 'user_id', 'id');
+    }
 }

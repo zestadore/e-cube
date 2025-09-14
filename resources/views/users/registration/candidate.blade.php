@@ -497,6 +497,10 @@
 @section('scripts')
     <script src="{{ asset('assets/js/basic_details.js') }}?v={{ time() }}"></script>
     <script>
+        window.qualList   = @json($qualifications);   // [{id:1,degree:'B.Tech'}, ...]
+        window.skillList  = @json($skills);           // [{id:1,skill:'PHP'}, ...]
+        window.candQual   = @json($candidateQualifications);
+        window.candSkill  = @json($candidateSkills);
         (function () 
         {
             "use strict";
@@ -568,8 +572,13 @@
                             showTab(currentTab);
                         }
                         break;
-                    case 'contact':
-                        showContactForm();
+                    case 3:
+                        saveQualificationDetails()
+                            .then(() => showTab(currentTab))        // success
+                            .catch(() => {                          // validation or ajax error
+                                currentTab--;
+                                showTab(currentTab);
+                            });
                         break;
                     default:
                         console.warn('unknown page');
@@ -589,10 +598,7 @@
                         // Address step
                         nextBtnFunction(1);
                     } else if (currentTab === 2) {
-                        // Qualification step
-                        if (saveQualificationDetails()) {
-                            nextBtnFunction(1);
-                        }
+                        nextBtnFunction(1);
                     } else {
                         nextBtnFunction(1);
                     }
@@ -691,148 +697,17 @@
             }
                 
         }
-        
-        function saveQualificationDetails(){
-            // Validate qualification fields
-            let isValid = true;
-            $('.qualification-row').each(function(index) {
-                const rowNum = index + 1;
-                const qualification = $(this).find('[name^="qualifications"][name$="[qualification]"]').val();
-                const university = $(this).find('[name^="qualifications"][name$="[university]"]').val();
-                const fromYear = $(this).find('[name^="qualifications"][name$="[from_year]"]').val();
-                const toYear = $(this).find('[name^="qualifications"][name$="[to_year]"]').val();
-                const percentage = $(this).find('[name^="qualifications"][name$="[percentage]"]').val();
-                const certificate = $(this).find('[name^="qualifications"][name$="[certificate]"]')[0];
-                
-                if (!qualification) {
-                    alert('Please enter Qualification for row ' + rowNum);
-                    isValid = false;
-                    return false;
-                }
-                if (!university) {
-                    alert('Please enter University/School for row ' + rowNum);
-                    isValid = false;
-                    return false;
-                }
-                if (!fromYear) {
-                    alert('Please select From Year for row ' + rowNum);
-                    isValid = false;
-                    return false;
-                }
-                if (!toYear) {
-                    alert('Please select To Year for row ' + rowNum);
-                    isValid = false;
-                    return false;
-                }
-                if (parseInt(fromYear) > parseInt(toYear)) {
-                    alert('From Year cannot be greater than To Year in row ' + rowNum);
-                    isValid = false;
-                    return false;
-                }
-                if (!percentage) {
-                    alert('Please enter Percentage of Marks for row ' + rowNum);
-                    isValid = false;
-                    return false;
-                } else if (isNaN(percentage) || parseFloat(percentage) < 0 || parseFloat(percentage) > 100) {
-                    alert('Percentage of Marks must be a number between 0 and 100 for row ' + rowNum);
-                    isValid = false;
-                    return false;
-                }
-                
-                // Check if file is selected and validate file type
-                if (certificate && certificate.files && certificate.files.length > 0) {
-                    const file = certificate.files[0];
-                    const validTypes = ['.pdf', '.jpg', '.jpeg', '.png', '.doc', '.docx'];
-                    const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
-                    
-                    if (!validTypes.includes(fileExt)) {
-                        alert('Invalid file type for certificate in row ' + rowNum + '. Allowed types: PDF, JPG, JPEG, PNG, DOC, DOCX');
-                        isValid = false;
-                        return false;
-                    }
-                    
-                    // Check file size (max 5MB)
-                    if (file.size > 5 * 1024 * 1024) {
-                        alert('Certificate file size exceeds 5MB limit in row ' + rowNum);
-                        isValid = false;
-                        return false;
-                    }
-                }
-            });
-            
-            // Validate skills fields
-            $('.skill-row').each(function(index) {
-                const rowNum = index + 1;
-                const skill = $(this).find('[name^="skills"][name$="[skill]"]').val();
-                const university = $(this).find('[name^="skills"][name$="[university]"]').val();
-                const fromYear = $(this).find('[name^="skills"][name$="[from_year]"]').val();
-                const toYear = $(this).find('[name^="skills"][name$="[to_year]"]').val();
-                const percentage = $(this).find('[name^="skills"][name$="[percentage]"]').val();
-                const certificate = $(this).find('[name^="skills"][name$="[certificate]"]')[0];
-                
-                if (!skill) {
-                    alert('Please select Skill for row ' + rowNum);
-                    isValid = false;
-                    return false;
-                }
-                if (!university) {
-                    alert('Please enter University/School for row ' + rowNum);
-                    isValid = false;
-                    return false;
-                }
-                if (!fromYear) {
-                    alert('Please select From Year for row ' + rowNum);
-                    isValid = false;
-                    return false;
-                }
-                if (!toYear) {
-                    alert('Please select To Year for row ' + rowNum);
-                    isValid = false;
-                    return false;
-                }
-                if (parseInt(fromYear) > parseInt(toYear)) {
-                    alert('From Year cannot be greater than To Year in row ' + rowNum);
-                    isValid = false;
-                    return false;
-                }
-                if (!percentage) {
-                    alert('Please enter Percentage of Marks for row ' + rowNum);
-                    isValid = false;
-                    return false;
-                } else if (isNaN(percentage) || parseFloat(percentage) < 0 || parseFloat(percentage) > 100) {
-                    alert('Percentage of Marks must be a number between 0 and 100 for row ' + rowNum);
-                    isValid = false;
-                    return false;
-                }
-                
-                // Check if file is selected and validate file type
-                if (certificate && certificate.files && certificate.files.length > 0) {
-                    const file = certificate.files[0];
-                    const validTypes = ['.pdf', '.jpg', '.jpeg', '.png', '.doc', '.docx'];
-                    const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
-                    
-                    if (!validTypes.includes(fileExt)) {
-                        alert('Invalid file type for certificate in row ' + rowNum + '. Allowed types: PDF, JPG, JPEG, PNG, DOC, DOCX');
-                        isValid = false;
-                        return false;
-                    }
-                    
-                    // Check file size (max 5MB)
-                    if (file.size > 5 * 1024 * 1024) {
-                        alert('Certificate file size exceeds 5MB limit in row ' + rowNum);
-                        isValid = false;
-                        return false;
-                    }
-                }
-            });
-            
-            if (isValid) {
-                // Add your AJAX code here to save qualification details
-                var formData = new FormData($('#form-wizard1')[0]);
-                // Add AJAX submission code here
-                return true;
-            }
-            return false;
+
+        async function saveQualificationDetails() {
+            const urlQ  = "{{route('save-candidate-qualification')}}";
+            const urlS  = "{{route('save-candidate-skill')}}";
+            const token = "{{csrf_token()}}";
+
+            /* await the combined promise */
+            return Promise.all([                     // ← return naked promise
+                updateQualificationDetails(token, urlQ),
+                updateSkillDetails(token, urlS)
+            ]);
         }
         
         // Qualification Add More Functionality
@@ -1133,6 +1008,10 @@
             '{{$presentAddress?->city}}','{{$presentAddress?->state}}',
             '{{$presentAddress?->zip}}','{{$presentAddress?->country}}','{{$presentAddress?->police_station}}',
             '{{$presentAddress?->panchayat_municipality}}');
+
+            prefillQualificationsAndSkills(
+                candQual, candSkill          // Collection<CandidateSkill>
+            );
         });
     </script>
 @endsection

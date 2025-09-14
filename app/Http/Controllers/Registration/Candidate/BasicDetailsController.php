@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Registration\Candidate;
 use App\Http\Controllers\Controller;
 use App\Models\BasicDetails;
 use App\Models\Address;
+use App\Models\CandidateQualification, CandidateSkill;
 use Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class BasicDetailsController extends Controller
@@ -12,7 +14,7 @@ class BasicDetailsController extends Controller
     
     public function index()
     {
-        //
+        return view('choose_type');
     }
 
     public function create()
@@ -114,6 +116,105 @@ class BasicDetailsController extends Controller
             $presentAddress = Address::create($presentAddressData);
             $permanentAddress = Address::create($permanentAddressData);
             return response()->json(['status' => true, 'present_address' => $presentAddress, 'permanent_address' => $permanentAddress]);
+        }
+    }
+
+    public function saveQualifications(Request $request)
+    {
+        /* ---- validate ---- */
+        $request->validate([
+            'qualifications'                 => 'required|array|min:1',
+            'qualifications.*.qualification' => 'required|exists:qualifications,id',
+            'qualifications.*.university'    => 'required|string|max:255',
+            'qualifications.*.from_year'     => 'required|digits:4|integer|min:1900|max:'.date('Y'),
+            'qualifications.*.to_year'       => 'required|digits:4|integer|min:1900|max:'.date('Y'),
+            'qualifications.*.percentage'    => 'required|integer|min:0|max:100',
+            'qualifications.*.certificate'   => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:5120',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            /* ---- delete old rows for this user ---- */
+            CandidateQualification::where('user_id', Auth::user()->id)->delete();
+
+            /* ---- insert new rows ---- */
+            foreach ($request->qualifications as $q) {
+                $certificatePath = null;
+                if (!empty($q['certificate']) && $request->hasFile("qualifications.*.certificate")) {
+                    $file = $q['certificate']; // Laravel will cast uploaded file automatically
+                    $certificatePath = $file->store('candidate/qualifications', 'public');
+                }
+
+                DB::table('candidate_qualifications')->insert([
+                    'user_id'           => Auth::user()->id,
+                    'qualification_id'  => $q['qualification'],
+                    'university'        => $q['university'],
+                    'from_year'         => $q['from_year'],
+                    'to_year'           => $q['to_year'],
+                    'percentage'        => $q['percentage'],
+                    'certificate'       => $certificatePath,
+                    'created_at'        => now(),
+                    'updated_at'        => now(),
+                ]);
+            }
+
+            DB::commit();
+            return response()->json(['message' => 'Qualifications saved successfully']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Failed to save qualifications', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function saveSkills(Request $request)
+    {
+        /* ---- allow empty payload ---- */
+        if (!$request->has('skills') || !is_array($request->skills) || count($request->skills) === 0) {
+            return response()->json(['message' => 'No skills to save']);
+        }
+
+        /* ---- validate ---- */
+        $request->validate([
+            'skills'                 => 'required|array|min:1',
+            'skills.*.skill'         => 'required|exists:computer_and_other_skills,id',
+            'skills.*.university'    => 'required|string|max:255',
+            'skills.*.from_year'     => 'required|digits:4|integer|min:1900|max:'.date('Y'),
+            'skills.*.to_year'       => 'required|digits:4|integer|min:1900|max:'.date('Y'),
+            'skills.*.percentage'    => 'required|integer|min:0|max:100',
+            'skills.*.certificate'   => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:5120',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            /* ---- delete old rows for this user ---- */
+            DB::table('candidate_skills')->where('user_id', Auth::user()->id)->delete();
+
+            /* ---- insert new rows ---- */
+            foreach ($request->skills as $s) {
+                $certificatePath = null;
+                if (!empty($s['certificate']) && $request->hasFile("skills.*.certificate")) {
+                    $file = $s['certificate'];
+                    $certificatePath = $file->store('candidate/skills', 'public');
+                }
+
+                DB::table('candidate_skills')->insert([
+                    'user_id'   => Auth::user()->id,
+                    'skill_id'  => $s['skill'],
+                    'university'=> $s['university'],
+                    'from_year' => $s['from_year'],
+                    'to_year'   => $s['to_year'],
+                    'percentage'=> $s['percentage'],
+                    'certificate'=> $certificatePath,
+                    'created_at'=> now(),
+                    'updated_at'=> now(),
+                ]);
+            }
+
+            DB::commit();
+            return response()->json(['message' => 'Skills saved successfully']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Failed to save skills', 'error' => $e->getMessage()], 500);
         }
     }
 
