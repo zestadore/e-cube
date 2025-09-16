@@ -32,6 +32,7 @@ class BasicDetailsController extends Controller
             'Job_type' => 'required',
             'differently_abled' => 'required',
         ]);
+
         $basicDetails = BasicDetails::where('user_id', Auth::id())->first();
         if($basicDetails){
             $basicDetails->update($request->except(['_token']));
@@ -221,6 +222,7 @@ class BasicDetailsController extends Controller
     public function saveExperience(Request $request)
     {
         if (!$request->has('experiences') || !is_array($request->experiences)) {
+            Auth::user()->update(['role' => 'employee']);
             return response()->json(['message' => 'No experiences to save']);
         }
 
@@ -259,7 +261,7 @@ class BasicDetailsController extends Controller
                     'updated_at'  => now(),
                 ]);
             }
-
+            Auth::user()->update(['role' => 'employee']);
             DB::commit();
             return response()->json(['message' => 'Experience saved successfully']);
         } catch (\Exception $ex) {
