@@ -1015,9 +1015,9 @@
              '{{$basics?->experience}}', '{{$basics?->job_type}}', '{{$basics?->differently_abled}}');
 
 
-            prefillAddressDetails('{{$permanentAddress->address_1}}','{{$permanentAddress->address_2}}','{{$permanentAddress->landmark}}','{{$permanentAddress->city}}',
-            '{{$permanentAddress->state}}','{{$permanentAddress->zip}}','{{$permanentAddress->country}}',
-            '{{$permanentAddress->police_station}}','{{$permanentAddress->panchayat_municipality}}','{{$presentAddress?->address_1}}','{{$presentAddress?->address_2}}','{{$presentAddress?->landmark}}',
+            prefillAddressDetails('{{$permanentAddress?->address_1}}','{{$permanentAddress?->address_2}}','{{$permanentAddress?->landmark}}','{{$permanentAddress?->city}}',
+            '{{$permanentAddress?->state}}','{{$permanentAddress?->zip}}','{{$permanentAddress?->country}}',
+            '{{$permanentAddress?->police_station}}','{{$permanentAddress?->panchayat_municipality}}','{{$presentAddress?->address_1}}','{{$presentAddress?->address_2}}','{{$presentAddress?->landmark}}',
             '{{$presentAddress?->city}}','{{$presentAddress?->state}}',
             '{{$presentAddress?->zip}}','{{$presentAddress?->country}}','{{$presentAddress?->police_station}}',
             '{{$presentAddress?->panchayat_municipality}}');
