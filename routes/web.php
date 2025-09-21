@@ -23,6 +23,7 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('industry', App\Http\Controllers\Admin\IndustryController::class);
         Route::resource('qualification', App\Http\Controllers\Admin\QualificationController::class);
         Route::resource('computer-and-other-skill', App\Http\Controllers\Admin\ComputerAndOtherSkillController::class);
+        Route::resource('background-question', App\Http\Controllers\Admin\BackGroundQuestionController::class);
     });
 });
 
