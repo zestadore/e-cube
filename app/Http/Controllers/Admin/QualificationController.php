@@ -21,6 +21,9 @@ class QualificationController extends Controller
             }
             return DataTables::of($data)
                 ->addIndexColumn()
+                ->addColumn('parent', function ($row) {
+                    return $row->parents->pluck('degree')->implode(', ');
+                })
                 ->addColumn('action', function ($row) {
                     $id = $row->id;
                     return view('admin.qualification.action', compact('id'));
@@ -28,7 +31,8 @@ class QualificationController extends Controller
                 ->rawColumns(['action'])
                 ->make(true);
         }
-        return view('admin.qualification.index');
+        $qualifications = Qualification::get();
+        return view('admin.qualification.index', compact('qualifications'));
     }
 
     public function create()
@@ -38,16 +42,22 @@ class QualificationController extends Controller
 
     public function store(QualificationValidation $request)
     {
-        $data = $request->validated();
+        $data = $request->except(['_token', 'parent']);
         
         if($request->filled('id')){
             $qualification = Qualification::find($request->id);
             $qualification->update($data);
-            return response()->json(['success' => 'Qualification updated successfully']);
+            $successmsg='Qualification updated successfully';
         }else{
             $qualification = Qualification::create($data);
-            return response()->json(['success' => 'Qualification created successfully']);
+            $successmsg='Qualification created successfully';
         }
+        if ($request->filled('parent')) {
+            $qualification->parents()->sync($request->parent);
+        }else{
+            $qualification->parents()->detach();
+        }
+        return response()->json(['success' => $successmsg]);
     }
 
     public function show(Qualification $qualification)
@@ -57,7 +67,7 @@ class QualificationController extends Controller
 
     public function edit($id)
     {
-        $qualification = Qualification::findOrFail(Crypt::decrypt($id));
+        $qualification = Qualification::with('parents')->findOrFail(Crypt::decrypt($id));
         return response()->json($qualification);
     }
 
@@ -69,6 +79,7 @@ class QualificationController extends Controller
     public function destroy($id)
     {
         $qualification = Qualification::findOrFail(Crypt::decrypt($id));
+        $qualification->parents()->detach();
         $qualification->delete();
         return redirect()->route('admin.qualification.index')->with('success', 'Qualification deleted successfully');
     }

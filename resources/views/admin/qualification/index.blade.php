@@ -37,6 +37,7 @@
                                         <tr class="ligth">
                                             <th>Slno.</th>
                                             <th>Qualification</th>
+                                            <th>Parents</th>
                                             <th style="min-width: 100px">Action</th>
                                         </tr>
                                     </thead>
@@ -62,6 +63,14 @@
                     <div class="modal-body">
                         <input type="hidden" value="" name="id" id="id">
                         <x-InputBox class="form-control {{ $errors->has('degree') ? ' is-invalid' : '' }}" title="Degree" name="degree" id="degree" type="text" required="True"/>
+                        <div class="form-group">
+                            <label for="parent">Parents</label>
+                            <select class="js-example-responsive js-states form-control" name="parent[]" id="parent" multiple="multiple" style="width: 100%">
+                                @foreach ($qualifications as $qualification)
+                                    <option value="{{$qualification->id}}">{{$qualification->degree}}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -78,10 +87,15 @@
     <script>
         $('#addQualificationButton').click(function(){
             $('#addForm')[0].reset();
+            $('#parent').val(null).trigger('change');
             $('#id').val('');
             $('#addModal').modal('show');
         });
-        
+        $(".js-example-responsive").select2({
+            width: 'resolve', // need to override the changed default
+            theme: "classic",
+            dropdownParent: $('#addModal')
+        });
         function drawTable()
         {
             var table = $('#item-table').DataTable({
@@ -102,6 +116,7 @@
                         name: 'degree'
                     },
                     {data: 'degree', name: 'degree'},
+                    {data: 'parent',name: 'parent'},
                     {data: 'action', name: 'action', orderable: false, searchable: false},
                 ],
                 'aoColumnDefs': [{
@@ -153,6 +168,8 @@
                 success: function(response){
                     $('#id').val(response.id);
                     $('#degree').val(response.degree);
+                     let parentIds = response.parents.map(parent => parent.id);
+                    $('#parent').val(parentIds).trigger('change');
                     $('#addModal').modal('show');
                 }
             });
