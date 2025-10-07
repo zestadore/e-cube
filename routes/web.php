@@ -37,5 +37,10 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('computer-and-other-skill', App\Http\Controllers\Admin\ComputerAndOtherSkillController::class);
         Route::resource('background-question', App\Http\Controllers\Admin\BackGroundQuestionController::class);
     });
+    Route::group(['as'=>'employee.','prefix' => 'employee'], function () {
+        Route::get('/', [App\Http\Controllers\HomeController::class, 'employeeDashboard'])->name('dashboard');
+        Route::get('background-questions', [App\Http\Controllers\HomeController::class, 'backGroundQuestion'])->name('background-questions');
+        Route::post('save-background-question', [App\Http\Controllers\HomeController::class, 'saveBackgroundQuestion'])->name('save-background-question');
+    });
 });
 

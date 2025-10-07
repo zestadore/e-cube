@@ -5,6 +5,8 @@ use Auth;
 use App\Models\Qualification;
 use App\Models\ComputerAndOtherSkill;
 use App\Models\Industry;
+use App\Models\BackGroundQuestion;
+use App\Models\BackgroundQuestionAnswer;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -34,7 +36,7 @@ class HomeController extends Controller
                 return redirect()->route('admin.dashboard');
                 break;
             case 'employee':
-                return redirect('/employee');
+                return redirect()->route('employee.dashboard');
                 break;
             case 'employer':
                 return redirect('/employer');
@@ -73,5 +75,29 @@ class HomeController extends Controller
 
     public function registerAsEmployer(){
         dd('register_as_employer');
+    }
+
+    public function employeeDashboard(){
+        return view('users.dashboard.employee');
+    }
+
+    public function backGroundQuestion(){
+        $questions=BackGroundQuestion::get();
+        $answers=BackgroundQuestionAnswer::where('user_id',Auth::user()->id)->first();
+        return view('users.background-questions.index',compact('questions','answers'));
+    }
+
+    public function saveBackgroundQuestion(Request $request){
+       $data=[
+           'user_id'=>Auth::user()->id,
+           'answers'=>json_encode($request->answers)
+       ];
+       $answer=BackgroundQuestionAnswer::where('user_id',Auth::user()->id)->first();
+       if($answer){
+           $answer->update($data);
+       }else{
+           BackgroundQuestionAnswer::create($data);
+       }
+       return redirect()->back()->with('success','Background question updated successfully');
     }
 }

@@ -589,7 +589,7 @@
                         const urlE = "{{route('save-candidate-experience')}}";
                         const token = $('meta[name="csrf-token"]').attr('content');
                         updateExperienceDetails(token, urlE)
-                            .then(() => showTab(currentTab))
+                            .then(() => window.location.href = "{{route('employee.dashboard')}}")
                             .catch(() => { currentTab--; showTab(currentTab); });
                         break;
                     default:
