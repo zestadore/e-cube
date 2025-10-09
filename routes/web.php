@@ -30,6 +30,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('candidate-qualifications', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'saveQualifications'])->name('save-candidate-qualification');
     Route::post('candidate-skills', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'saveSkills'])->name('save-candidate-skill');
     Route::post('save-candidate-experience', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'saveExperience'])->name('save-candidate-experience');
+    Route::get('/change-password', [App\Http\Controllers\HomeController::class, 'changePassword'])->name('change.password');
+    Route::post('/change-password', [App\Http\Controllers\HomeController::class, 'updatePassword'])->name('update.password');
+    Route::get('/profile', [App\Http\Controllers\HomeController::class, 'authUserProfile'])->name('profile');
+    Route::post('/update-profile', [App\Http\Controllers\HomeController::class, 'updateProfile'])->name('profile.update');
     Route::group(['as'=>'admin.','prefix' => 'admin'], function () {
         Route::get('/', [App\Http\Controllers\HomeController::class, 'adminDashboard'])->name('dashboard');
         Route::resource('industry', App\Http\Controllers\Admin\IndustryController::class);

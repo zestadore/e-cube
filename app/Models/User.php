@@ -23,7 +23,8 @@ class User extends Authenticatable
         'mobile',
         'email',
         'password',
-        'role'
+        'role',
+        'image',
     ];
 
     /**
@@ -36,6 +37,8 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $appends=['image_path','full_name'];
+
     /**
      * Get the attributes that should be cast.
      *
@@ -47,6 +50,18 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function getImagePathAttribute(){
+        if($this->attributes['image']!=null){
+            return url('/') .'/uploads/profiles/'.$this->attributes['image'];
+        }else{
+            return null;
+        }
+    }
+
+    public function getFullNameAttribute(){
+        return $this->attributes['first_name'] . ' ' . $this->attributes['last_name'];
     }
 
     public function basics()
