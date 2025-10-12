@@ -37,6 +37,7 @@
                                         <tr class="ligth">
                                             <th>Slno.</th>
                                             <th>Skill</th>
+                                            <th>Industry/Role</th>
                                             <th style="min-width: 100px">Action</th>
                                         </tr>
                                     </thead>
@@ -64,6 +65,15 @@
                         <input type="hidden" name="id" id="id">
                         <div class="form-group">
                             <x-InputBox class="form-control {{ $errors->has('skill') ? ' is-invalid' : '' }}" title="Skill" name="skill" id="skill" type="text" required="True"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="industry_id">Industry/Roles</label>
+                            <select class="js-example-responsive js-states form-control" name="industry_id" id="industry_id" style="width: 100%">
+                                <option value="">Select an Industry</option>
+                                @foreach ($industries as $industry)
+                                    <option value="{{$industry->id}}">{{$industry->industry_name}}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -105,6 +115,10 @@
                         name: 'skill'
                     },
                     {
+                        data: 'industry',
+                        name: 'industry'
+                    },
+                    {
                         data: 'action',
                         name: 'action',
                         orderable: false,
@@ -124,6 +138,7 @@
             $('#skillModalLabel').text('Add Skill');
             $('#skillForm')[0].reset();
             $('#id').val('');
+            $('#industry_id').val(null).trigger('change');
             $('#skillModal').modal('show');
         });
 
@@ -163,6 +178,7 @@
                 success: function(response){
                     $('#id').val(response.id);
                     $('#skill').val(response.skill);
+                    $('#industry_id').val(response.industry_id).trigger('change');
                     $('#skillModal').modal('show');
                 }
             });

@@ -24,6 +24,7 @@ class ComputerAndOtherSkillValidation extends FormRequest
         return [
             'skill' => 'required',
             'id' => 'nullable|exists:computer_and_other_skills,id',
+            'industry_id' => 'required|exists:industries,id',
         ];
     }
 }

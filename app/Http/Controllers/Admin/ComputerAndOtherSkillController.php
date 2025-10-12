@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ComputerAndOtherSkill;
+use App\Models\Industry;
 use Illuminate\Http\Request;
 use DataTables;
 use App\Http\Requests\ComputerAndOtherSkillValidation;
@@ -25,10 +26,14 @@ class ComputerAndOtherSkillController extends Controller
                     $id = Crypt::encrypt($row->id);
                     return view('admin.computer_and_other_skill.action', compact('id'));
                 })
+                ->addColumn('industry', function ($row) {
+                    return $row->industry->industry_name;
+                })
                 ->rawColumns(['action'])
                 ->make(true);
         }
-        return view('admin.computer_and_other_skill.index');
+        $industries= Industry::where('status', 1)->get();
+        return view('admin.computer_and_other_skill.index', compact('industries'));
     }
 
     public function create()
