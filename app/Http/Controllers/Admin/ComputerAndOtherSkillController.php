@@ -50,7 +50,17 @@ class ComputerAndOtherSkillController extends Controller
             $skill->update($data);
             return response()->json(['success' => 'Skill updated successfully']);
         }else{
-            $skill = ComputerAndOtherSkill::create($data);
+            $skills=explode(',', $request->skill);
+            $data=[];
+            foreach($skills as $skill){
+                $data[]=[
+                    'skill'=>$skill,
+                    'industry_id'=>$request->industry_id,
+                    'created_at'=>Now(),
+                    'updated_at'=>Now()
+                ];
+            }
+            $skill = ComputerAndOtherSkill::insert($data);
             return response()->json(['success' => 'Skill created successfully']);
         }
     }
