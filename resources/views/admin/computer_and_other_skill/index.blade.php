@@ -64,7 +64,7 @@
                     <div class="modal-body">
                         <input type="hidden" name="id" id="id">
                         <div class="form-group">
-                            <x-InputBox class="form-control {{ $errors->has('skill') ? ' is-invalid' : '' }}" title="Skill" name="skill" id="skill" type="text" required="True"/>
+                            <x-InputBox class="form-control {{ $errors->has('skill') ? ' is-invalid' : '' }}" title="Skill" name="skill" id="skill" type="textarea" required="True"/>
                         </div>
                         <div class="form-group">
                             <label for="industry_id">Industry/Roles</label>
