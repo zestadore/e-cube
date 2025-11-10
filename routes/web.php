@@ -34,6 +34,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/change-password', [App\Http\Controllers\HomeController::class, 'updatePassword'])->name('update.password');
     Route::get('/profile', [App\Http\Controllers\HomeController::class, 'authUserProfile'])->name('profile');
     Route::post('/update-profile', [App\Http\Controllers\HomeController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/company-profile', [App\Http\Controllers\Registration\Company\CompanyProfileController::class, 'store'])->name('company.profile.store');
     Route::group(['as'=>'admin.','prefix' => 'admin'], function () {
         Route::get('/', [App\Http\Controllers\HomeController::class, 'adminDashboard'])->name('dashboard');
         Route::resource('industry', App\Http\Controllers\Admin\IndustryController::class);
@@ -45,6 +46,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [App\Http\Controllers\HomeController::class, 'employeeDashboard'])->name('dashboard');
         Route::get('background-questions', [App\Http\Controllers\HomeController::class, 'backGroundQuestion'])->name('background-questions');
         Route::post('save-background-question', [App\Http\Controllers\HomeController::class, 'saveBackgroundQuestion'])->name('save-background-question');
+    });
+    Route::group(['as'=>'employer.','prefix' => 'employer'], function () {
+        Route::get('/', [App\Http\Controllers\HomeController::class, 'employeeDashboard'])->name('dashboard');
+        Route::get('company-profile', [App\Http\Controllers\Registration\Company\CompanyProfileController::class, 'index'])->name('company_profile');
     });
 });
 

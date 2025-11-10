@@ -75,7 +75,8 @@ class HomeController extends Controller
     }
 
     public function registerAsEmployer(){
-        dd('register_as_employer');
+        $industries = Industry::get();
+        return view('users.registration.employer',compact('industries'));
     }
 
     public function employeeDashboard(){
