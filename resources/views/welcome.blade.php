@@ -1,93 +1,1216 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tabler Demo</title>
-  <link rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/css/tabler.min.css" />
-</head>
 
-<body>
-    <header class="navbar navbar-expand-md d-print-none">
-        <div class="container-xl">
-            <button
-            class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbar-menu"
-            aria-controls="navbar-menu"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-            >
-            <span class="navbar-toggler-icon"></span>
-            </button>
-            <!-- BEGIN NAVBAR LOGO --><a href="../../.." aria-label="Tabler" class="navbar-brand navbar-brand-autodark me-3"><svg xmlns="http://www.w3.org/2000/svg" width="110" height="32" viewBox="0 0 232 68" class="navbar-brand-image">
-                <path d="M64.6 16.2C63 9.9 58.1 5 51.8 3.4 40 1.5 28 1.5 16.2 3.4 9.9 5 5 9.9 3.4 16.2 1.5 28 1.5 40 3.4 51.8 5 58.1 9.9 63 16.2 64.6c11.8 1.9 23.8 1.9 35.6 0C58.1 63 63 58.1 64.6 51.8c1.9-11.8 1.9-23.8 0-35.6zM33.3 36.3c-2.8 4.4-6.6 8.2-11.1 11-1.5.9-3.3.9-4.8.1s-2.4-2.3-2.5-4c0-1.7.9-3.3 2.4-4.1 2.3-1.4 4.4-3.2 6.1-5.3-1.8-2.1-3.8-3.8-6.1-5.3-2.3-1.3-3-4.2-1.7-6.4s4.3-2.9 6.5-1.6c4.5 2.8 8.2 6.5 11.1 10.9 1 1.4 1 3.3.1 4.7zM49.2 46H37.8c-2.1 0-3.8-1-3.8-3s1.7-3 3.8-3h11.4c2.1 0 3.8 1 3.8 3s-1.7 3-3.8 3z" fill="#066fd1" style="fill: var(--tblr-primary, #066fd1)" />
-                <path d="M105.8 46.1c.4 0 .9.2 1.2.6s.6 1 .6 1.7c0 .9-.5 1.6-1.4 2.2s-2 .9-3.2.9c-2 0-3.7-.4-5-1.3s-2-2.6-2-5.4V31.6h-2.2c-.8 0-1.4-.3-1.9-.8s-.9-1.1-.9-1.9c0-.7.3-1.4.8-1.8s1.2-.7 1.9-.7h2.2v-3.1c0-.8.3-1.5.8-2.1s1.3-.8 2.1-.8 1.5.3 2 .8.8 1.3.8 2.1v3.1h3.4c.8 0 1.4.3 1.9.8s.8 1.2.8 1.9-.3 1.4-.8 1.8-1.2.7-1.9.7h-3.4v13c0 .7.2 1.2.5 1.5s.8.5 1.4.5c.3 0 .6-.1 1.1-.2.5-.2.8-.3 1.2-.3zm28-20.7c.8 0 1.5.3 2.1.8.5.5.8 1.2.8 2.1v20.3c0 .8-.3 1.5-.8 2.1-.5.6-1.2.8-2.1.8s-1.5-.3-2-.8-.8-1.2-.8-2.1c-.8.9-1.9 1.7-3.2 2.4-1.3.7-2.8 1-4.3 1-2.2 0-4.2-.6-6-1.7-1.8-1.1-3.2-2.7-4.2-4.7s-1.6-4.3-1.6-6.9c0-2.6.5-4.9 1.5-6.9s2.4-3.6 4.2-4.8c1.8-1.1 3.7-1.7 5.9-1.7 1.5 0 3 .3 4.3.8 1.3.6 2.5 1.3 3.4 2.1 0-.8.3-1.5.8-2.1.5-.5 1.2-.7 2-.7zm-9.7 21.3c2.1 0 3.8-.8 5.1-2.3s2-3.4 2-5.7-.7-4.2-2-5.8c-1.3-1.5-3-2.3-5.1-2.3-2 0-3.7.8-5 2.3-1.3 1.5-2 3.5-2 5.8s.6 4.2 1.9 5.7 3 2.3 5.1 2.3zm32.1-21.3c2.2 0 4.2.6 6 1.7 1.8 1.1 3.2 2.7 4.2 4.7s1.6 4.3 1.6 6.9-.5 4.9-1.5 6.9-2.4 3.6-4.2 4.8c-1.8 1.1-3.7 1.7-5.9 1.7-1.5 0-3-.3-4.3-.9s-2.5-1.4-3.4-2.3v.3c0 .8-.3 1.5-.8 2.1-.5.6-1.2.8-2.1.8s-1.5-.3-2.1-.8c-.5-.5-.8-1.2-.8-2.1V18.9c0-.8.3-1.5.8-2.1.5-.6 1.2-.8 2.1-.8s1.5.3 2.1.8c.5.6.8 1.3.8 2.1v10c.8-1 1.8-1.8 3.2-2.5 1.3-.7 2.8-1 4.3-1zm-.7 21.3c2 0 3.7-.8 5-2.3s2-3.5 2-5.8-.6-4.2-1.9-5.7-3-2.3-5.1-2.3-3.8.8-5.1 2.3-2 3.4-2 5.7.7 4.2 2 5.8c1.3 1.6 3 2.3 5.1 2.3zm23.6 1.9c0 .8-.3 1.5-.8 2.1s-1.3.8-2.1.8-1.5-.3-2-.8-.8-1.3-.8-2.1V18.9c0-.8.3-1.5.8-2.1s1.3-.8 2.1-.8 1.5.3 2 .8.8 1.3.8 2.1v29.7zm29.3-10.5c0 .8-.3 1.4-.9 1.9-.6.5-1.2.7-2 .7h-15.8c.4 1.9 1.3 3.4 2.6 4.4 1.4 1.1 2.9 1.6 4.7 1.6 1.3 0 2.3-.1 3.1-.4.7-.2 1.3-.5 1.8-.8.4-.3.7-.5.9-.6.6-.3 1.1-.4 1.6-.4.7 0 1.2.2 1.7.7s.7 1 .7 1.7c0 .9-.4 1.6-1.3 2.4-.9.7-2.1 1.4-3.6 1.9s-3 .8-4.6.8c-2.7 0-5-.6-7-1.7s-3.5-2.7-4.6-4.6-1.6-4.2-1.6-6.6c0-2.8.6-5.2 1.7-7.2s2.7-3.7 4.6-4.8 3.9-1.7 6-1.7 4.1.6 6 1.7 3.4 2.7 4.5 4.7c.9 1.9 1.5 4.1 1.5 6.3zm-12.2-7.5c-3.7 0-5.9 1.7-6.6 5.2h12.6v-.3c-.1-1.3-.8-2.5-2-3.5s-2.5-1.4-4-1.4zm30.3-5.2c1 0 1.8.3 2.4.8.7.5 1 1.2 1 1.9 0 1-.3 1.7-.8 2.2-.5.5-1.1.8-1.8.7-.5 0-1-.1-1.6-.3-.2-.1-.4-.1-.6-.2-.4-.1-.7-.1-1.1-.1-.8 0-1.6.3-2.4.8s-1.4 1.3-1.9 2.3-.7 2.3-.7 3.7v11.4c0 .8-.3 1.5-.8 2.1-.5.6-1.2.8-2.1.8s-1.5-.3-2.1-.8c-.5-.6-.8-1.3-.8-2.1V28.8c0-.8.3-1.5.8-2.1.5-.6 1.2-.8 2.1-.8s1.5.3 2.1.8c.5.6.8 1.3.8 2.1v.6c.7-1.3 1.8-2.3 3.2-3 1.3-.7 2.8-1 4.3-1z" fill-rule="evenodd" clip-rule="evenodd" fill="#4a4a4a"/>
-            </svg></a><!-- END NAVBAR LOGO -->
-            <ul class="navbar-nav">
-            <li class="nav-item active">
-                <a class="nav-link" href="#">
-                <span class="nav-link-icon">
-                    <!-- Download SVG icon from http://tabler.io/icons/icon/home -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-1"><path d="M5 12l-2 0l9 -9l9 9l-2 0" /><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" /><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" /></svg>
-                </span>
-                <span class="nav-link-title"> Home </span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">
-                <span class="nav-link-icon"
-                    ><!-- Download SVG icon from http://tabler.io/icons/icon/checkbox -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-1"><path d="M9 11l3 3l8 -8" /><path d="M20 12v6a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h9" /></svg>
-                </span>
-                <span class="nav-link-title"> Profile </span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">
-                <span class="nav-link-icon"
-                    ><!-- Download SVG icon from http://tabler.io/icons/icon/checkbox -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-1"><path d="M9 11l3 3l8 -8" /><path d="M20 12v6a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h9" /></svg>
-                </span>
-                <span class="nav-link-title"> Settings </span>
-                </a>
-            </li>
-            </ul>
-            <div class="navbar-nav flex-row order-md-last ms-auto">
-            <div class="nav-item dropdown">
-                <a
-                href="#"
-                class="nav-link d-flex lh-1 text-reset"
-                data-bs-toggle="dropdown"
-                aria-label="Open user menu"
-                >
-                <span
-                    class="avatar avatar-sm"
-                    style="background-image: url(/static/avatars/044m.jpg)"
-                ></span>
-                <div class="d-none d-xl-block ps-2">
-                    <div>Paweł Kuna</div>
-                    <div class="mt-1 small text-secondary">UI Designer</div>
-                </div>
-                </a>
-                <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                <a href="#" class="dropdown-item">Status</a>
-                <a href="./profile.html" class="dropdown-item">Profile</a>
-                <a href="#" class="dropdown-item">Feedback</a>
-                <div class="dropdown-divider"></div>
-                <a href="./settings.html" class="dropdown-item">Settings</a>
-                <a href="./sign-in.html" class="dropdown-item">Logout</a>
+	<!-- META ============================================= -->
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="keywords" content="" />
+	<meta name="author" content="" />
+	<meta name="robots" content="" />
+	
+	<!-- DESCRIPTION -->
+	<meta name="description" content="EduChamp : Education HTML Template" />
+	
+	<!-- OG -->
+	<meta property="og:title" content="EduChamp : Education HTML Template" />
+	<meta property="og:description" content="EduChamp : Education HTML Template" />
+	<meta property="og:image" content="" />
+	<meta name="format-detection" content="telephone=no">
+	
+	<!-- FAVICONS ICON ============================================= -->
+	<link rel="icon" href="assets/images/favicon.ico" type="image/x-icon" />
+	<link rel="shortcut icon" type="image/x-icon" href="assets/images/favicon.png" />
+	
+	<!-- PAGE TITLE HERE ============================================= -->
+	<title>EduChamp : Education HTML Template </title>
+	
+	<!-- MOBILE SPECIFIC ============================================= -->
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<!--[if lt IE 9]>
+	<script src="assets/js/html5shiv.min.js"></script>
+	<script src="assets/js/respond.min.js"></script>
+	<![endif]-->
+	
+	<!-- All PLUGINS CSS ============================================= -->
+	<link rel="stylesheet" type="text/css" href="assets/css/assets.css">
+	
+	<!-- TYPOGRAPHY ============================================= -->
+	<link rel="stylesheet" type="text/css" href="assets/css/typography.css">
+	
+	<!-- SHORTCODES ============================================= -->
+	<link rel="stylesheet" type="text/css" href="assets/css/shortcodes/shortcodes.css">
+	
+	<!-- STYLESHEETS ============================================= -->
+	<link rel="stylesheet" type="text/css" href="assets/css/style.css">
+	<link class="skin" rel="stylesheet" type="text/css" href="assets/css/color/color-1.css">
+	
+	<!-- REVOLUTION SLIDER CSS ============================================= -->
+	<link rel="stylesheet" type="text/css" href="assets/vendors/revolution/css/layers.css">
+	<link rel="stylesheet" type="text/css" href="assets/vendors/revolution/css/settings.css">
+	<link rel="stylesheet" type="text/css" href="assets/vendors/revolution/css/navigation.css">
+	<!-- REVOLUTION SLIDER END -->	
+</head>
+<body id="bg">
+    <div class="page-wraper">
+        <div id="loading-icon-bx"></div>
+        <!-- Header Top ==== -->
+        <header class="header rs-nav header-transparent">
+            <div class="top-bar">
+                <div class="container">
+                    <div class="row d-flex justify-content-between">
+                        <div class="topbar-left">
+                            <ul>
+                                <li><a href="faq-1.html"><i class="fa fa-question-circle"></i>Ask a Question</a></li>
+                                <li><a href="javascript:;"><i class="fa fa-envelope-o"></i>Support@website.com</a></li>
+                            </ul>
+                        </div>
+                        <div class="topbar-right">
+                            <ul>
+                                <li>
+                                    <select class="header-lang-bx">
+                                        <option data-icon="flag flag-uk">English UK</option>
+                                        <option data-icon="flag flag-us">English US</option>
+                                    </select>
+                                </li>
+                                <li><a href="login.html">Login</a></li>
+                                <li><a href="register.html">Register</a></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
+            <div class="sticky-header navbar-expand-lg">
+                <div class="menu-bar clearfix">
+                    <div class="container clearfix">
+                        <!-- Header Logo ==== -->
+                        <div class="menu-logo">
+                            <a href="index.html"><img src="assets/images/logo-white.png" alt=""></a>
+                        </div>
+                        <!-- Mobile Nav Button ==== -->
+                        <button class="navbar-toggler collapsed menuicon justify-content-end" type="button" data-toggle="collapse" data-target="#menuDropdown" aria-controls="menuDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </button>
+                        <!-- Author Nav ==== -->
+                        <div class="secondary-menu">
+                            <div class="secondary-inner">
+                                <ul>
+                                    <li><a href="javascript:;" class="btn-link"><i class="fa fa-facebook"></i></a></li>
+                                    <li><a href="javascript:;" class="btn-link"><i class="fa fa-google-plus"></i></a></li>
+                                    <li><a href="javascript:;" class="btn-link"><i class="fa fa-linkedin"></i></a></li>
+                                    <!-- Search Button ==== -->
+                                    <li class="search-btn"><button id="quik-search-btn" type="button" class="btn-link"><i class="fa fa-search"></i></button></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- Search Box ==== -->
+                        <div class="nav-search-bar">
+                            <form action="#">
+                                <input name="search" value="" type="text" class="form-control" placeholder="Type to search">
+                                <span><i class="ti-search"></i></span>
+                            </form>
+                            <span id="search-remove"><i class="ti-close"></i></span>
+                        </div>
+                        <!-- Navigation Menu ==== -->
+                        <div class="menu-links navbar-collapse collapse justify-content-start" id="menuDropdown">
+                            <div class="menu-logo">
+                                <a href="index.html"><img src="assets/images/logo.png" alt=""></a>
+                            </div>
+                            <ul class="nav navbar-nav">	
+                                <li class="active"><a href="javascript:;">Home <i class="fa fa-chevron-down"></i></a>
+                                    <ul class="sub-menu">
+                                        <li><a href="index.html">Home 1</a></li>
+                                        <li><a href="index-2.html">Home 2</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="javascript:;">Pages <i class="fa fa-chevron-down"></i></a>
+                                    <ul class="sub-menu">
+                                        <li><a href="javascript:;">About<i class="fa fa-angle-right"></i></a>
+                                            <ul class="sub-menu">
+                                                <li><a href="about-1.html">About 1</a></li>
+                                                <li><a href="about-2.html">About 2</a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="javascript:;">Event<i class="fa fa-angle-right"></i></a>
+                                            <ul class="sub-menu">
+                                                <li><a href="event.html">Event</a></li>
+                                                <li><a href="events-details.html">Events Details</a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="javascript:;">FAQ's<i class="fa fa-angle-right"></i></a>
+                                            <ul class="sub-menu">
+                                                <li><a href="faq-1.html">FAQ's 1</a></li>
+                                                <li><a href="faq-2.html">FAQ's 2</a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="javascript:;">Contact Us<i class="fa fa-angle-right"></i></a>
+                                            <ul class="sub-menu">
+                                                <li><a href="contact-1.html">Contact Us 1</a></li>
+                                                <li><a href="contact-2.html">Contact Us 2</a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="portfolio.html">Portfolio</a></li>
+                                        <li><a href="profile.html">Profile</a></li>
+                                        <li><a href="membership.html">Membership</a></li>
+                                        <li><a href="error-404.html">404 Page</a></li>
+                                    </ul>
+                                </li>
+                                <li class="add-mega-menu"><a href="javascript:;">Our Courses <i class="fa fa-chevron-down"></i></a>
+                                    <ul class="sub-menu add-menu">
+                                        <li class="add-menu-left">
+                                            <h5 class="menu-adv-title">Our Courses</h5>
+                                            <ul>
+                                                <li><a href="courses.html">Courses </a></li>
+                                                <li><a href="courses-details.html">Courses Details</a></li>
+                                                <li><a href="profile.html">Instructor Profile</a></li>
+                                                <li><a href="event.html">Upcoming Event</a></li>
+                                                <li><a href="membership.html">Membership</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="add-menu-right">
+                                            <img src="assets/images/adv/adv.jpg" alt=""/>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><a href="javascript:;">Blog <i class="fa fa-chevron-down"></i></a>
+                                    <ul class="sub-menu">
+                                        <li><a href="blog-classic-grid.html">Blog Classic</a></li>
+                                        <li><a href="blog-classic-sidebar.html">Blog Classic Sidebar</a></li>
+                                        <li><a href="blog-list-sidebar.html">Blog List Sidebar</a></li>
+                                        <li><a href="blog-standard-sidebar.html">Blog Standard Sidebar</a></li>
+                                        <li><a href="blog-details.html">Blog Details</a></li>
+                                    </ul>
+                                </li>
+                                <li class="nav-dashboard"><a href="javascript:;">Dashboard <i class="fa fa-chevron-down"></i></a>
+                                    <ul class="sub-menu">
+                                        <li><a href="admin/index.html">Dashboard</a></li>
+                                        <li><a href="admin/add-listing.html">Add Listing</a></li>
+                                        <li><a href="admin/bookmark.html">Bookmark</a></li>
+                                        <li><a href="admin/courses.html">Courses</a></li>
+                                        <li><a href="admin/review.html">Review</a></li>
+                                        <li><a href="admin/teacher-profile.html">Teacher Profile</a></li>
+                                        <li><a href="admin/user-profile.html">User Profile</a></li>
+                                        <li><a href="javascript:;">Calendar<i class="fa fa-angle-right"></i></a>
+                                            <ul class="sub-menu">
+                                                <li><a href="admin/basic-calendar.html">Basic Calendar</a></li>
+                                                <li><a href="admin/list-view-calendar.html">List View Calendar</a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="javascript:;">Mailbox<i class="fa fa-angle-right"></i></a>
+                                            <ul class="sub-menu">
+                                                <li><a href="admin/mailbox.html">Mailbox</a></li>
+                                                <li><a href="admin/mailbox-compose.html">Compose</a></li>
+                                                <li><a href="admin/mailbox-read.html">Mail Read</a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            <div class="nav-social-link">
+                                <a href="javascript:;"><i class="fa fa-facebook"></i></a>
+                                <a href="javascript:;"><i class="fa fa-google-plus"></i></a>
+                                <a href="javascript:;"><i class="fa fa-linkedin"></i></a>
+                            </div>
+                        </div>
+                        <!-- Navigation Menu END ==== -->
+                    </div>
+                </div>
             </div>
+        </header>
+        <!-- Header Top END ==== -->
+        <!-- Content -->
+        <div class="page-content bg-white">
+            <!-- Main Slider -->
+            <div class="rev-slider">
+                <div id="rev_slider_486_1_wrapper" class="rev_slider_wrapper fullwidthbanner-container" data-alias="news-gallery36" data-source="gallery" style="margin:0px auto;background-color:#ffffff;padding:0px;margin-top:0px;margin-bottom:0px;">
+                    <!-- START REVOLUTION SLIDER 5.3.0.2 fullwidth mode -->
+                    <div id="rev_slider_486_1" class="rev_slider fullwidthabanner" style="display:none;" data-version="5.3.0.2">
+                        <ul>	<!-- SLIDE  -->
+                            <li data-index="rs-100" 
+                            data-transition="parallaxvertical" 
+                            data-slotamount="default" 
+                            data-hideafterloop="0" 
+                            data-hideslideonmobile="off" 
+                            data-easein="default" 
+                            data-easeout="default" 
+                            data-masterspeed="default" 
+                            data-thumb="error-404.html" 
+                            data-rotate="0" 
+                            data-fstransition="fade" 
+                            data-fsmasterspeed="1500" 
+                            data-fsslotamount="7" 
+                            data-saveperformance="off" 
+                            data-title="A STUDY ON HAPPINESS" 
+                            data-param1="" data-param2="" 
+                            data-param3="" data-param4="" 
+                            data-param5="" data-param6="" 
+                            data-param7="" data-param8="" 
+                            data-param9="" data-param10="" 
+                            data-description="Science says that Women are generally happier">
+                                <!-- MAIN IMAGE -->
+                                <img src="assets/images/slider/slide1.jpg" alt="" 
+                                    data-bgposition="center center" 
+                                    data-bgfit="cover" 
+                                    data-bgrepeat="no-repeat" 
+                                    data-bgparallax="10" 
+                                    class="rev-slidebg" 
+                                    data-no-retina />
+                                    
+                                <!-- LAYER NR. 1 -->
+                                <div class="tp-caption tp-shape tp-shapewrapper " 
+                                    id="slide-100-layer-1" 
+                                    data-x="['center','center','center','center']" data-hoffset="['0','0','0','0']" 
+                                    data-y="['middle','middle','middle','middle']" data-voffset="['0','0','0','0']" 
+                                    data-width="full"
+                                    data-height="full"
+                                    data-whitespace="nowrap"
+                                    data-type="shape" 
+                                    data-basealign="slide" 
+                                    data-responsive_offset="off" 
+                                    data-responsive="off"
+                                    data-frames='[{"from":"opacity:0;","speed":1,"to":"o:1;","delay":0,"ease":"Power4.easeOut"},{"delay":"wait","speed":1,"to":"opacity:0;","ease":"Power4.easeOut"}]'
+                                    data-textAlign="['left','left','left','left']"
+                                    data-paddingtop="[0,0,0,0]"
+                                    data-paddingright="[0,0,0,0]"
+                                    data-paddingbottom="[0,0,0,0]"
+                                    data-paddingleft="[0,0,0,0]"
+                                    style="z-index: 5;background-color:rgba(2, 0, 11, 0.80);border-color:rgba(0, 0, 0, 0);border-width:0px;"> </div>	
+                                <!-- LAYER NR. 2 -->
+                                <div class="tp-caption Newspaper-Title   tp-resizeme" 
+                                    id="slide-100-layer-2" 
+                                    data-x="['center','center','center','center']" 
+                                    data-hoffset="['0','0','0','0']" 
+                                    data-y="['top','top','top','top']" 
+                                    data-voffset="['250','250','250','240']" 
+                                    data-fontsize="['50','50','50','30']"
+                                    data-lineheight="['55','55','55','35']"
+                                    data-width="full"
+                                    data-height="none"
+                                    data-whitespace="normal"
+                                    data-type="text" 
+                                    data-responsive_offset="on" 
+                                    data-frames='[{"from":"y:[-100%];z:0;rX:0deg;rY:0;rZ:0;sX:1;sY:1;skX:0;skY:0;","mask":"x:0px;y:0px;s:inherit;e:inherit;","speed":1500,"to":"o:1;","delay":1000,"ease":"Power3.easeInOut"},{"delay":"wait","speed":1000,"to":"auto:auto;","mask":"x:0;y:0;s:inherit;e:inherit;","ease":"Power3.easeInOut"}]'
+                                    data-textAlign="['center','center','center','center']"
+                                    data-paddingtop="[0,0,0,0]"
+                                    data-paddingright="[0,0,0,0]"
+                                    data-paddingbottom="[10,10,10,10]"
+                                    data-paddingleft="[0,0,0,0]"
+                                    style="z-index: 6; font-family:rubik; font-weight:700; text-align:center; white-space: normal;">
+                                        Welcome To University
+                                </div>
+
+                                <!-- LAYER NR. 3 -->
+                                <div class="tp-caption Newspaper-Subtitle   tp-resizeme" 
+                                    id="slide-100-layer-3" 
+                                    data-x="['center','center','center','center']" 
+                                    data-hoffset="['0','0','0','0']" 
+                                    data-y="['top','top','top','top']" 
+                                    data-voffset="['210','210','210','210']" 
+                                    data-width="none"
+                                    data-height="none"
+                                    data-whitespace="nowrap"
+                                    data-type="text" 
+                                    data-responsive_offset="on"
+                                    data-frames='[{"from":"y:[-100%];z:0;rX:0deg;rY:0;rZ:0;sX:1;sY:1;skX:0;skY:0;","mask":"x:0px;y:0px;s:inherit;e:inherit;","speed":1500,"to":"o:1;","delay":1000,"ease":"Power3.easeInOut"},{"delay":"wait","speed":1000,"to":"auto:auto;","mask":"x:0;y:0;s:inherit;e:inherit;","ease":"Power3.easeInOut"}]'
+                                    data-textAlign="['left','left','left','left']"
+                                    data-paddingtop="[0,0,0,0]"
+                                    data-paddingright="[0,0,0,0]"
+                                    data-paddingbottom="[0,0,0,0]"
+                                    data-paddingleft="[0,0,0,0]"
+                                    style="z-index: 7; white-space: nowrap; color:#fff; font-family:rubik; font-size:18px; font-weight:400;">
+                                        Batter Education For A Better 
+                                </div>
+                                
+                                <!-- LAYER NR. 3 -->
+                                <div class="tp-caption Newspaper-Subtitle   tp-resizeme" 
+                                    id="slide-100-layer-4" 
+                                    data-x="['center','center','center','center']" 
+                                    data-hoffset="['0','0','0','0']" 
+                                    data-y="['top','top','top','top']" 
+                                    data-voffset="['320','320','320','290']" 
+                                    data-width="['800','800','700','420']"
+                                    data-height="['100','100','100','120']"
+                                    data-whitespace="unset"
+                                    data-type="text" 
+                                    data-responsive_offset="on"
+                                    data-frames='[{"from":"y:[-100%];z:0;rX:0deg;rY:0;rZ:0;sX:1;sY:1;skX:0;skY:0;","mask":"x:0px;y:0px;s:inherit;e:inherit;","speed":1500,"to":"o:1;","delay":1000,"ease":"Power3.easeInOut"},{"delay":"wait","speed":1000,"to":"auto:auto;","mask":"x:0;y:0;s:inherit;e:inherit;","ease":"Power3.easeInOut"}]'
+                                    data-textAlign="['center','center','center','center']"
+                                    data-paddingtop="[0,0,0,0]"
+                                    data-paddingright="[0,0,0,0]"
+                                    data-paddingbottom="[0,0,0,0]"
+                                    data-paddingleft="[0,0,0,0]"
+                                    style="z-index: 7; text-transform:capitalize; white-space: unset; color:#fff; font-family:rubik; font-size:18px; line-height:28px; font-weight:400;">
+                                        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the
+                                </div>
+                                <!-- LAYER NR. 4 -->
+                                <div class="tp-caption Newspaper-Button rev-btn " 
+                                    id="slide-100-layer-5" 
+                                    data-x="['center','center','center','center']" 
+                                    data-hoffset="['90','80','75','90']" 
+                                    data-y="['top','top','top','top']" 
+                                    data-voffset="['400','400','400','420']" 
+                                    data-width="none"
+                                    data-height="none"
+                                    data-whitespace="nowrap"
+                                    data-type="button" 
+                                    data-responsive_offset="on" 
+                                    data-responsive="off"
+                                    data-frames='[{"from":"y:[-100%];z:0;rX:0deg;rY:0;rZ:0;sX:1;sY:1;skX:0;skY:0;","mask":"x:0px;y:0px;","speed":1500,"to":"o:1;","delay":1000,"ease":"Power3.easeInOut"},{"delay":"wait","speed":1000,"to":"auto:auto;","mask":"x:0;y:0;","ease":"Power3.easeInOut"},{"frame":"hover","speed":"300","ease":"Power1.easeInOut","to":"o:1;rX:0;rY:0;rZ:0;z:0;","style":"c:rgba(0, 0, 0, 1.00);bg:rgba(255, 255, 255, 1.00);bc:rgba(255, 255, 255, 1.00);bw:1px 1px 1px 1px;"}]'
+                                    data-textAlign="['center','center','center','center']"
+                                    data-paddingtop="[12,12,12,12]"
+                                    data-paddingright="[30,35,35,15]"
+                                    data-paddingbottom="[12,12,12,12]"
+                                    data-paddingleft="[30,35,35,15]"
+                                    style="z-index: 8; white-space: nowrap; outline:none;box-shadow:none;box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;cursor:pointer; background-color:var(--primary) !important; border:0; border-radius:30px; margin-right:5px;">READ MORE </div>
+                                <div class="tp-caption Newspaper-Button rev-btn" 
+                                    id="slide-100-layer-6" 
+                                    data-x="['center','center','center','center']" 
+                                    data-hoffset="['-90','-80','-75','-90']" 
+                                    data-y="['top','top','top','top']" 
+                                    data-voffset="['400','400','400','420']" 
+                                    data-width="none"
+                                    data-height="none"
+                                    data-whitespace="nowrap"
+                                    data-type="button" 
+                                    data-responsive_offset="on" 
+                                    data-responsive="off"
+                                    data-frames='[{"from":"y:[-100%];z:0;rX:0deg;rY:0;rZ:0;sX:1;sY:1;skX:0;skY:0;","mask":"x:0px;y:0px;","speed":1500,"to":"o:1;","delay":1000,"ease":"Power3.easeInOut"},{"delay":"wait","speed":1000,"to":"auto:auto;","mask":"x:0;y:0;","ease":"Power3.easeInOut"},{"frame":"hover","speed":"300","ease":"Power1.easeInOut","to":"o:1;rX:0;rY:0;rZ:0;z:0;","style":"c:rgba(0, 0, 0, 1.00);bg:rgba(255, 255, 255, 1.00);bc:rgba(255, 255, 255, 1.00);bw:1px 1px 1px 1px;"}]'
+                                    data-textAlign="['center','center','center','center']"
+                                    data-paddingtop="[12,12,12,12]"
+                                    data-paddingright="[30,35,35,15]"
+                                    data-paddingbottom="[12,12,12,12]"
+                                    data-paddingleft="[30,35,35,15]"
+                                    style="z-index: 8; white-space: nowrap; outline:none;box-shadow:none;box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;cursor:pointer; border-radius:30px;">CONTACT US</div>
+                            </li>
+                            <li data-index="rs-200" 
+                            data-transition="parallaxvertical" 
+                            data-slotamount="default" 
+                            data-hideafterloop="0" 
+                            data-hideslideonmobile="off" 
+                            data-easein="default" 
+                            data-easeout="default" 
+                            data-masterspeed="default" 
+                            data-thumb="assets/images/slider/slide1.jpg" 
+                            data-rotate="0" 
+                            data-fstransition="fade" 
+                            data-fsmasterspeed="1500" 
+                            data-fsslotamount="7" 
+                            data-saveperformance="off" 
+                            data-title="A STUDY ON HAPPINESS" 
+                            data-param1="" data-param2="" 
+                            data-param3="" data-param4="" 
+                            data-param5="" data-param6="" 
+                            data-param7="" data-param8="" 
+                            data-param9="" data-param10="" 
+                            data-description="Science says that Women are generally happier">
+                                <!-- MAIN IMAGE -->
+                                <img src="assets/images/slider/slide2.jpg" alt="" 
+                                    data-bgposition="center center" 
+                                    data-bgfit="cover" 
+                                    data-bgrepeat="no-repeat" 
+                                    data-bgparallax="10" 
+                                    class="rev-slidebg" 
+                                    data-no-retina />
+                                    
+                                <!-- LAYER NR. 1 -->
+                                <div class="tp-caption tp-shape tp-shapewrapper " 
+                                    id="slide-200-layer-1" 
+                                    data-x="['center','center','center','center']" data-hoffset="['0','0','0','0']" 
+                                    data-y="['middle','middle','middle','middle']" data-voffset="['0','0','0','0']" 
+                                    data-width="full"
+                                    data-height="full"
+                                    data-whitespace="nowrap"
+                                    data-type="shape" 
+                                    data-basealign="slide" 
+                                    data-responsive_offset="off" 
+                                    data-responsive="off"
+                                    data-frames='[{"from":"opacity:0;","speed":1,"to":"o:1;","delay":0,"ease":"Power4.easeOut"},{"delay":"wait","speed":1000,"to":"opacity:1;","ease":"Power4.easeOut"}]'
+                                    data-textAlign="['left','left','left','left']"
+                                    data-paddingtop="[0,0,0,0]"
+                                    data-paddingright="[0,0,0,0]"
+                                    data-paddingbottom="[0,0,0,0]"
+                                    data-paddingleft="[0,0,0,0]"
+                                    style="z-index: 5;background-color:rgba(2, 0, 11, 0.80);border-color:rgba(0, 0, 0, 0);border-width:0px;"> 
+                                </div>
+
+                                <!-- LAYER NR. 2 -->
+                                <div class="tp-caption Newspaper-Title   tp-resizeme" 
+                                    id="slide-200-layer-2" 
+                                    data-x="['center','center','center','center']" 
+                                    data-hoffset="['0','0','0','0']" 
+                                    data-y="['top','top','top','top']" 
+                                    data-voffset="['250','250','250','240']" 
+                                    data-fontsize="['50','50','50','30']"
+                                    data-lineheight="['55','55','55','35']"
+                                    data-width="full"
+                                    data-height="none"
+                                    data-whitespace="normal"
+                                    data-type="text" 
+                                    data-responsive_offset="on" 
+                                    data-frames='[{"from":"y:[-100%];z:0;rX:0deg;rY:0;rZ:0;sX:1;sY:1;skX:0;skY:0;","mask":"x:0px;y:0px;s:inherit;e:inherit;","speed":1500,"to":"o:1;","delay":1000,"ease":"Power3.easeInOut"},{"delay":"wait","speed":1000,"to":"auto:auto;","mask":"x:0;y:0;s:inherit;e:inherit;","ease":"Power3.easeInOut"}]'
+                                    data-textAlign="['center','center','center','center']"
+                                    data-paddingtop="[0,0,0,0]"
+                                    data-paddingright="[0,0,0,0]"
+                                    data-paddingbottom="[10,10,10,10]"
+                                    data-paddingleft="[0,0,0,0]"
+                                    style="z-index: 6; font-family:rubik; font-weight:700; text-align:center; white-space: normal;text-transform:uppercase;">
+                                        Welcome To University
+                                </div>
+
+                                <!-- LAYER NR. 3 -->
+                                <div class="tp-caption Newspaper-Subtitle   tp-resizeme" 
+                                    id="slide-200-layer-3" 
+                                    data-x="['center','center','center','center']" 
+                                    data-hoffset="['0','0','0','0']" 
+                                    data-y="['top','top','top','top']" 
+                                    data-voffset="['210','210','210','210']" 
+                                    data-width="none"
+                                    data-height="none"
+                                    data-whitespace="nowrap"
+                                    data-type="text" 
+                                    data-responsive_offset="on"
+                                    data-frames='[{"from":"y:[-100%];z:0;rX:0deg;rY:0;rZ:0;sX:1;sY:1;skX:0;skY:0;","mask":"x:0px;y:0px;s:inherit;e:inherit;","speed":1500,"to":"o:1;","delay":1000,"ease":"Power3.easeInOut"},{"delay":"wait","speed":1000,"to":"auto:auto;","mask":"x:0;y:0;s:inherit;e:inherit;","ease":"Power3.easeInOut"}]'
+                                    data-textAlign="['left','left','left','left']"
+                                    data-paddingtop="[0,0,0,0]"
+                                    data-paddingright="[0,0,0,0]"
+                                    data-paddingbottom="[0,0,0,0]"
+                                    data-paddingleft="[0,0,0,0]"
+                                    style="z-index: 7; white-space: nowrap;text-transform:uppercase; color:#fff; font-family:rubik; font-size:18px; font-weight:400;">
+                                        Batter Education For A Better 
+                                </div>
+                                
+                                <!-- LAYER NR. 3 -->
+                                <div class="tp-caption Newspaper-Subtitle   tp-resizeme" 
+                                    id="slide-200-layer-4" 
+                                    data-x="['center','center','center','center']" 
+                                    data-hoffset="['0','0','0','0']" 
+                                    data-y="['top','top','top','top']" 
+                                    data-voffset="['320','320','320','290']" 
+                                    data-width="['800','800','700','420']"
+                                    data-height="['100','100','100','120']"
+                                    data-whitespace="unset"
+                                    data-type="text" 
+                                    data-responsive_offset="on"
+                                    data-frames='[{"from":"y:[-100%];z:0;rX:0deg;rY:0;rZ:0;sX:1;sY:1;skX:0;skY:0;","mask":"x:0px;y:0px;s:inherit;e:inherit;","speed":1500,"to":"o:1;","delay":1000,"ease":"Power3.easeInOut"},{"delay":"wait","speed":1000,"to":"auto:auto;","mask":"x:0;y:0;s:inherit;e:inherit;","ease":"Power3.easeInOut"}]'
+                                    data-textAlign="['center','center','center','center']"
+                                    data-paddingtop="[0,0,0,0]"
+                                    data-paddingright="[0,0,0,0]"
+                                    data-paddingbottom="[0,0,0,0]"
+                                    data-paddingleft="[0,0,0,0]"
+                                    style="z-index: 7; text-transform:capitalize; white-space: unset; color:#fff; font-family:rubik; font-size:18px; line-height:28px; font-weight:400;">
+                                        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the
+                                </div>
+                                <!-- LAYER NR. 4 -->
+                                <div class="tp-caption Newspaper-Button rev-btn " 
+                                    id="slide-200-layer-5" 
+                                    data-x="['center','center','center','center']" 
+                                    data-hoffset="['90','80','75','90']" 
+                                    data-y="['top','top','top','top']" 
+                                    data-voffset="['400','400','400','420']" 
+                                    data-width="none"
+                                    data-height="none"
+                                    data-whitespace="nowrap"
+                                    data-type="button" 
+                                    data-responsive_offset="on" 
+                                    data-responsive="off"
+                                    data-frames='[{"from":"y:[-100%];z:0;rX:0deg;rY:0;rZ:0;sX:1;sY:1;skX:0;skY:0;","mask":"x:0px;y:0px;","speed":1500,"to":"o:1;","delay":1000,"ease":"Power3.easeInOut"},{"delay":"wait","speed":1000,"to":"auto:auto;","mask":"x:0;y:0;","ease":"Power3.easeInOut"},{"frame":"hover","speed":"300","ease":"Power1.easeInOut","to":"o:1;rX:0;rY:0;rZ:0;z:0;","style":"c:rgba(0, 0, 0, 1.00);bg:rgba(255, 255, 255, 1.00);bc:rgba(255, 255, 255, 1.00);bw:1px 1px 1px 1px;"}]'
+                                    data-textAlign="['center','center','center','center']"
+                                    data-paddingtop="[12,12,12,12]"
+                                    data-paddingright="[30,35,35,15]"
+                                    data-paddingbottom="[12,12,12,12]"
+                                    data-paddingleft="[30,35,35,15]"
+                                    style="z-index: 8; white-space: nowrap; outline:none;box-shadow:none;box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;cursor:pointer; background-color:var(--primary) !important; border:0; border-radius:30px; margin-right:5px;">READ MORE </div>
+                                <div class="tp-caption Newspaper-Button rev-btn" 
+                                    id="slide-200-layer-6" 
+                                    data-x="['center','center','center','center']" 
+                                    data-hoffset="['-90','-80','-75','-90']" 
+                                    data-y="['top','top','top','top']" 
+                                    data-voffset="['400','400','400','420']" 
+                                    data-width="none"
+                                    data-height="none"
+                                    data-whitespace="nowrap"
+                                    data-type="button" 
+                                    data-responsive_offset="on" 
+                                    data-responsive="off"
+                                    data-frames='[{"from":"y:[-100%];z:0;rX:0deg;rY:0;rZ:0;sX:1;sY:1;skX:0;skY:0;","mask":"x:0px;y:0px;","speed":1500,"to":"o:1;","delay":1000,"ease":"Power3.easeInOut"},{"delay":"wait","speed":1000,"to":"auto:auto;","mask":"x:0;y:0;","ease":"Power3.easeInOut"},{"frame":"hover","speed":"300","ease":"Power1.easeInOut","to":"o:1;rX:0;rY:0;rZ:0;z:0;","style":"c:rgba(0, 0, 0, 1.00);bg:rgba(255, 255, 255, 1.00);bc:rgba(255, 255, 255, 1.00);bw:1px 1px 1px 1px;"}]'
+                                    data-textAlign="['center','center','center','center']"
+                                    data-paddingtop="[12,12,12,12]"
+                                    data-paddingright="[30,35,35,15]"
+                                    data-paddingbottom="[12,12,12,12]"
+                                    data-paddingleft="[30,35,35,15]"
+                                    style="z-index: 8; white-space: nowrap; outline:none;box-shadow:none;box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;cursor:pointer; border-radius:30px;">CONTACT US</div>
+                            </li>
+                            <!-- SLIDE  -->
+                        </ul>
+                    </div><!-- END REVOLUTION SLIDER -->  
+                </div>  
+            </div>  
+            <!-- Main Slider -->
+            <div class="content-block">
+                
+                <!-- Our Services -->
+                <div class="section-area content-inner service-info-bx">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-4 col-md-4 col-sm-6">
+                                <div class="service-bx">
+                                    <div class="action-box">
+                                        <img src="assets/images/our-services/pic1.jpg" alt="">
+                                    </div>
+                                    <div class="info-bx text-center">
+                                        <div class="feature-box-sm radius bg-white">
+                                            <i class="fa fa-bank text-primary"></i>
+                                        </div>
+                                        <h4><a href="#">Best Industry Leaders</a></h4>
+                                        <a href="#" class="btn radius-xl">View More</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-6">
+                                <div class="service-bx">
+                                    <div class="action-box">
+                                        <img src="assets/images/our-services/pic2.jpg" alt="">
+                                    </div>
+                                    <div class="info-bx text-center">
+                                        <div class="feature-box-sm radius bg-white">
+                                            <i class="fa fa-book text-primary"></i>
+                                        </div>
+                                        <h4><a href="#">Learn Courses Online</a></h4>
+                                        <a href="#" class="btn radius-xl">View More</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-12">
+                                <div class="service-bx m-b0">
+                                    <div class="action-box">
+                                        <img src="assets/images/our-services/pic3.jpg" alt="">
+                                    </div>
+                                    <div class="info-bx text-center">
+                                        <div class="feature-box-sm radius bg-white">
+                                            <i class="fa fa-file-text-o text-primary"></i>
+                                        </div>
+                                        <h4><a href="#">Book Library & Store</a></h4>
+                                        <a href="#" class="btn radius-xl">View More</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Our Services END -->
+                
+                <!-- Popular Courses -->
+                <div class="section-area section-sp2 popular-courses-bx">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-12 heading-bx left">
+                                <h2 class="title-head">Popular <span>Courses</span></h2>
+                                <p>It is a long established fact that a reader will be distracted by the readable content of a page</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                        <div class="courses-carousel owl-carousel owl-btn-1 col-12 p-lr0">
+                            <div class="item">
+                                <div class="cours-bx">
+                                    <div class="action-box">
+                                        <img src="assets/images/courses/pic1.jpg" alt="">
+                                        <a href="#" class="btn">Read More</a>
+                                    </div>
+                                    <div class="info-bx text-center">
+                                        <h5><a href="#">Introduction EduChamp – LMS plugin</a></h5>
+                                        <span>Programming</span>
+                                    </div>
+                                    <div class="cours-more-info">
+                                        <div class="review">
+                                            <span>3 Review</span>
+                                            <ul class="cours-star">
+                                                <li class="active"><i class="fa fa-star"></i></li>
+                                                <li class="active"><i class="fa fa-star"></i></li>
+                                                <li class="active"><i class="fa fa-star"></i></li>
+                                                <li><i class="fa fa-star"></i></li>
+                                                <li><i class="fa fa-star"></i></li>
+                                            </ul>
+                                        </div>
+                                        <div class="price">
+                                            <del>$190</del>
+                                            <h5>$120</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="cours-bx">
+                                    <div class="action-box">
+                                        <img src="assets/images/courses/pic2.jpg" alt="">
+                                        <a href="#" class="btn">Read More</a>
+                                    </div>
+                                    <div class="info-bx text-center">
+                                        <h5><a href="#">Introduction EduChamp – LMS plugin</a></h5>
+                                        <span>Programming</span>
+                                    </div>
+                                    <div class="cours-more-info">
+                                        <div class="review">
+                                            <span>3 Review</span>
+                                            <ul class="cours-star">
+                                                <li class="active"><i class="fa fa-star"></i></li>
+                                                <li class="active"><i class="fa fa-star"></i></li>
+                                                <li class="active"><i class="fa fa-star"></i></li>
+                                                <li><i class="fa fa-star"></i></li>
+                                                <li><i class="fa fa-star"></i></li>
+                                            </ul>
+                                        </div>
+                                        <div class="price">
+                                            <del>$190</del>
+                                            <h5>$120</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="cours-bx">
+                                    <div class="action-box">
+                                        <img src="assets/images/courses/pic3.jpg" alt="">
+                                        <a href="#" class="btn">Read More</a>
+                                    </div>
+                                    <div class="info-bx text-center">
+                                        <h5><a href="#">Introduction EduChamp – LMS plugin</a></h5>
+                                        <span>Programming</span>
+                                    </div>
+                                    <div class="cours-more-info">
+                                        <div class="review">
+                                            <span>3 Review</span>
+                                            <ul class="cours-star">
+                                                <li class="active"><i class="fa fa-star"></i></li>
+                                                <li class="active"><i class="fa fa-star"></i></li>
+                                                <li class="active"><i class="fa fa-star"></i></li>
+                                                <li><i class="fa fa-star"></i></li>
+                                                <li><i class="fa fa-star"></i></li>
+                                            </ul>
+                                        </div>
+                                        <div class="price">
+                                            <del>$190</del>
+                                            <h5>$120</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="cours-bx">
+                                    <div class="action-box">
+                                        <img src="assets/images/courses/pic4.jpg" alt="">
+                                        <a href="#" class="btn">Read More</a>
+                                    </div>
+                                    <div class="info-bx text-center">
+                                        <h5><a href="#">Introduction EduChamp – LMS plugin</a></h5>
+                                        <span>Programming</span>
+                                    </div>
+                                    <div class="cours-more-info">
+                                        <div class="review">
+                                            <span>3 Review</span>
+                                            <ul class="cours-star">
+                                                <li class="active"><i class="fa fa-star"></i></li>
+                                                <li class="active"><i class="fa fa-star"></i></li>
+                                                <li class="active"><i class="fa fa-star"></i></li>
+                                                <li><i class="fa fa-star"></i></li>
+                                                <li><i class="fa fa-star"></i></li>
+                                            </ul>
+                                        </div>
+                                        <div class="price">
+                                            <del>$190</del>
+                                            <h5>$120</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Popular Courses END -->
+                
+                <!-- Form -->
+                <div class="section-area section-sp1 ovpr-dark bg-fix online-cours" style="background-image:url(assets/images/background/bg1.jpg);">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-12 text-center text-white">
+                                <h2>Online Courses To Learn</h2>
+                                <h5>Own Your Feature Learning New Skills Online</h5>
+                                <form class="cours-search">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" placeholder="What do you want to learn today?	">
+                                        <div class="input-group-append">
+                                            <button class="btn" type="submit">Search</button> 
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="mw800 m-auto">
+                            <div class="row">
+                                <div class="col-md-4 col-sm-6">
+                                    <div class="cours-search-bx m-b30">
+                                        <div class="icon-box">
+                                            <h3><i class="ti-user"></i><span class="counter">5</span>M</h3>
+                                        </div>
+                                        <span class="cours-search-text">Over 5 million student</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-6">
+                                    <div class="cours-search-bx m-b30">
+                                        <div class="icon-box">
+                                            <h3><i class="ti-book"></i><span class="counter">30</span>K</h3>
+                                        </div>
+                                        <span class="cours-search-text">30,000 Courses.</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-12">
+                                    <div class="cours-search-bx m-b30">
+                                        <div class="icon-box">
+                                            <h3><i class="ti-layout-list-post"></i><span class="counter">20</span>K</h3>
+                                        </div>
+                                        <span class="cours-search-text">Learn Anythink Online.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Form END -->
+                <div class="section-area section-sp2">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-12 text-center heading-bx">
+                                <h2 class="title-head m-b0">Upcoming <span>Events</span></h2>
+                                <p class="m-b0">Upcoming Education Events To Feed Brain. </p>
+                            </div>
+                        </div>
+                        <div class="row">
+                        <div class="upcoming-event-carousel owl-carousel owl-btn-center-lr owl-btn-1 col-12 p-lr0  m-b30">
+                            <div class="item">
+                                <div class="event-bx">
+                                    <div class="action-box">
+                                        <img src="assets/images/event/pic4.jpg" alt="">
+                                    </div>
+                                    <div class="info-bx d-flex">
+                                        <div>
+                                            <div class="event-time">
+                                                <div class="event-date">29</div>
+                                                <div class="event-month">October</div>
+                                            </div>
+                                        </div>
+                                        <div class="event-info">
+                                            <h4 class="event-title"><a href="#">Education Autumn Tour 2019</a></h4>
+                                            <ul class="media-post">
+                                                <li><a href="#"><i class="fa fa-clock-o"></i> 7:00am 8:00am</a></li>
+                                                <li><a href="#"><i class="fa fa-map-marker"></i> Berlin, Germany</a></li>
+                                            </ul>
+                                            <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the..</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="event-bx">
+                                    <div class="action-box">
+                                        <img src="assets/images/event/pic3.jpg" alt="">
+                                    </div>
+                                    <div class="info-bx d-flex">
+                                        <div>
+                                            <div class="event-time">
+                                                <div class="event-date">29</div>
+                                                <div class="event-month">October</div>
+                                            </div>
+                                        </div>
+                                        <div class="event-info">
+                                            <h4 class="event-title"><a href="#">Education Autumn Tour 2019</a></h4>
+                                            <ul class="media-post">
+                                                <li><a href="#"><i class="fa fa-clock-o"></i> 7:00am 8:00am</a></li>
+                                                <li><a href="#"><i class="fa fa-map-marker"></i> Berlin, Germany</a></li>
+                                            </ul>
+                                            <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the..</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="event-bx">
+                                    <div class="action-box">
+                                        <img src="assets/images/event/pic2.jpg" alt="">
+                                    </div>
+                                    <div class="info-bx d-flex">
+                                        <div>
+                                            <div class="event-time">
+                                                <div class="event-date">29</div>
+                                                <div class="event-month">October</div>
+                                            </div>
+                                        </div>
+                                        <div class="event-info">
+                                            <h4 class="event-title"><a href="#">Education Autumn Tour 2019</a></h4>
+                                            <ul class="media-post">
+                                                <li><a href="#"><i class="fa fa-clock-o"></i> 7:00am 8:00am</a></li>
+                                                <li><a href="#"><i class="fa fa-map-marker"></i> Berlin, Germany</a></li>
+                                            </ul>
+                                            <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the..</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                        <div class="text-center">
+                            <a href="#" class="btn">View All Event</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonials -->
+                <div class="section-area section-sp2 bg-fix ovbl-dark" style="background-image:url(assets/images/background/bg1.jpg);">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-12 text-white heading-bx left">
+                                <h2 class="title-head text-uppercase">what people <span>say</span></h2>
+                                <p>It is a long established fact that a reader will be distracted by the readable content of a page</p>
+                            </div>
+                        </div>
+                        <div class="testimonial-carousel owl-carousel owl-btn-1 col-12 p-lr0">
+                            <div class="item">
+                                <div class="testimonial-bx">
+                                    <div class="testimonial-thumb">
+                                        <img src="assets/images/testimonials/pic1.jpg" alt="">
+                                    </div>
+                                    <div class="testimonial-info">
+                                        <h5 class="name">Peter Packer</h5>
+                                        <p>-Art Director</p>
+                                    </div>
+                                    <div class="testimonial-content">
+                                        <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type...</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="testimonial-bx">
+                                    <div class="testimonial-thumb">
+                                        <img src="assets/images/testimonials/pic2.jpg" alt="">
+                                    </div>
+                                    <div class="testimonial-info">
+                                        <h5 class="name">Peter Packer</h5>
+                                        <p>-Art Director</p>
+                                    </div>
+                                    <div class="testimonial-content">
+                                        <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Testimonials END -->
+                
+                <!-- Recent News -->
+                <div class="section-area section-sp2">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-12 heading-bx left">
+                                <h2 class="title-head">Recent <span>News</span></h2>
+                                <p>It is a long established fact that a reader will be distracted by the readable content of a page</p>
+                            </div>
+                        </div>
+                        <div class="recent-news-carousel owl-carousel owl-btn-1 col-12 p-lr0">
+                            <div class="item">
+                                <div class="recent-news">
+                                    <div class="action-box">
+                                        <img src="assets/images/blog/latest-blog/pic1.jpg" alt="">
+                                    </div>
+                                    <div class="info-bx">
+                                        <ul class="media-post">
+                                            <li><a href="#"><i class="fa fa-calendar"></i>Jan 02 2019</a></li>
+                                            <li><a href="#"><i class="fa fa-user"></i>By William</a></li>
+                                        </ul>
+                                        <h5 class="post-title"><a href="blog-details.html">This Story Behind Education Will Haunt You Forever.</a></h5>
+                                        <p>Knowing that, you’ve optimised your pages countless amount of times, written tons.</p>
+                                        <div class="post-extra">
+                                            <a href="#" class="btn-link">READ MORE</a>
+                                            <a href="#" class="comments-bx"><i class="fa fa-comments-o"></i>20 Comment</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="recent-news">
+                                    <div class="action-box">
+                                        <img src="assets/images/blog/latest-blog/pic2.jpg" alt="">
+                                    </div>
+                                    <div class="info-bx">
+                                        <ul class="media-post">
+                                            <li><a href="#"><i class="fa fa-calendar"></i>Feb 05 2019</a></li>
+                                            <li><a href="#"><i class="fa fa-user"></i>By John</a></li>
+                                        </ul>
+                                        <h5 class="post-title"><a href="blog-details.html">What Will Education Be Like In The Next 50 Years?</a></h5>
+                                        <p>As desperate as you are right now, you have done everything you can on your.</p>
+                                        <div class="post-extra">
+                                            <a href="#" class="btn-link">READ MORE</a>
+                                            <a href="#" class="comments-bx"><i class="fa fa-comments-o"></i>14 Comment</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="recent-news">
+                                    <div class="action-box">
+                                        <img src="assets/images/blog/latest-blog/pic3.jpg" alt="">
+                                    </div>
+                                    <div class="info-bx">
+                                        <ul class="media-post">
+                                            <li><a href="#"><i class="fa fa-calendar"></i>April 14 2019</a></li>
+                                            <li><a href="#"><i class="fa fa-user"></i>By George</a></li>
+                                        </ul>
+                                        <h5 class="post-title"><a href="blog-details.html">Master The Skills Of Education And Be.</a></h5>
+                                        <p>You will see in the guide all my years of valuable experience together with.</p>
+                                        <div class="post-extra">
+                                            <a href="#" class="btn-link">READ MORE</a>
+                                            <a href="#" class="comments-bx"><i class="fa fa-comments-o"></i>23 Comment</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Recent News End -->
+                
+            </div>
+            <!-- contact area END -->
         </div>
-    </header>
-  <script
-    src="https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/js/tabler.min.js">
-  </script>
+        <!-- Content END-->
+        <!-- Footer ==== -->
+        <footer>
+            <div class="footer-top">
+                <div class="pt-exebar">
+                    <div class="container">
+                        <div class="d-flex align-items-stretch">
+                            <div class="pt-logo mr-auto">
+                                <a href="index.html"><img src="assets/images/logo-white.png" alt=""/></a>
+                            </div>
+                            <div class="pt-social-link">
+                                <ul class="list-inline m-a0">
+                                    <li><a href="#" class="btn-link"><i class="fa fa-facebook"></i></a></li>
+                                    <li><a href="#" class="btn-link"><i class="fa fa-twitter"></i></a></li>
+                                    <li><a href="#" class="btn-link"><i class="fa fa-linkedin"></i></a></li>
+                                    <li><a href="#" class="btn-link"><i class="fa fa-google-plus"></i></a></li>
+                                </ul>
+                            </div>
+                            <div class="pt-btn-join">
+                                <a href="#" class="btn ">Join Now</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-4 col-md-12 col-sm-12 footer-col-4">
+                            <div class="widget">
+                                <h5 class="footer-title">Sign Up For A Newsletter</h5>
+                                <p class="text-capitalize m-b20">Weekly Breaking news analysis and cutting edge advices on job searching.</p>
+                                <div class="subscribe-form m-b20">
+                                    <form class="subscription-form" action="http://educhamp.themetrades.com/demo/assets/script/mailchamp.php" method="post">
+                                        <div class="ajax-message"></div>
+                                        <div class="input-group">
+                                            <input name="email" required="required"  class="form-control" placeholder="Your Email Address" type="email">
+                                            <span class="input-group-btn">
+                                                <button name="submit" value="Submit" type="submit" class="btn"><i class="fa fa-arrow-right"></i></button>
+                                            </span> 
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-5 col-md-7 col-sm-12">
+                            <div class="row">
+                                <div class="col-4 col-lg-4 col-md-4 col-sm-4">
+                                    <div class="widget footer_widget">
+                                        <h5 class="footer-title">Company</h5>
+                                        <ul>
+                                            <li><a href="index.html">Home</a></li>
+                                            <li><a href="about-1.html">About</a></li>
+                                            <li><a href="faq-1.html">FAQs</a></li>
+                                            <li><a href="contact-1.html">Contact</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-4 col-lg-4 col-md-4 col-sm-4">
+                                    <div class="widget footer_widget">
+                                        <h5 class="footer-title">Get In Touch</h5>
+                                        <ul>
+                                            <li><a href="http://educhamp.themetrades.com/admin/index.html">Dashboard</a></li>
+                                            <li><a href="blog-classic-grid.html">Blog</a></li>
+                                            <li><a href="portfolio.html">Portfolio</a></li>
+                                            <li><a href="event.html">Event</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-4 col-lg-4 col-md-4 col-sm-4">
+                                    <div class="widget footer_widget">
+                                        <h5 class="footer-title">Courses</h5>
+                                        <ul>
+                                            <li><a href="courses.html">Courses</a></li>
+                                            <li><a href="courses-details.html">Details</a></li>
+                                            <li><a href="membership.html">Membership</a></li>
+                                            <li><a href="profile.html">Profile</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-3 col-md-5 col-sm-12 footer-col-4">
+                            <div class="widget widget_gallery gallery-grid-4">
+                                <h5 class="footer-title">Our Gallery</h5>
+                                <ul class="magnific-image">
+                                    <li><a href="assets/images/gallery/pic1.jpg" class="magnific-anchor"><img src="assets/images/gallery/pic1.jpg" alt=""></a></li>
+                                    <li><a href="assets/images/gallery/pic2.jpg" class="magnific-anchor"><img src="assets/images/gallery/pic2.jpg" alt=""></a></li>
+                                    <li><a href="assets/images/gallery/pic3.jpg" class="magnific-anchor"><img src="assets/images/gallery/pic3.jpg" alt=""></a></li>
+                                    <li><a href="assets/images/gallery/pic4.jpg" class="magnific-anchor"><img src="assets/images/gallery/pic4.jpg" alt=""></a></li>
+                                    <li><a href="assets/images/gallery/pic5.jpg" class="magnific-anchor"><img src="assets/images/gallery/pic5.jpg" alt=""></a></li>
+                                    <li><a href="assets/images/gallery/pic6.jpg" class="magnific-anchor"><img src="assets/images/gallery/pic6.jpg" alt=""></a></li>
+                                    <li><a href="assets/images/gallery/pic7.jpg" class="magnific-anchor"><img src="assets/images/gallery/pic7.jpg" alt=""></a></li>
+                                    <li><a href="assets/images/gallery/pic8.jpg" class="magnific-anchor"><img src="assets/images/gallery/pic8.jpg" alt=""></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 text-center"> <a target="_blank" href="https://www.templateshub.net">Templates Hub</a></div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <!-- Footer END ==== -->
+        <button class="back-to-top fa fa-chevron-up" ></button>
+    </div>
+
+<!-- External JavaScripts -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/vendors/bootstrap/js/popper.min.js"></script>
+    <script src="assets/vendors/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/vendors/bootstrap-select/bootstrap-select.min.js"></script>
+    <script src="assets/vendors/bootstrap-touchspin/jquery.bootstrap-touchspin.js"></script>
+    <script src="assets/vendors/magnific-popup/magnific-popup.js"></script>
+    <script src="assets/vendors/counter/waypoints-min.js"></script>
+    <script src="assets/vendors/counter/counterup.min.js"></script>
+    <script src="assets/vendors/imagesloaded/imagesloaded.js"></script>
+    <script src="assets/vendors/masonry/masonry.js"></script>
+    <script src="assets/vendors/masonry/filter.js"></script>
+    <script src="assets/vendors/owl-carousel/owl.carousel.js"></script>
+    <script src="assets/js/functions.js"></script>
+    <script src="assets/js/contact.js"></script>
+    <script src='assets/vendors/switcher/switcher.js'></script>
+    <!-- Revolution JavaScripts Files -->
+    <script src="assets/vendors/revolution/js/jquery.themepunch.tools.min.js"></script>
+    <script src="assets/vendors/revolution/js/jquery.themepunch.revolution.min.js"></script>
+    <!-- Slider revolution 5.0 Extensions  (Load Extensions only on Local File Systems !  The following part can be removed on Server for On Demand Loading) -->
+    <script src="assets/vendors/revolution/js/extensions/revolution.extension.actions.min.js"></script>
+    <script src="assets/vendors/revolution/js/extensions/revolution.extension.carousel.min.js"></script>
+    <script src="assets/vendors/revolution/js/extensions/revolution.extension.kenburn.min.js"></script>
+    <script src="assets/vendors/revolution/js/extensions/revolution.extension.layeranimation.min.js"></script>
+    <script src="assets/vendors/revolution/js/extensions/revolution.extension.migration.min.js"></script>
+    <script src="assets/vendors/revolution/js/extensions/revolution.extension.navigation.min.js"></script>
+    <script src="assets/vendors/revolution/js/extensions/revolution.extension.parallax.min.js"></script>
+    <script src="assets/vendors/revolution/js/extensions/revolution.extension.slideanims.min.js"></script>
+    <script src="assets/vendors/revolution/js/extensions/revolution.extension.video.min.js"></script>
+    <script>
+        jQuery(document).ready(function() {
+            var ttrevapi;
+            var tpj =jQuery;
+            if(tpj("#rev_slider_486_1").revolution == undefined){
+                revslider_showDoubleJqueryError("#rev_slider_486_1");
+            }else{
+                ttrevapi = tpj("#rev_slider_486_1").show().revolution({
+                    sliderType:"standard",
+                    jsFileLocation:"assets/vendors/revolution/js/",
+                    sliderLayout:"fullwidth",
+                    dottedOverlay:"none",
+                    delay:9000,
+                    navigation: {
+                        keyboardNavigation:"on",
+                        keyboard_direction: "horizontal",
+                        mouseScrollNavigation:"off",
+                        mouseScrollReverse:"default",
+                        onHoverStop:"on",
+                        touch:{
+                            touchenabled:"on",
+                            swipe_threshold: 75,
+                            swipe_min_touches: 1,
+                            swipe_direction: "horizontal",
+                            drag_block_vertical: false
+                        }
+                        ,
+                        arrows: {
+                            style: "uranus",
+                            enable: true,
+                            hide_onmobile: false,
+                            hide_onleave: false,
+                            tmp: '',
+                            left: {
+                                h_align: "left",
+                                v_align: "center",
+                                h_offset: 10,
+                                v_offset: 0
+                            },
+                            right: {
+                                h_align: "right",
+                                v_align: "center",
+                                h_offset: 10,
+                                v_offset: 0
+                            }
+                        },
+                        
+                    },
+                    viewPort: {
+                        enable:true,
+                        outof:"pause",
+                        visible_area:"80%",
+                        presize:false
+                    },
+                    responsiveLevels:[1240,1024,778,480],
+                    visibilityLevels:[1240,1024,778,480],
+                    gridwidth:[1240,1024,778,480],
+                    gridheight:[768,600,600,600],
+                    lazyType:"none",
+                    parallax: {
+                        type:"scroll",
+                        origo:"enterpoint",
+                        speed:400,
+                        levels:[5,10,15,20,25,30,35,40,45,50,46,47,48,49,50,55],
+                        type:"scroll",
+                    },
+                    shadow:0,
+                    spinner:"off",
+                    stopLoop:"off",
+                    stopAfterLoops:-1,
+                    stopAtSlide:-1,
+                    shuffle:"off",
+                    autoHeight:"off",
+                    hideThumbsOnMobile:"off",
+                    hideSliderAtLimit:0,
+                    hideCaptionAtLimit:0,
+                    hideAllCaptionAtLilmit:0,
+                    debugMode:false,
+                    fallbacks: {
+                        simplifyAll:"off",
+                        nextSlideOnWindowFocus:"off",
+                        disableFocusListener:false,
+                    }
+                });
+            }
+        });	
+    </script>
 </body>
 
 </html>
