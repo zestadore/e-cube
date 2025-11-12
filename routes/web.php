@@ -48,7 +48,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('save-background-question', [App\Http\Controllers\HomeController::class, 'saveBackgroundQuestion'])->name('save-background-question');
     });
     Route::group(['as'=>'employer.','prefix' => 'employer'], function () {
-        Route::get('/', [App\Http\Controllers\HomeController::class, 'employeeDashboard'])->name('dashboard');
+        Route::get('/', [App\Http\Controllers\HomeController::class, 'employerDashboard'])->name('dashboard');
         Route::get('company-profile', [App\Http\Controllers\Registration\Company\CompanyProfileController::class, 'index'])->name('company_profile');
     });
 });

@@ -93,4 +93,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(CandidateExperience::class, 'user_id', 'id');
     }
+
+    public function companyProfile()
+    {
+        return $this->hasOne(CompanyProfile::class, 'user_id', 'id');
+    }
 }

@@ -76,11 +76,16 @@ class HomeController extends Controller
 
     public function registerAsEmployer(){
         $industries = Industry::get();
-        return view('users.registration.employer',compact('industries'));
+        $profile=null;
+        return view('users.registration.employer',compact('industries','profile'));
     }
 
     public function employeeDashboard(){
         return view('users.dashboard.employee');
+    }
+
+    public function employerDashboard(){
+        return view('users.dashboard.employer');
     }
 
     public function backGroundQuestion(){
