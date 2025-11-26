@@ -63,20 +63,13 @@
                     <div class="row d-flex justify-content-between">
                         <div class="topbar-left">
                             <ul>
-                                <li><a href="faq-1.html"><i class="fa fa-question-circle"></i>Ask a Question</a></li>
-                                <li><a href="javascript:;"><i class="fa fa-envelope-o"></i>Support@website.com</a></li>
+                                <li><a href="javascript:;"><i class="fa fa-envelope-o"></i>support@ecubecareers.com</a></li>
                             </ul>
                         </div>
                         <div class="topbar-right">
                             <ul>
-                                <li>
-                                    <select class="header-lang-bx">
-                                        <option data-icon="flag flag-uk">English UK</option>
-                                        <option data-icon="flag flag-us">English US</option>
-                                    </select>
-                                </li>
-                                <li><a href="login.html">Login</a></li>
-                                <li><a href="register.html">Register</a></li>
+                                <li><a href="{{ route('login') }}">Login</a></li>
+                                <li><a href="{{ route('register') }}">Register</a></li>
                             </ul>
                         </div>
                     </div>
@@ -121,92 +114,21 @@
                                 <a href="index.html"><img src="assets/images/logo.png" alt=""></a>
                             </div>
                             <ul class="nav navbar-nav">	
-                                <li class="active"><a href="javascript:;">Home <i class="fa fa-chevron-down"></i></a>
+                                <li class="active"><a href="{{route('index')}}">Home</a></li>
+                                <li><a href="javascript:;">Industries <i class="fa fa-chevron-down"></i></a>
                                     <ul class="sub-menu">
-                                        <li><a href="index.html">Home 1</a></li>
-                                        <li><a href="index-2.html">Home 2</a></li>
-                                    </ul>
-                                </li>
-                                <li><a href="javascript:;">Pages <i class="fa fa-chevron-down"></i></a>
-                                    <ul class="sub-menu">
-                                        <li><a href="javascript:;">About<i class="fa fa-angle-right"></i></a>
-                                            <ul class="sub-menu">
-                                                <li><a href="about-1.html">About 1</a></li>
-                                                <li><a href="about-2.html">About 2</a></li>
-                                            </ul>
-                                        </li>
-                                        <li><a href="javascript:;">Event<i class="fa fa-angle-right"></i></a>
-                                            <ul class="sub-menu">
-                                                <li><a href="event.html">Event</a></li>
-                                                <li><a href="events-details.html">Events Details</a></li>
-                                            </ul>
-                                        </li>
-                                        <li><a href="javascript:;">FAQ's<i class="fa fa-angle-right"></i></a>
-                                            <ul class="sub-menu">
-                                                <li><a href="faq-1.html">FAQ's 1</a></li>
-                                                <li><a href="faq-2.html">FAQ's 2</a></li>
-                                            </ul>
-                                        </li>
-                                        <li><a href="javascript:;">Contact Us<i class="fa fa-angle-right"></i></a>
-                                            <ul class="sub-menu">
-                                                <li><a href="contact-1.html">Contact Us 1</a></li>
-                                                <li><a href="contact-2.html">Contact Us 2</a></li>
-                                            </ul>
-                                        </li>
-                                        <li><a href="portfolio.html">Portfolio</a></li>
-                                        <li><a href="profile.html">Profile</a></li>
-                                        <li><a href="membership.html">Membership</a></li>
-                                        <li><a href="error-404.html">404 Page</a></li>
-                                    </ul>
-                                </li>
-                                <li class="add-mega-menu"><a href="javascript:;">Our Courses <i class="fa fa-chevron-down"></i></a>
-                                    <ul class="sub-menu add-menu">
-                                        <li class="add-menu-left">
-                                            <h5 class="menu-adv-title">Our Courses</h5>
-                                            <ul>
-                                                <li><a href="courses.html">Courses </a></li>
-                                                <li><a href="courses-details.html">Courses Details</a></li>
-                                                <li><a href="profile.html">Instructor Profile</a></li>
-                                                <li><a href="event.html">Upcoming Event</a></li>
-                                                <li><a href="membership.html">Membership</a></li>
-                                            </ul>
-                                        </li>
-                                        <li class="add-menu-right">
-                                            <img src="assets/images/adv/adv.jpg" alt=""/>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <li><a href="javascript:;">Blog <i class="fa fa-chevron-down"></i></a>
-                                    <ul class="sub-menu">
-                                        <li><a href="blog-classic-grid.html">Blog Classic</a></li>
-                                        <li><a href="blog-classic-sidebar.html">Blog Classic Sidebar</a></li>
-                                        <li><a href="blog-list-sidebar.html">Blog List Sidebar</a></li>
-                                        <li><a href="blog-standard-sidebar.html">Blog Standard Sidebar</a></li>
-                                        <li><a href="blog-details.html">Blog Details</a></li>
-                                    </ul>
-                                </li>
-                                <li class="nav-dashboard"><a href="javascript:;">Dashboard <i class="fa fa-chevron-down"></i></a>
-                                    <ul class="sub-menu">
-                                        <li><a href="admin/index.html">Dashboard</a></li>
-                                        <li><a href="admin/add-listing.html">Add Listing</a></li>
-                                        <li><a href="admin/bookmark.html">Bookmark</a></li>
-                                        <li><a href="admin/courses.html">Courses</a></li>
-                                        <li><a href="admin/review.html">Review</a></li>
-                                        <li><a href="admin/teacher-profile.html">Teacher Profile</a></li>
-                                        <li><a href="admin/user-profile.html">User Profile</a></li>
-                                        <li><a href="javascript:;">Calendar<i class="fa fa-angle-right"></i></a>
-                                            <ul class="sub-menu">
-                                                <li><a href="admin/basic-calendar.html">Basic Calendar</a></li>
-                                                <li><a href="admin/list-view-calendar.html">List View Calendar</a></li>
-                                            </ul>
-                                        </li>
-                                        <li><a href="javascript:;">Mailbox<i class="fa fa-angle-right"></i></a>
-                                            <ul class="sub-menu">
-                                                <li><a href="admin/mailbox.html">Mailbox</a></li>
-                                                <li><a href="admin/mailbox-compose.html">Compose</a></li>
-                                                <li><a href="admin/mailbox-read.html">Mail Read</a></li>
-                                            </ul>
-                                        </li>
+                                        @foreach ($industries as $industry)
+                                            <li>
+                                                <a href="javascript:;">{{ $industry->industry_name }}@if ($industry->children->count())<i class="fa fa-angle-right"></i>@endif</a>
+                                                @if ($industry->children->count())
+                                                    <ul class="sub-menu">
+                                                        @foreach ($industry->children as $child)
+                                                            @include('submenu', ['industry' => $child])
+                                                        @endforeach
+                                                    </ul>
+                                                @endif
+                                            </li>
+                                        @endforeach
                                     </ul>
                                 </li>
                             </ul>
@@ -252,7 +174,7 @@
                             data-param9="" data-param10="" 
                             data-description="Science says that Women are generally happier">
                                 <!-- MAIN IMAGE -->
-                                <img src="assets/images/slider/slide2.jpg" alt="" 
+                                <img src="assets/images/slider/slide3.jpg" alt="" 
                                     data-bgposition="center center" 
                                     data-bgfit="cover" 
                                     data-bgrepeat="no-repeat" 
@@ -386,7 +308,164 @@
                                     data-paddingleft="[30,35,35,15]"
                                     style="z-index: 8; white-space: nowrap; outline:none;box-shadow:none;box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;cursor:pointer; border-radius:30px;">Login</div>
                             </li>
-                            
+                            <li data-index="rs-200" 
+                            data-transition="parallaxvertical" 
+                            data-slotamount="default" 
+                            data-hideafterloop="0" 
+                            data-hideslideonmobile="off" 
+                            data-easein="default" 
+                            data-easeout="default" 
+                            data-masterspeed="default" 
+                            data-thumb="assets/images/slider/slide1.jpg" 
+                            data-rotate="0" 
+                            data-fstransition="fade" 
+                            data-fsmasterspeed="1500" 
+                            data-fsslotamount="7" 
+                            data-saveperformance="off" 
+                            data-title="A STUDY ON HAPPINESS" 
+                            data-param1="" data-param2="" 
+                            data-param3="" data-param4="" 
+                            data-param5="" data-param6="" 
+                            data-param7="" data-param8="" 
+                            data-param9="" data-param10="" 
+                            data-description="Science says that Women are generally happier">
+                                <!-- MAIN IMAGE -->
+                                <img src="assets/images/slider/slide4.jpg" alt="" 
+                                    data-bgposition="center center" 
+                                    data-bgfit="cover" 
+                                    data-bgrepeat="no-repeat" 
+                                    data-bgparallax="10" 
+                                    class="rev-slidebg" 
+                                    data-no-retina />
+                                    
+                                <!-- LAYER NR. 1 -->
+                                <div class="tp-caption tp-shape tp-shapewrapper " 
+                                    id="slide-200-layer-1" 
+                                    data-x="['center','center','center','center']" data-hoffset="['0','0','0','0']" 
+                                    data-y="['middle','middle','middle','middle']" data-voffset="['0','0','0','0']" 
+                                    data-width="full"
+                                    data-height="full"
+                                    data-whitespace="nowrap"
+                                    data-type="shape" 
+                                    data-basealign="slide" 
+                                    data-responsive_offset="off" 
+                                    data-responsive="off"
+                                    data-frames='[{"from":"opacity:0;","speed":1,"to":"o:1;","delay":0,"ease":"Power4.easeOut"},{"delay":"wait","speed":1000,"to":"opacity:1;","ease":"Power4.easeOut"}]'
+                                    data-textAlign="['left','left','left','left']"
+                                    data-paddingtop="[0,0,0,0]"
+                                    data-paddingright="[0,0,0,0]"
+                                    data-paddingbottom="[0,0,0,0]"
+                                    data-paddingleft="[0,0,0,0]"
+                                    style="z-index: 5;background-color:rgba(2, 0, 11, 0.80);border-color:rgba(0, 0, 0, 0);border-width:0px;"> 
+                                </div>
+
+                                <!-- LAYER NR. 2 -->
+                                <div class="tp-caption Newspaper-Title   tp-resizeme" 
+                                    id="slide-200-layer-2" 
+                                    data-x="['center','center','center','center']" 
+                                    data-hoffset="['0','0','0','0']" 
+                                    data-y="['top','top','top','top']" 
+                                    data-voffset="['250','250','250','240']" 
+                                    data-fontsize="['50','50','50','30']"
+                                    data-lineheight="['55','55','55','35']"
+                                    data-width="full"
+                                    data-height="none"
+                                    data-whitespace="normal"
+                                    data-type="text" 
+                                    data-responsive_offset="on" 
+                                    data-frames='[{"from":"y:[-100%];z:0;rX:0deg;rY:0;rZ:0;sX:1;sY:1;skX:0;skY:0;","mask":"x:0px;y:0px;s:inherit;e:inherit;","speed":1500,"to":"o:1;","delay":1000,"ease":"Power3.easeInOut"},{"delay":"wait","speed":1000,"to":"auto:auto;","mask":"x:0;y:0;s:inherit;e:inherit;","ease":"Power3.easeInOut"}]'
+                                    data-textAlign="['center','center','center','center']"
+                                    data-paddingtop="[0,0,0,0]"
+                                    data-paddingright="[0,0,0,0]"
+                                    data-paddingbottom="[10,10,10,10]"
+                                    data-paddingleft="[0,0,0,0]"
+                                    style="z-index: 6; font-family:rubik; font-weight:700; text-align:center; white-space: normal;text-transform:uppercase;">
+                                        Rocket Fast Hiring
+                                </div>
+
+                                <!-- LAYER NR. 3 -->
+                                <div class="tp-caption Newspaper-Subtitle   tp-resizeme" 
+                                    id="slide-200-layer-3" 
+                                    data-x="['center','center','center','center']" 
+                                    data-hoffset="['0','0','0','0']" 
+                                    data-y="['top','top','top','top']" 
+                                    data-voffset="['210','210','210','210']" 
+                                    data-width="none"
+                                    data-height="none"
+                                    data-whitespace="nowrap"
+                                    data-type="text" 
+                                    data-responsive_offset="on"
+                                    data-frames='[{"from":"y:[-100%];z:0;rX:0deg;rY:0;rZ:0;sX:1;sY:1;skX:0;skY:0;","mask":"x:0px;y:0px;s:inherit;e:inherit;","speed":1500,"to":"o:1;","delay":1000,"ease":"Power3.easeInOut"},{"delay":"wait","speed":1000,"to":"auto:auto;","mask":"x:0;y:0;s:inherit;e:inherit;","ease":"Power3.easeInOut"}]'
+                                    data-textAlign="['left','left','left','left']"
+                                    data-paddingtop="[0,0,0,0]"
+                                    data-paddingright="[0,0,0,0]"
+                                    data-paddingbottom="[0,0,0,0]"
+                                    data-paddingleft="[0,0,0,0]"
+                                    style="z-index: 7; white-space: nowrap;text-transform:uppercase; color:#fff; font-family:rubik; font-size:18px; font-weight:400;">
+                                        Easy & Convenient Process 
+                                </div>
+                                
+                                <!-- LAYER NR. 3 -->
+                                <div class="tp-caption Newspaper-Subtitle   tp-resizeme" 
+                                    id="slide-200-layer-4" 
+                                    data-x="['center','center','center','center']" 
+                                    data-hoffset="['0','0','0','0']" 
+                                    data-y="['top','top','top','top']" 
+                                    data-voffset="['320','320','320','290']" 
+                                    data-width="['800','800','700','420']"
+                                    data-height="['100','100','100','120']"
+                                    data-whitespace="unset"
+                                    data-type="text" 
+                                    data-responsive_offset="on"
+                                    data-frames='[{"from":"y:[-100%];z:0;rX:0deg;rY:0;rZ:0;sX:1;sY:1;skX:0;skY:0;","mask":"x:0px;y:0px;s:inherit;e:inherit;","speed":1500,"to":"o:1;","delay":1000,"ease":"Power3.easeInOut"},{"delay":"wait","speed":1000,"to":"auto:auto;","mask":"x:0;y:0;s:inherit;e:inherit;","ease":"Power3.easeInOut"}]'
+                                    data-textAlign="['center','center','center','center']"
+                                    data-paddingtop="[0,0,0,0]"
+                                    data-paddingright="[0,0,0,0]"
+                                    data-paddingbottom="[0,0,0,0]"
+                                    data-paddingleft="[0,0,0,0]"
+                                    style="z-index: 7; text-transform:capitalize; white-space: unset; color:#fff; font-family:rubik; font-size:18px; line-height:28px; font-weight:400;">
+                                        Experience a hassle-free and streamlined processing & documentation tailored for your convenience and ease of search.
+                                </div>
+                                <!-- LAYER NR. 4 -->
+                                <div class="tp-caption Newspaper-Button rev-btn " 
+                                    id="slide-200-layer-5" 
+                                    data-x="['center','center','center','center']" 
+                                    data-hoffset="['90','80','75','90']" 
+                                    data-y="['top','top','top','top']" 
+                                    data-voffset="['400','400','400','420']" 
+                                    data-width="none"
+                                    data-height="none"
+                                    data-whitespace="nowrap"
+                                    data-type="button" 
+                                    data-responsive_offset="on" 
+                                    data-responsive="off"
+                                    data-frames='[{"from":"y:[-100%];z:0;rX:0deg;rY:0;rZ:0;sX:1;sY:1;skX:0;skY:0;","mask":"x:0px;y:0px;","speed":1500,"to":"o:1;","delay":1000,"ease":"Power3.easeInOut"},{"delay":"wait","speed":1000,"to":"auto:auto;","mask":"x:0;y:0;","ease":"Power3.easeInOut"},{"frame":"hover","speed":"300","ease":"Power1.easeInOut","to":"o:1;rX:0;rY:0;rZ:0;z:0;","style":"c:rgba(0, 0, 0, 1.00);bg:rgba(255, 255, 255, 1.00);bc:rgba(255, 255, 255, 1.00);bw:1px 1px 1px 1px;"}]'
+                                    data-textAlign="['center','center','center','center']"
+                                    data-paddingtop="[12,12,12,12]"
+                                    data-paddingright="[30,35,35,15]"
+                                    data-paddingbottom="[12,12,12,12]"
+                                    data-paddingleft="[30,35,35,15]"
+                                    style="z-index: 8; white-space: nowrap; outline:none;box-shadow:none;box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;cursor:pointer; background-color:var(--primary) !important; border:0; border-radius:30px; margin-right:5px;">READ MORE </div>
+                                <div class="tp-caption Newspaper-Button rev-btn" 
+                                    id="slide-200-layer-6" 
+                                    data-x="['center','center','center','center']" 
+                                    data-hoffset="['-90','-80','-75','-90']" 
+                                    data-y="['top','top','top','top']" 
+                                    data-voffset="['400','400','400','420']" 
+                                    data-width="none"
+                                    data-height="none"
+                                    data-whitespace="nowrap"
+                                    data-type="button" 
+                                    data-responsive_offset="on" 
+                                    data-responsive="off"
+                                    data-frames='[{"from":"y:[-100%];z:0;rX:0deg;rY:0;rZ:0;sX:1;sY:1;skX:0;skY:0;","mask":"x:0px;y:0px;","speed":1500,"to":"o:1;","delay":1000,"ease":"Power3.easeInOut"},{"delay":"wait","speed":1000,"to":"auto:auto;","mask":"x:0;y:0;","ease":"Power3.easeInOut"},{"frame":"hover","speed":"300","ease":"Power1.easeInOut","to":"o:1;rX:0;rY:0;rZ:0;z:0;","style":"c:rgba(0, 0, 0, 1.00);bg:rgba(255, 255, 255, 1.00);bc:rgba(255, 255, 255, 1.00);bw:1px 1px 1px 1px;"}]'
+                                    data-textAlign="['center','center','center','center']"
+                                    data-paddingtop="[12,12,12,12]"
+                                    data-paddingright="[30,35,35,15]"
+                                    data-paddingbottom="[12,12,12,12]"
+                                    data-paddingleft="[30,35,35,15]"
+                                    style="z-index: 8; white-space: nowrap; outline:none;box-shadow:none;box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;cursor:pointer; border-radius:30px;">CONTACT US</div>
+                            </li>
                             <!-- SLIDE  -->
                         </ul>
                     </div><!-- END REVOLUTION SLIDER -->  
@@ -577,17 +656,17 @@
                                     <div class="info-bx d-flex">
                                         <div>
                                             <div class="event-time">
-                                                <div class="event-date">29</div>
-                                                <div class="event-month">October</div>
+                                                <div class="event-date">20</div>
+                                                <div class="event-month">December</div>
                                             </div>
                                         </div>
                                         <div class="event-info">
-                                            <h4 class="event-title"><a href="#">Education Autumn Tour 2019</a></h4>
+                                            <h4 class="event-title"><a href="#">Beauty & Fitness Trainee</a></h4>
                                             <ul class="media-post">
-                                                <li><a href="#"><i class="fa fa-clock-o"></i> 7:00am 8:00am</a></li>
-                                                <li><a href="#"><i class="fa fa-map-marker"></i> Berlin, Germany</a></li>
+                                                <li><a href="#"><i class="fa fa-clock-o"></i> 7:00am 7:00pm</a></li>
+                                                <li><a href="#"><i class="fa fa-map-marker"></i> Interview scheduled</a></li>
                                             </ul>
-                                            <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the..</p>
+                                            {{-- <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the..</p> --}}
                                         </div>
                                     </div>
                                 </div>
@@ -600,17 +679,17 @@
                                     <div class="info-bx d-flex">
                                         <div>
                                             <div class="event-time">
-                                                <div class="event-date">29</div>
-                                                <div class="event-month">October</div>
+                                                <div class="event-date">25</div>
+                                                <div class="event-month">December</div>
                                             </div>
                                         </div>
                                         <div class="event-info">
-                                            <h4 class="event-title"><a href="#">Education Autumn Tour 2019</a></h4>
+                                            <h4 class="event-title"><a href="#">Nutrition & Diet Consultant</a></h4>
                                             <ul class="media-post">
-                                                <li><a href="#"><i class="fa fa-clock-o"></i> 7:00am 8:00am</a></li>
-                                                <li><a href="#"><i class="fa fa-map-marker"></i> Berlin, Germany</a></li>
+                                                <li><a href="#"><i class="fa fa-clock-o"></i> 7:00am 8:00pm</a></li>
+                                                <li><a href="#"><i class="fa fa-map-marker"></i> Interview scheduled</a></li>
                                             </ul>
-                                            <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the..</p>
+                                            {{-- <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the..</p> --}}
                                         </div>
                                     </div>
                                 </div>
@@ -623,17 +702,17 @@
                                     <div class="info-bx d-flex">
                                         <div>
                                             <div class="event-time">
-                                                <div class="event-date">29</div>
-                                                <div class="event-month">October</div>
+                                                <div class="event-date">15</div>
+                                                <div class="event-month">January</div>
                                             </div>
                                         </div>
                                         <div class="event-info">
-                                            <h4 class="event-title"><a href="#">Education Autumn Tour 2019</a></h4>
+                                            <h4 class="event-title"><a href="#">Front Desk / Client Coordinator</a></h4>
                                             <ul class="media-post">
-                                                <li><a href="#"><i class="fa fa-clock-o"></i> 7:00am 8:00am</a></li>
-                                                <li><a href="#"><i class="fa fa-map-marker"></i> Berlin, Germany</a></li>
+                                                <li><a href="#"><i class="fa fa-clock-o"></i> 7:00am 6:00pm</a></li>
+                                                <li><a href="#"><i class="fa fa-map-marker"></i> Interview scheduled</a></li>
                                             </ul>
-                                            <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the..</p>
+                                            {{-- <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the..</p> --}}
                                         </div>
                                     </div>
                                 </div>
@@ -818,7 +897,7 @@
     <script src="assets/vendors/owl-carousel/owl.carousel.js"></script>
     <script src="assets/js/functions.js"></script>
     <script src="assets/js/contact.js"></script>
-    <script src='assets/vendors/switcher/switcher.js'></script>
+    {{-- <script src='assets/vendors/switcher/switcher.js'></script> --}}
     <!-- Revolution JavaScripts Files -->
     <script src="assets/vendors/revolution/js/jquery.themepunch.tools.min.js"></script>
     <script src="assets/vendors/revolution/js/jquery.themepunch.revolution.min.js"></script>
