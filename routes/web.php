@@ -6,7 +6,8 @@ use Illuminate\Support\Facades\Route;
 //     return view('welcome');
 // });
 
-Route::get('/', [App\Http\Controllers\FrontendController::class, 'index'])->name('index');
+Route::get('/', [App\Http\Controllers\FrontendController::class, 'index'])->name('frontend_index');
+Route::get('/about-us', [App\Http\Controllers\FrontendController::class, 'about_us'])->name('about');
 
 Auth::routes();
 Route::get('/migrate', function () {

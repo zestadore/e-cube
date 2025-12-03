@@ -11,4 +11,9 @@ class FrontendController extends Controller
         $industries = Industry::doesntHave('parents')->where('status', 1)->get();
         return view('welcome', compact('industries'));
     }
+
+    public function about_us()
+    {
+        return view('frontend.about');
+    }
 }
