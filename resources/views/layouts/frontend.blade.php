@@ -116,6 +116,7 @@
                             <ul class="nav navbar-nav">	
                                 <li class="{{ request()->is('/') ? 'active' : '' }}"><a href="{{route('frontend_index')}}">Home</a></li>
                                 <li class="{{ request()->is('about-us') ? 'active' : '' }}"><a href="{{route('about')}}">About</a></li>
+                                <li class="{{ request()->is('faq') ? 'active' : '' }}"><a href="{{route('faq')}}">FAQ</a></li>
                                 {{-- <li><a href="javascript:;">Industries <i class="fa fa-chevron-down"></i></a>
                                     <ul class="sub-menu">
                                         @foreach ($industries as $industry)
