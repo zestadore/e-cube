@@ -45,6 +45,7 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('qualification', App\Http\Controllers\Admin\QualificationController::class);
         Route::resource('computer-and-other-skill', App\Http\Controllers\Admin\ComputerAndOtherSkillController::class);
         Route::resource('background-question', App\Http\Controllers\Admin\BackGroundQuestionController::class);
+        Route::resource('subscription-packages', App\Http\Controllers\Admin\SubscriptionPackageController::class);
     });
     Route::group(['as'=>'employee.','prefix' => 'employee'], function () {
         Route::get('/', [App\Http\Controllers\HomeController::class, 'employeeDashboard'])->name('dashboard');
