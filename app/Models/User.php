@@ -98,4 +98,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(CompanyProfile::class, 'user_id', 'id');
     }
+
+    public function backgroundQuestions()
+    {
+        return $this->hasMany(BackgroundQuestionAnswer::class, 'user_id', 'id');
+    }
 }

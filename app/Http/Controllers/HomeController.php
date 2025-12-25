@@ -81,7 +81,11 @@ class HomeController extends Controller
     }
 
     public function employeeDashboard(){
-        return view('users.dashboard.employee');
+        if(count(Auth::user()->backGroundQuestions)){
+            return view('users.dashboard.employee');
+        }else{
+            return redirect()->route('employee.background-questions');
+        }
     }
 
     public function employerDashboard(){
@@ -105,7 +109,7 @@ class HomeController extends Controller
        }else{
            BackgroundQuestionAnswer::create($data);
        }
-       return redirect()->back()->with('success','Background question updated successfully');
+       return redirect()->route('employee.dashboard')->with('success','Background question updated successfully');
     }
 
     public function changePassword()
