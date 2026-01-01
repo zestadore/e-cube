@@ -7,6 +7,8 @@ use App\Models\ComputerAndOtherSkill;
 use App\Models\Industry;
 use App\Models\BackGroundQuestion;
 use App\Models\BackgroundQuestionAnswer;
+use App\Models\PaymentMethod;
+use App\Models\SubscriptionPackage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -165,5 +167,23 @@ class HomeController extends Controller
         }else{
             return redirect()->back()->with('error', 'Failed to update the data. Please try again.');
         }
+    }
+
+    public function subscriptionPackages()
+    {
+        $role=Auth::user()->role;
+        switch ($role) {
+            case "employee":
+                $packages=SubscriptionPackage::where('type','employee')->get();
+                break;
+            case "employer":
+                $packages=SubscriptionPackage::where('type','employer')->get();
+                break;
+            default:
+                $packages=SubscriptionPackage::get();
+                break;
+        }
+        $paymentMethods=PaymentMethod::where('status',1)->get();
+        return view('users.subscription.packages',compact('packages','paymentMethods'));
     }
 }

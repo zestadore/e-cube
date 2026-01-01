@@ -26,6 +26,22 @@
                 </div>
             </div>
         </div>
+        @if (Auth::user()?->validity === null || Auth::user()?->validity->isPast())
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap align-items-center justify-content-between">
+                            <div class="d-flex flex-wrap align-items-center">
+                                <div class="d-flex flex-wrap align-items-center mb-3 mb-sm-0">
+                                    <span class="text-danger"> Kindly subscribe to a plan to access your dashboard</span>
+                                </div>
+                            </div>
+                            <a href="{{route('subscription.packages')}}" class="btn btn-primary btn-sm ms-2" style="float:right !important;">Explore Plans</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
         <div class="col-lg-3">
             <div class="card">
                 <div class="card-header">

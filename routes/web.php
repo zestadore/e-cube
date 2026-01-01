@@ -39,6 +39,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [App\Http\Controllers\HomeController::class, 'authUserProfile'])->name('profile');
     Route::post('/update-profile', [App\Http\Controllers\HomeController::class, 'updateProfile'])->name('profile.update');
     Route::post('/company-profile', [App\Http\Controllers\Registration\Company\CompanyProfileController::class, 'store'])->name('company.profile.store');
+    Route::get('/subscription-packages', [App\Http\Controllers\HomeController::class, 'subscriptionPackages'])->name('subscription.packages');
     Route::group(['as'=>'admin.','prefix' => 'admin'], function () {
         Route::get('/', [App\Http\Controllers\HomeController::class, 'adminDashboard'])->name('dashboard');
         Route::resource('industry', App\Http\Controllers\Admin\IndustryController::class);
