@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [App\Http\Controllers\FrontendController::class, 'index'])->name('frontend_index');
 Route::get('/about-us', [App\Http\Controllers\FrontendController::class, 'about_us'])->name('about');
 Route::get('/faq', [App\Http\Controllers\FrontendController::class, 'faq'])->name('faq');
+Route::get('/privacy-policy', [App\Http\Controllers\FrontendController::class, 'privacyPolicy'])->name('privacy-policy');
+Route::get('/terms-and-conditions', [App\Http\Controllers\FrontendController::class, 'termsAndConditions'])->name('terms-and-conditions');
+Route::get('/refund-policy', [App\Http\Controllers\FrontendController::class, 'refundPolicy'])->name('refund-policy');
 
 Auth::routes();
 Route::get('/migrate', function () {
