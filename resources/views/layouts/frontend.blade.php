@@ -6,25 +6,25 @@
 	<!-- META ============================================= -->
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="keywords" content="" />
+	<meta name="keywords" content="Human Resource Management, Recruitment, Talent Management, Talent Acquisition" />
 	<meta name="author" content="" />
 	<meta name="robots" content="" />
 	
 	<!-- DESCRIPTION -->
-	<meta name="description" content="EduChamp : Education HTML Template" />
+	<meta name="description" content="E Cube Careers - an emerging and dynamic Human Resource talent-hunt platform designed to bridge the gap between talented jobseekers and forward-thinking employers" />
 	
 	<!-- OG -->
-	<meta property="og:title" content="EduChamp : Education HTML Template" />
-	<meta property="og:description" content="EduChamp : Education HTML Template" />
+	<meta property="og:title" content="E Cube Careers - an emerging and dynamic Human Resource talent-hunt platform designed to bridge the gap between talented jobseekers and forward-thinking employers" />
+	<meta property="og:description" content="E Cube Careers - an emerging and dynamic Human Resource talent-hunt platform designed to bridge the gap between talented jobseekers and forward-thinking employers" />
 	<meta property="og:image" content="" />
 	<meta name="format-detection" content="telephone=no">
 	
 	<!-- FAVICONS ICON ============================================= -->
-	<link rel="icon" href="assets/images/favicon.ico" type="image/x-icon" />
-	<link rel="shortcut icon" type="image/x-icon" href="assets/images/favicon.png" />
+	<link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon" />
+	<link rel="shortcut icon" type="image/x-icon" href="{{ asset('admin_assets/images/logo/logo.png') }}" />
 	
 	<!-- PAGE TITLE HERE ============================================= -->
-	<title>EduChamp : Education HTML Template </title>
+	<title>E Cube Careers - an emerging and dynamic Human Resource talent-hunt platform</title>
 	
 	<!-- MOBILE SPECIFIC ============================================= -->
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -111,7 +111,7 @@
                         <!-- Navigation Menu ==== -->
                         <div class="menu-links navbar-collapse collapse justify-content-start" id="menuDropdown">
                             <div class="menu-logo">
-                                <a href="index.html"><img src="assets/images/logo.png" alt=""></a>
+                                <a href="/"><img src="{{ asset('admin_assets/images/logo/e-cube-logo.png') }}" alt=""></a>
                             </div>
                             <ul class="nav navbar-nav">	
                                 <li class="{{ request()->is('/') ? 'active' : '' }}"><a href="{{route('frontend_index')}}">Home</a></li>
