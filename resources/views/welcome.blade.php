@@ -125,7 +125,7 @@
                                     Don’t wait… Your Dream Job is Just a Click Away!
                             </div>
                             <!-- LAYER NR. 4 -->
-                            <div class="tp-caption Newspaper-Button rev-btn " 
+                            <div class="tp-caption Newspaper-Button rev-btn register-btn" 
                                 id="slide-100-layer-5" 
                                 data-x="['center','center','center','center']" 
                                 data-hoffset="['90','80','75','90']" 
@@ -144,7 +144,7 @@
                                 data-paddingbottom="[12,12,12,12]"
                                 data-paddingleft="[30,35,35,15]"
                                 style="z-index: 8; white-space: nowrap; outline:none;box-shadow:none;box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;cursor:pointer; background-color:var(--primary) !important; border:0; border-radius:30px; margin-right:5px;">Register </div>
-                            <div class="tp-caption Newspaper-Button rev-btn" 
+                            <div class="tp-caption Newspaper-Button rev-btn login-btn" 
                                 id="slide-100-layer-6" 
                                 data-x="['center','center','center','center']" 
                                 data-hoffset="['-90','-80','-75','-90']" 
@@ -358,7 +358,7 @@
                                         <i class="fa fa-book text-primary"></i>
                                     </div>
                                     <h4><a href="#">Easy & Convenient Process!</a></h4>
-                                    <a href="/login" class="btn radius-xl">Login</a>
+                                    <a href="{{ route('login') }}" class="btn radius-xl">Login</a>
                                 </div>
                             </div>
                         </div>
@@ -452,7 +452,7 @@
                     <div class="row">
                         <div class="col-md-12 text-center text-white">
                             <h2>Your Career. Our Mission.</h2>
-                            <h5>Still confused? We can help!</h5>
+                            <h5>Search here for an opportunity or for a manpower !</h5>
                             <form class="cours-search">
                                 <div class="input-group">
                                     <input type="text" class="form-control" placeholder="We are here to help you!	">
@@ -629,4 +629,4 @@
         <!-- contact area END -->
     </div>
     <!-- Content END-->
-@endsection     
+@endsection    
