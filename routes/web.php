@@ -51,6 +51,9 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('background-question', App\Http\Controllers\Admin\BackGroundQuestionController::class);
         Route::resource('subscription-packages', App\Http\Controllers\Admin\SubscriptionPackageController::class);
         Route::resource('payment-methods', App\Http\Controllers\Admin\PaymentMethodController::class);
+        Route::resource('sliders', App\Http\Controllers\Admin\SliderController::class);
+        Route::resource('events', App\Http\Controllers\Admin\EventController::class);
+        Route::resource('reviews', App\Http\Controllers\Admin\ReviewController::class);
     });
     Route::group(['as'=>'employee.','prefix' => 'employee'], function () {
         Route::get('/', [App\Http\Controllers\HomeController::class, 'employeeDashboard'])->name('dashboard');
