@@ -96,7 +96,7 @@ class EventController extends Controller
     {
         $event = Event::findOrFail(Crypt::decrypt($id));
         if($event->image!=null){
-            unlink(public_path('uploads/events/'. $event->image));
+            unlink(public_path('uploads/sliders/'. $event->image));
         }
         $event->delete();
         return redirect()->route('admin.events.index')->with('success', 'Event deleted successfully');
