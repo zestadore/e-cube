@@ -1,3 +1,6 @@
+@php
+    use Carbon\Carbon;
+@endphp
 @extends('layouts.frontend')
 @section('content')
     <!-- Content -->
@@ -392,54 +395,20 @@
                     </div>
                     <div class="row">
                     <div class="courses-carousel owl-carousel owl-btn-1 col-12 p-lr0">
-                        <div class="item">
-                            <div class="cours-bx">
-                                <div class="action-box">
-                                    <img src="assets/images/courses/pic1.jpg" alt="">
-                                    <a href="#" class="btn">Read More</a>
-                                </div>
-                                <div class="info-bx text-center">
-                                    <h5><a href="#">Top Employers</a></h5>
-                                    <span>Top Employers in Your Industry Contact You Directly!</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="item">
-                            <div class="cours-bx">
-                                <div class="action-box">
-                                    <img src="assets/images/courses/pic2.jpg" alt="">
-                                    <a href="#" class="btn">Read More</a>
-                                </div>
-                                <div class="info-bx text-center">
-                                    <h5><a href="#">Stay in Your Role</a></h5>
-                                    <span>Stay in Your Role – Get same-category jobs!</span>
+                        @foreach ($sliders as $item)
+                            <div class="item">
+                                <div class="cours-bx">
+                                    <div class="action-box">
+                                        <img src="{{ $item->image_path }}" alt="">
+                                        <a href="#" class="btn">Read More</a>
+                                    </div>
+                                    <div class="info-bx text-center">
+                                        <h5><a href="#">{{ $item->title }}</a></h5>
+                                        <span>{{ $item->description }}</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="item">
-                            <div class="cours-bx">
-                                <div class="action-box">
-                                    <img src="assets/images/courses/pic3.jpg" alt="">
-                                    <a href="#" class="btn">Read More</a>
-                                </div>
-                                <div class="info-bx text-center">
-                                    <h5><a href="#">100% Selection Guarantee</a></h5>
-                                    <span>100% Selection Guarantee – Employers choose YOU!</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="item">
-                            <div class="cours-bx">
-                                <div class="action-box">
-                                    <img src="assets/images/courses/pic4.jpg" alt="">
-                                    <a href="#" class="btn">Read More</a>
-                                </div>
-                                <div class="info-bx text-center">
-                                    <h5><a href="#">Super-Fast Hiring</a></h5>
-                                    <span>Super-Fast Hiring – Land your dream job in days!</span>
-                                </div>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
                     </div>
                 </div>
@@ -504,80 +473,36 @@
                     </div>
                     <div class="row">
                     <div class="upcoming-event-carousel owl-carousel owl-btn-center-lr owl-btn-1 col-12 p-lr0  m-b30">
-                        <div class="item">
-                            <div class="event-bx">
-                                <div class="action-box">
-                                    <img src="assets/images/event/pic4.jpg" alt="">
-                                </div>
-                                <div class="info-bx d-flex">
-                                    <div>
-                                        <div class="event-time">
-                                            <div class="event-date">20</div>
-                                            <div class="event-month">December</div>
-                                        </div>
+                        @foreach ($events as $item)
+                            <div class="item">
+                                <div class="event-bx">
+                                    <div class="action-box">
+                                        <img src="{{ $item->image_path }}" alt="">
                                     </div>
-                                    <div class="event-info">
-                                        <h4 class="event-title"><a href="#">Beauty & Fitness Trainee</a></h4>
-                                        <ul class="media-post">
-                                            <li><a href="#"><i class="fa fa-clock-o"></i> 7:00am 7:00pm</a></li>
-                                            <li><a href="#"><i class="fa fa-map-marker"></i> Interview scheduled</a></li>
-                                        </ul>
-                                        {{-- <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the..</p> --}}
+                                    <div class="info-bx d-flex">
+                                        <div>
+                                            <div class="event-time">
+                                                <div class="event-date">{{ Carbon::parse($item->date)->format('d') }}</div>
+                                                <div class="event-month">{{ Carbon::parse($item->date)->format('M') }}</div>
+                                            </div>
+                                        </div>
+                                        <div class="event-info">
+                                            <h4 class="event-title"><a href="#">{{ $item->title }}</a></h4>
+                                            <ul class="media-post">
+                                                <li><a href="#"><i class="fa fa-clock-o"></i> {{ Carbon::parse($item->start_time)->format('h:i A') }} - {{ Carbon::parse($item->end_time)->format('h:i A') }}</a></li>
+                                                <li><a href="#"><i class="fa fa-map-marker"></i> {{ $item->location }}</a></li>
+                                            </ul>
+                                            {{-- <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the..</p> --}}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="item">
-                            <div class="event-bx">
-                                <div class="action-box">
-                                    <img src="assets/images/event/pic3.jpg" alt="">
-                                </div>
-                                <div class="info-bx d-flex">
-                                    <div>
-                                        <div class="event-time">
-                                            <div class="event-date">25</div>
-                                            <div class="event-month">December</div>
-                                        </div>
-                                    </div>
-                                    <div class="event-info">
-                                        <h4 class="event-title"><a href="#">Nutrition & Diet Consultant</a></h4>
-                                        <ul class="media-post">
-                                            <li><a href="#"><i class="fa fa-clock-o"></i> 7:00am 8:00pm</a></li>
-                                            <li><a href="#"><i class="fa fa-map-marker"></i> Interview scheduled</a></li>
-                                        </ul>
-                                        {{-- <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the..</p> --}}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="item">
-                            <div class="event-bx">
-                                <div class="action-box">
-                                    <img src="assets/images/event/pic2.jpg" alt="">
-                                </div>
-                                <div class="info-bx d-flex">
-                                    <div>
-                                        <div class="event-time">
-                                            <div class="event-date">15</div>
-                                            <div class="event-month">January</div>
-                                        </div>
-                                    </div>
-                                    <div class="event-info">
-                                        <h4 class="event-title"><a href="#">Front Desk / Client Coordinator</a></h4>
-                                        <ul class="media-post">
-                                            <li><a href="#"><i class="fa fa-clock-o"></i> 7:00am 6:00pm</a></li>
-                                            <li><a href="#"><i class="fa fa-map-marker"></i> Interview scheduled</a></li>
-                                        </ul>
-                                        {{-- <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the..</p> --}}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
                     </div>
-                    <div class="text-center">
+                    {{-- <div class="text-center">
                         <a href="#" class="btn">View All Event</a>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
             
@@ -591,36 +516,18 @@
                         </div>
                     </div>
                     <div class="testimonial-carousel owl-carousel owl-btn-1 col-12 p-lr0">
-                        <div class="item">
-                            <div class="testimonial-bx">
-                                <div class="testimonial-info">
-                                    <h5 class="name">Same Role. Better Pay.</h5>
-                                </div>
-                                <div class="testimonial-content">
-                                    <p>Staying in the same role doesn’t mean settling for the same salary. We help you secure opportunities where your skills are valued — and rewarded — with the pay you truly deserve.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="item">
-                            <div class="testimonial-bx">
-                                <div class="testimonial-info">
-                                    <h5 class="name">Right Pick! Right Destination!</h5>
-                                </div>
-                                <div class="testimonial-content">
-                                    <p>You’ve earned the experience. Now earn the pay that matches it. We connect professionals to companies that appreciate their talent and offer better compensation for the same role.</p>
+                        @foreach ($reviews as $item)
+                            <div class="item">
+                                <div class="testimonial-bx">
+                                    <div class="testimonial-info">
+                                        <h5 class="name">{{ $item->title }}</h5>
+                                    </div>
+                                    <div class="testimonial-content">
+                                        <p>{{ $item->description }}</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="item">
-                            <div class="testimonial-bx">
-                                <div class="testimonial-info">
-                                    <h5 class="name">From Doctors to Drivers — We can Cover!</h5>
-                                </div>
-                                <div class="testimonial-content">
-                                    <p>From medical experts to on-road heroes, we serve candidates from every background. Whatever your profession, we’re here to support your next career move.</p>
-                                </div>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
             </div>

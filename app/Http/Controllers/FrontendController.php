@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 use App\Models\Industry;
+use App\Models\Review;
+use App\Models\Slider;
+Use App\Models\Event;
 use Illuminate\Http\Request;
 
 class FrontendController extends Controller
@@ -9,7 +12,10 @@ class FrontendController extends Controller
     public function index()
     {
         $industries = Industry::doesntHave('parents')->where('status', 1)->get();
-        return view('welcome', compact('industries'));
+        $events = Event::get();
+        $sliders = Slider::where('status', 1)->get();
+        $reviews = Review::where('status', 1)->get();
+        return view('welcome', compact('industries', 'events', 'sliders', 'reviews'));
     }
 
     public function about_us()
