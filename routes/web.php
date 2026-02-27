@@ -1,7 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
 // Route::get('/', function () {
 //     return view('welcome');
 // });
@@ -43,6 +44,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/update-profile', [App\Http\Controllers\HomeController::class, 'updateProfile'])->name('profile.update');
     Route::post('/company-profile', [App\Http\Controllers\Registration\Company\CompanyProfileController::class, 'store'])->name('company.profile.store');
     Route::get('/subscription-packages', [App\Http\Controllers\HomeController::class, 'subscriptionPackages'])->name('subscription.packages');
+    Route::post('/razorpay/order', [App\Http\Controllers\RazorpayController::class, 'createOrder'])->name('razorpay.order');
+    Route::post('/razorpay/verify', [App\Http\Controllers\RazorpayController::class, 'verify'])->name('razorpay.verify');
     Route::group(['as'=>'admin.','prefix' => 'admin'], function () {
         Route::get('/', [App\Http\Controllers\HomeController::class, 'adminDashboard'])->name('dashboard');
         Route::resource('industry', App\Http\Controllers\Admin\IndustryController::class);
@@ -55,14 +58,32 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('events', App\Http\Controllers\Admin\EventController::class);
         Route::resource('reviews', App\Http\Controllers\Admin\ReviewController::class);
     });
-    Route::group(['as'=>'employee.','prefix' => 'employee'], function () {
+    Route::group(['as'=>'employee.','prefix' => 'employee', 'middleware' => 'verified'], function () {
         Route::get('/', [App\Http\Controllers\HomeController::class, 'employeeDashboard'])->name('dashboard');
         Route::get('background-questions', [App\Http\Controllers\HomeController::class, 'backGroundQuestion'])->name('background-questions');
         Route::post('save-background-question', [App\Http\Controllers\HomeController::class, 'saveBackgroundQuestion'])->name('save-background-question');
     });
-    Route::group(['as'=>'employer.','prefix' => 'employer'], function () {
+    Route::group(['as'=>'employer.','prefix' => 'employer', 'middleware' => 'verified'], function () {
         Route::get('/', [App\Http\Controllers\HomeController::class, 'employerDashboard'])->name('dashboard');
         Route::get('company-profile', [App\Http\Controllers\Registration\Company\CompanyProfileController::class, 'index'])->name('company_profile');
     });
+    // 1️⃣ Verification notice page
+    Route::get('/email/verify', function () {
+        return view('auth.verify-email');
+    })->name('verification.notice');
+
+    // 2️⃣ Verify email link
+    Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+        $request->fulfill();
+
+        return redirect()->route('employee.dashboard'); // or wherever you want
+    })->middleware(['signed'])->name('verification.verify');
+
+    // 3️⃣ Resend verification email
+    Route::post('/email/verification-notification', function (Request $request) {
+        $request->user()->sendEmailVerificationNotification();
+
+        return back()->with('message', 'Verification link sent!');
+    })->middleware(['throttle:6,1'])->name('verification.send');
 });
 

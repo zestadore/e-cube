@@ -92,9 +92,9 @@
                         <div class="secondary-menu">
                             <div class="secondary-inner">
                                 <ul>
-                                    <li><a href="javascript:;" class="btn-link"><i class="fa fa-facebook"></i></a></li>
-                                    <li><a href="javascript:;" class="btn-link"><i class="fa fa-instagram"></i></a></li>
-                                    <li><a href="javascript:;" class="btn-link"><i class="fa fa-linkedin"></i></a></li>
+                                    <li><a href="https://www.facebook.com/profile.php?id=61579163681281" target="_blank" class="btn-link"><i class="fa fa-facebook"></i></a></li>
+                                    <li><a href="https://www.instagram.com/ecubecareer" target="_blank" class="btn-link"><i class="fa fa-instagram"></i></a></li>
+                                    <li><a href="https://www.linkedin.com/groups/18044047" target="_blank" class="btn-link"><i class="fa fa-linkedin"></i></a></li>
                                 </ul>
                             </div>
                         </div>
@@ -156,9 +156,9 @@
                             </div>
                             <div class="pt-social-link">
                                 <ul class="list-inline m-a0">
-                                    <li><a href="#" class="btn-link"><i class="fa fa-facebook"></i></a></li>
-                                    <li><a href="#" class="btn-link"><i class="fa fa-instagram"></i></a></li>
-                                    <li><a href="#" class="btn-link"><i class="fa fa-linkedin"></i></a></li>
+                                    <li><a href="https://www.facebook.com/profile.php?id=61579163681281" target="_blank" class="btn-link"><i class="fa fa-facebook"></i></a></li>
+                                    <li><a href="https://www.instagram.com/ecubecareer" target="_blank" class="btn-link"><i class="fa fa-instagram"></i></a></li>
+                                    <li><a href="https://www.linkedin.com/groups/18044047" target="_blank" class="btn-link"><i class="fa fa-linkedin"></i></a></li>
                                 </ul>
                             </div>
                             <div class="pt-btn-join register-btn">

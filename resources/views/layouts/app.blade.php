@@ -27,7 +27,18 @@
     
     <!-- RTL Css -->
     <link rel="stylesheet" href="{{ asset('admin_assets/css/rtl.min.css') }}"/>
+    <style>
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
 
+        .sidebar-body {
+            flex: 1;
+            overflow-y: auto;
+        }
+    </style>
     <!-- Scripts -->
     @yield('styles')
 </head>
