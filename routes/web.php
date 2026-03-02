@@ -13,6 +13,7 @@ Route::get('/faq', [App\Http\Controllers\FrontendController::class, 'faq'])->nam
 Route::get('/privacy-policy', [App\Http\Controllers\FrontendController::class, 'privacyPolicy'])->name('privacy-policy');
 Route::get('/terms-and-conditions', [App\Http\Controllers\FrontendController::class, 'termsAndConditions'])->name('terms-and-conditions');
 Route::get('/refund-policy', [App\Http\Controllers\FrontendController::class, 'refundPolicy'])->name('refund-policy');
+Route::get('/contact', [App\Http\Controllers\FrontendController::class, 'contact'])->name('contact');
 
 Auth::routes();
 Route::get('/migrate', function () {

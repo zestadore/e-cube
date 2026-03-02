@@ -42,4 +42,9 @@ class FrontendController extends Controller
     {
         return view('frontend.refund-policy');
     }
+
+    public function contact()
+    {
+        return view('frontend.contact');
+    }
 }
