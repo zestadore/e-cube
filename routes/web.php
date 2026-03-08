@@ -58,6 +58,7 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('sliders', App\Http\Controllers\Admin\SliderController::class);
         Route::resource('events', App\Http\Controllers\Admin\EventController::class);
         Route::resource('reviews', App\Http\Controllers\Admin\ReviewController::class);
+        Route::resource('users', App\Http\Controllers\Admin\UserController::class);
     });
     Route::group(['as'=>'employee.','prefix' => 'employee', 'middleware' => 'verified'], function () {
         Route::get('/', [App\Http\Controllers\HomeController::class, 'employeeDashboard'])->name('dashboard');
