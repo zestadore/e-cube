@@ -81,7 +81,7 @@
                                 </div>
                             </div>
                             <div class="card-footer bg-transparent border-0 pt-0 pb-3 px-3 mt-auto">
-                                <a href="#" class="btn btn-light btn-sm w-100 fw-semibold text-primary" style="font-size: 12px;">
+                                <a href="{{ route('subscription.packages') }}" class="btn btn-light btn-sm w-100 fw-semibold text-primary" style="font-size: 12px;">
                                     <i class="fas fa-arrow-up me-1"></i>Upgrade
                                 </a>
                             </div>
