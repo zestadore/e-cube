@@ -30,6 +30,138 @@
                 <br>
                 <p> </p>
                 <p> </p>
+                
+                <!-- Dashboard Widgets -->
+                <div class="row mb-4">
+                    <!-- Subscription Widget -->
+                    <div class="col-md-4 d-flex">
+                        <div class="card border-0 shadow-sm w-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; min-height: 200px;">
+                            <div class="card-body position-relative overflow-hidden py-4 px-3 d-flex flex-column">
+                                <div class="position-absolute top-0 end-0 m-3 opacity-20">
+                                    <i class="fas fa-crown fa-3x text-white"></i>
+                                </div>
+                                <div class="position-relative flex-grow-1">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="bg-white bg-opacity-25 rounded d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px; min-width: 45px;">
+                                            <i class="fas fa-gem fa-lg text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="text-white-50 mb-0 text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">Subscription</h6>
+                                            <h5 class="text-white mb-0 fw-bold" style="font-size: 18px;">
+                                                @if(Auth::user()->subscriptionPackage)
+                                                    {{ Auth::user()->subscriptionPackage->package_name }}
+                                                @else
+                                                    Free Plan
+                                                @endif
+                                            </h5>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center" style="margin-top: 20px;">
+                                        <div>
+                                            <small class="text-white-50" style="font-size: 10px;">Status</small>
+                                            <div class="mt-1">
+                                                @if(Auth::user()->validity && Carbon::parse(Auth::user()->validity)->isFuture())
+                                                    <span class="badge bg-success border-0" style="font-size: 9px;"><i class="fas fa-check-circle me-1"></i>Active</span>
+                                                @else
+                                                    <span class="badge bg-warning text-dark border-0" style="font-size: 9px;"><i class="fas fa-exclamation-circle me-1"></i>Expired</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <small class="text-white-50" style="font-size: 10px;">Valid Until</small>
+                                            <p class="text-white mb-0 fw-semibold" style="font-size: 13px;">
+                                                @if(Auth::user()->validity)
+                                                    {{ Carbon::parse(Auth::user()->validity)->format('d M Y') }}
+                                                @else
+                                                    --
+                                                @endif
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent border-0 pt-0 pb-3 px-3 mt-auto">
+                                <a href="#" class="btn btn-light btn-sm w-100 fw-semibold text-primary" style="font-size: 12px;">
+                                    <i class="fas fa-arrow-up me-1"></i>Upgrade
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Job Posts Widget -->
+                    <div class="col-md-4 d-flex">
+                        <div class="card border-0 shadow-sm w-100" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); border-radius: 12px; min-height: 200px;">
+                            <div class="card-body position-relative overflow-hidden py-4 px-3 d-flex flex-column">
+                                <div class="position-absolute top-0 end-0 m-3 opacity-20">
+                                    <i class="fas fa-briefcase fa-3x text-white"></i>
+                                </div>
+                                <div class="position-relative flex-grow-1">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="bg-white bg-opacity-25 rounded d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px; min-width: 45px;">
+                                            <i class="fas fa-bullhorn fa-lg text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="text-white-50 mb-0 text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">Job Posts</h6>
+                                            <h5 class="text-white mb-0 fw-bold" style="font-size: 18px;">0 Active</h5>
+                                        </div>
+                                    </div>
+                                    <div class="row text-center" style="margin-top: 20px;">
+                                        <div class="col-4">
+                                            <h6 class="text-white mb-0 fw-bold" style="font-size: 16px;">0</h6>
+                                            <small class="text-white-50" style="font-size: 9px;">Posted</small>
+                                        </div>
+                                        <div class="col-4">
+                                            <h6 class="text-white mb-0 fw-bold" style="font-size: 16px;">0</h6>
+                                            <small class="text-white-50" style="font-size: 9px;">Active</small>
+                                        </div>
+                                        <div class="col-4">
+                                            <h6 class="text-white mb-0 fw-bold" style="font-size: 16px;">0</h6>
+                                            <small class="text-white-50" style="font-size: 9px;">Expired</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent border-0 pt-0 pb-3 px-3 mt-auto">
+                                <a href="#" class="btn btn-light btn-sm w-100 fw-semibold text-success" style="font-size: 12px;">
+                                    <i class="fas fa-plus me-1"></i>Post Job
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Candidate Search Widget -->
+                    <div class="col-md-4 d-flex">
+                        <div class="card border-0 shadow-sm w-100" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 12px; min-height: 200px;">
+                            <div class="card-body position-relative overflow-hidden py-4 px-3 d-flex flex-column">
+                                <div class="position-absolute top-0 end-0 m-3 opacity-20">
+                                    <i class="fas fa-users fa-3x text-white"></i>
+                                </div>
+                                <div class="position-relative flex-grow-1">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="bg-white bg-opacity-25 rounded d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px; min-width: 45px;">
+                                            <i class="fas fa-search fa-lg text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="text-white-50 mb-0 text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">Candidate Pool</h6>
+                                            <h5 class="text-white mb-0 fw-bold" style="font-size: 18px;">Find Talent</h5>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-wrap gap-1" style="margin-top: 20px;">
+                                        <span class="badge bg-white bg-opacity-25 text-white border-0" style="font-size: 9px;"><i class="fas fa-check me-1"></i>Skills</span>
+                                        <span class="badge bg-white bg-opacity-25 text-white border-0" style="font-size: 9px;"><i class="fas fa-check me-1"></i>Experience</span>
+                                        <span class="badge bg-white bg-opacity-25 text-white border-0" style="font-size: 9px;"><i class="fas fa-check me-1"></i>Resumes</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent border-0 pt-0 pb-3 px-3 mt-auto">
+                                <a href="#" class="btn btn-light btn-sm w-100 fw-semibold text-info" style="font-size: 12px;">
+                                    <i class="fas fa-search me-1"></i>Search
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex flex-wrap align-items-center justify-content-between" style="float:right;">
@@ -47,74 +179,55 @@
                         <ul class="list-inline m-0 p-0">
                             <li class="d-flex mb-2">
                                 <div class="news-icon me-3">
-                                    <svg class="icon-20" width="20" viewBox="0 0 24 24">
-                                        <path fill="currentColor" d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4C22,2.89 21.1,2 20,2Z" />
-                                    </svg>
+                                    <i class="fas fa-building text-primary" style="font-size: 18px; width: 20px;"></i>
                                 </div>
-                                <p class="news-detail mb-0">
-                                    {{Auth::user()->companyProfile->company_name}}
+                                <p class="news-detail mb-0">{{Auth::user()->companyProfile->company_name}}</p>
                             </li>
-                            <li class="d-flex">
+                            <li class="d-flex mb-2">
                                 <div class="news-icon me-3">
-                                    <svg class="icon-20" width="20" viewBox="0 0 24 24">
-                                        <path fill="currentColor" d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4C22,2.89 21.1,2 20,2Z" />
-                                    </svg>
+                                    <i class="fas fa-map-marker-alt text-danger" style="font-size: 18px; width: 20px;"></i>
                                 </div>
                                 <p class="news-detail mb-0">Address : {{Auth::user()->companyProfile->company_address}}</p>
                             </li>
-                            <li class="d-flex">
+                            <li class="d-flex mb-2">
                                 <div class="news-icon me-3">
-                                    <svg class="icon-20" width="20" viewBox="0 0 24 24">
-                                        <path fill="currentColor" d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4C22,2.89 21.1,2 20,2Z" />
-                                    </svg>
+                                    <i class="fas fa-globe text-info" style="font-size: 18px; width: 20px;"></i>
                                 </div>
                                 <p class="news-detail mb-0">Website : {{Auth::user()->companyProfile->company_website}}</p>
                             </li>
-                            <li class="d-flex">
+                            <li class="d-flex mb-2">
                                 <div class="news-icon me-3">
-                                    <svg class="icon-20" width="20" viewBox="0 0 24 24">
-                                        <path fill="currentColor" d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4C22,2.89 21.1,2 20,2Z" />
-                                    </svg>
+                                    <i class="fas fa-envelope text-warning" style="font-size: 18px; width: 20px;"></i>
                                 </div>
                                 <p class="news-detail mb-0">Email : {{Auth::user()->companyProfile->company_email}}</p>
                             </li>
-                            <li class="d-flex">
+                            <li class="d-flex mb-2">
                                 <div class="news-icon me-3">
-                                    <svg class="icon-20" width="20" viewBox="0 0 24 24">
-                                        <path fill="currentColor" d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4C22,2.89 21.1,2 20,2Z" />
-                                    </svg>
+                                    <i class="fas fa-phone text-success" style="font-size: 18px; width: 20px;"></i>
                                 </div>
                                 <p class="news-detail mb-0">Phone : {{Auth::user()->companyProfile->company_phone}}</p>
                             </li>
-                            <li class="d-flex">
+                            <li class="d-flex mb-2">
                                 <div class="news-icon me-3">
-                                    <svg class="icon-20" width="20" viewBox="0 0 24 24">
-                                        <path fill="currentColor" d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4C22,2.89 21.1,2 20,2Z" />
-                                    </svg>
+                                    <i class="fas fa-file-alt text-secondary" style="font-size: 18px; width: 20px;"></i>
                                 </div>
                                 <p class="news-detail mb-0">Description : {{Auth::user()->companyProfile->company_description}}</p>
                             </li>
-                            <li class="d-flex">
+                            <li class="d-flex mb-2">
                                 <div class="news-icon me-3">
-                                    <svg class="icon-20" width="20" viewBox="0 0 24 24">
-                                        <path fill="currentColor" d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4C22,2.89 21.1,2 20,2Z" />
-                                    </svg>
+                                    <i class="fas fa-calendar-alt text-info" style="font-size: 18px; width: 20px;"></i>
                                 </div>
                                 <p class="news-detail mb-0">Date of Establishment : {{Auth::user()->companyProfile->date_of_establishment}}</p>
                             </li>
-                            <li class="d-flex">
+                            <li class="d-flex mb-2">
                                 <div class="news-icon me-3">
-                                    <svg class="icon-20" width="20" viewBox="0 0 24 24">
-                                        <path fill="currentColor" d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4C22,2.89 21.1,2 20,2Z" />
-                                    </svg>
+                                    <i class="fas fa-file-invoice text-primary" style="font-size: 18px; width: 20px;"></i>
                                 </div>
                                 <p class="news-detail mb-0">GST : {{Auth::user()->companyProfile->gst_number}}</p>
                             </li>
                             <li class="d-flex">
                                 <div class="news-icon me-3">
-                                    <svg class="icon-20" width="20" viewBox="0 0 24 24">
-                                        <path fill="currentColor" d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4C22,2.89 21.1,2 20,2Z" />
-                                    </svg>
+                                    <i class="fas fa-id-card text-dark" style="font-size: 18px; width: 20px;"></i>
                                 </div>
                                 <p class="news-detail mb-0">Pan : {{Auth::user()->companyProfile->pan_number}}</p>
                             </li>
@@ -131,18 +244,13 @@
                         <ul class="list-inline m-0 p-0">
                             <li class="d-flex mb-2">
                                 <div class="news-icon me-3">
-                                    <svg class="icon-20" width="20" viewBox="0 0 24 24">
-                                        <path fill="currentColor" d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4C22,2.89 21.1,2 20,2Z" />
-                                    </svg>
+                                    <i class="fas fa-user-tie text-primary" style="font-size: 18px; width: 20px;"></i>
                                 </div>
-                                <p class="news-detail mb-0">
-                                    {{Auth::user()->companyProfile->chairman_name}}
+                                <p class="news-detail mb-0">{{Auth::user()->companyProfile->chairman_name}}</p>
                             </li>
                             <li class="d-flex">
                                 <div class="news-icon me-3">
-                                    <svg class="icon-20" width="20" viewBox="0 0 24 24">
-                                        <path fill="currentColor" d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4C22,2.89 21.1,2 20,2Z" />
-                                    </svg>
+                                    <i class="fas fa-phone text-success" style="font-size: 18px; width: 20px;"></i>
                                 </div>
                                 <p class="news-detail mb-0">Phone : {{Auth::user()->companyProfile->chairman_contact}}</p>
                             </li>
@@ -159,18 +267,13 @@
                         <ul class="list-inline m-0 p-0">
                             <li class="d-flex mb-2">
                                 <div class="news-icon me-3">
-                                    <svg class="icon-20" width="20" viewBox="0 0 24 24">
-                                        <path fill="currentColor" d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4C22,2.89 21.1,2 20,2Z" />
-                                    </svg>
+                                    <i class="fas fa-user text-info" style="font-size: 18px; width: 20px;"></i>
                                 </div>
-                                <p class="news-detail mb-0">
-                                    {{Auth::user()->companyProfile->hr_name}}
+                                <p class="news-detail mb-0">{{Auth::user()->companyProfile->hr_name}}</p>
                             </li>
                             <li class="d-flex">
                                 <div class="news-icon me-3">
-                                    <svg class="icon-20" width="20" viewBox="0 0 24 24">
-                                        <path fill="currentColor" d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4C22,2.89 21.1,2 20,2Z" />
-                                    </svg>
+                                    <i class="fas fa-phone text-success" style="font-size: 18px; width: 20px;"></i>
                                 </div>
                                 <p class="news-detail mb-0">Phone : {{Auth::user()->companyProfile->hr_contact}}</p>
                             </li>
@@ -187,26 +290,19 @@
                         <ul class="list-inline m-0 p-0">
                             <li class="d-flex mb-2">
                                 <div class="news-icon me-3">
-                                    <svg class="icon-20" width="20" viewBox="0 0 24 24">
-                                        <path fill="currentColor" d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4C22,2.89 21.1,2 20,2Z" />
-                                    </svg>
+                                    <i class="fas fa-briefcase text-primary" style="font-size: 18px; width: 20px;"></i>
                                 </div>
-                                <p class="news-detail mb-0">
-                                    {{ucfirst(Auth::user()->companyProfile->registration_type)}}
+                                <p class="news-detail mb-0">{{ucfirst(Auth::user()->companyProfile->registration_type)}}</p>
                             </li>
-                            <li class="d-flex">
+                            <li class="d-flex mb-2">
                                 <div class="news-icon me-3">
-                                    <svg class="icon-20" width="20" viewBox="0 0 24 24">
-                                        <path fill="currentColor" d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4C22,2.89 21.1,2 20,2Z" />
-                                    </svg>
+                                    <i class="fas fa-users text-info" style="font-size: 18px; width: 20px;"></i>
                                 </div>
                                 <p class="news-detail mb-0">No of employees : {{Auth::user()->companyProfile->no_of_employees}}</p>
                             </li>
                             <li class="d-flex">
                                 <div class="news-icon me-3">
-                                    <svg class="icon-20" width="20" viewBox="0 0 24 24">
-                                        <path fill="currentColor" d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4C22,2.89 21.1,2 20,2Z" />
-                                    </svg>
+                                    <i class="fas fa-industry text-secondary" style="font-size: 18px; width: 20px;"></i>
                                 </div>
                                 <p class="news-detail mb-0">Industry : {{Auth::user()->companyProfile->industry->industry_name}}</p>
                             </li>
