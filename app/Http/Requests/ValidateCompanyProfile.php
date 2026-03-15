@@ -29,7 +29,7 @@ class ValidateCompanyProfile extends FormRequest
             'hr_name' => 'required',
             'hr_contact' => 'required|numeric',
             'registration_type' => 'required|in:pvt_ltd,public_ltd,others',
-            'industry_id' => 'required|exists:industries,id',
+            // 'industry_id' => 'required|exists:industries,id',
             'company_logo'=>'nullable|mimes:jpeg,jpg,png|max:2048',
             'id' => 'nullable|exists:company_profiles,id',
         ];
