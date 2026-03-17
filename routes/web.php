@@ -70,6 +70,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('company-profile', [App\Http\Controllers\Registration\Company\CompanyProfileController::class, 'index'])->name('company_profile');
         Route::get('select-industry', [App\Http\Controllers\Registration\Company\CompanyProfileController::class, 'selectIndustry'])->name('select_industry');
         Route::post('save-industry', [App\Http\Controllers\Registration\Company\CompanyProfileController::class, 'saveIndustry'])->name('save_industry');
+        Route::resource('jobs', App\Http\Controllers\JobPostController::class);
     });
     // 1️⃣ Verification notice page
     Route::get('/email/verify', function () {

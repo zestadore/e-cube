@@ -122,7 +122,7 @@
                                 </div>
                             </div>
                             <div class="card-footer bg-transparent border-0 pt-0 pb-3 px-3 mt-auto">
-                                <a href="#" class="btn btn-light btn-sm w-100 fw-semibold text-success" style="font-size: 12px;">
+                                <a href="{{ route('employer.jobs.index') }}" class="btn btn-light btn-sm w-100 fw-semibold text-success" style="font-size: 12px;">
                                     <i class="fas fa-plus me-1"></i>Post Job
                                 </a>
                             </div>
