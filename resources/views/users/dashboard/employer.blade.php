@@ -48,8 +48,8 @@
                                         <div>
                                             <h6 class="text-white-50 mb-0 text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">Subscription</h6>
                                             <h5 class="text-white mb-0 fw-bold" style="font-size: 18px;">
-                                                @if(Auth::user()->subscriptionPackage)
-                                                    {{ Auth::user()->subscriptionPackage->package_name }}
+                                                @if(Auth::user()->subscriptionPackage && Auth::user()->subscriptionPackage->package)
+                                                    {{ Auth::user()->subscriptionPackage->package->name }}
                                                 @else
                                                     Free Plan
                                                 @endif
@@ -102,20 +102,20 @@
                                         </div>
                                         <div>
                                             <h6 class="text-white-50 mb-0 text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">Job Posts</h6>
-                                            <h5 class="text-white mb-0 fw-bold" style="font-size: 18px;">0 Active</h5>
+                                            <h5 class="text-white mb-0 fw-bold" style="font-size: 18px;">{{ Auth::user()->jobPosts()->where('status', 'active')->count() }} Active</h5>
                                         </div>
                                     </div>
                                     <div class="row text-center" style="margin-top: 20px;">
                                         <div class="col-4">
-                                            <h6 class="text-white mb-0 fw-bold" style="font-size: 16px;">0</h6>
+                                            <h6 class="text-white mb-0 fw-bold" style="font-size: 16px;">{{ Auth::user()->jobPosts()->count() }}</h6>
                                             <small class="text-white-50" style="font-size: 9px;">Posted</small>
                                         </div>
                                         <div class="col-4">
-                                            <h6 class="text-white mb-0 fw-bold" style="font-size: 16px;">0</h6>
+                                            <h6 class="text-white mb-0 fw-bold" style="font-size: 16px;">{{ Auth::user()->jobPosts()->where('status', 'active')->count() }}</h6>
                                             <small class="text-white-50" style="font-size: 9px;">Active</small>
                                         </div>
                                         <div class="col-4">
-                                            <h6 class="text-white mb-0 fw-bold" style="font-size: 16px;">0</h6>
+                                            <h6 class="text-white mb-0 fw-bold" style="font-size: 16px;">{{ Auth::user()->jobPosts()->where('expiry_date', '<', now())->orWhere('status', 'inactive')->count() }}</h6>
                                             <small class="text-white-50" style="font-size: 9px;">Expired</small>
                                         </div>
                                     </div>

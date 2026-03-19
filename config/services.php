@@ -35,4 +35,13 @@ return [
         ],
     ],
 
+    'paytm' => [
+        'merchant_id' => env('PAYTM_MERCHANT_ID'),
+        'merchant_key' => env('PAYTM_MERCHANT_KEY'),
+        'website' => env('PAYTM_WEBSITE', 'DEFAULT'),
+        'industry_type' => env('PAYTM_INDUSTRY_TYPE', 'Retail'),
+        'environment' => env('PAYTM_ENVIRONMENT', 'production'), // 'staging' or 'production'
+        'test_mode' => env('PAYTM_TEST_MODE', false), // Set to true for local testing without Paytm servers
+    ],
+
 ];

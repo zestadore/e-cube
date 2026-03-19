@@ -25,7 +25,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'role',
         'image',
-        'mobile_verified_at'
+        'mobile_verified_at',
+        'validity',
     ];
 
     /**
@@ -103,5 +104,29 @@ class User extends Authenticatable implements MustVerifyEmail
     public function backgroundQuestions()
     {
         return $this->hasMany(BackgroundQuestionAnswer::class, 'user_id', 'id');
+    }
+
+    public function subscriptionPackage()
+    {
+        return $this->hasOne(PaymentHistory::class, 'user_id', 'id')
+            ->where('status', 'completed')
+            ->whereHas('package')
+            ->latest();
+    }
+
+    public function activeSubscriptionPackage()
+    {
+        return $this->hasOne(PaymentHistory::class, 'user_id', 'id')
+            ->where('status', 'completed')
+            ->whereHas('package')
+            ->whereHas('user', function ($query) {
+                $query->whereNotNull('validity')->where('validity', '>', now());
+            })
+            ->latest();
+    }
+
+    public function jobPosts()
+    {
+        return $this->hasMany(JobPost::class, 'user_id', 'id');
     }
 }

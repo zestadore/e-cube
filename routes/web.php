@@ -45,8 +45,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/update-profile', [App\Http\Controllers\HomeController::class, 'updateProfile'])->name('profile.update');
     Route::post('/company-profile', [App\Http\Controllers\Registration\Company\CompanyProfileController::class, 'store'])->name('company.profile.store');
     Route::get('/subscription-packages', [App\Http\Controllers\HomeController::class, 'subscriptionPackages'])->name('subscription.packages');
-    Route::post('/razorpay/order', [App\Http\Controllers\RazorpayController::class, 'createOrder'])->name('razorpay.order');
-    Route::post('/razorpay/verify', [App\Http\Controllers\RazorpayController::class, 'verify'])->name('razorpay.verify');
+    
+    // Paytm Payment Routes
+    Route::post('/paytm/initiate', [App\Http\Controllers\PaytmController::class, 'initiatePayment'])->name('paytm.initiate');
+    Route::post('/paytm/callback', [App\Http\Controllers\PaytmController::class, 'handleCallback'])->name('paytm.callback');
+    Route::post('/paytm/status', [App\Http\Controllers\PaytmController::class, 'checkStatus'])->name('paytm.status');
+    Route::post('/paytm/test', [App\Http\Controllers\PaytmController::class, 'testPayment'])->name('paytm.test');
     Route::group(['as'=>'admin.','prefix' => 'admin'], function () {
         Route::get('/', [App\Http\Controllers\HomeController::class, 'adminDashboard'])->name('dashboard');
         Route::resource('industry', App\Http\Controllers\Admin\IndustryController::class);

@@ -69,9 +69,9 @@
                     </div>
 
                     <button class="btn btn-primary w-100 fw-bold py-3 pay-btn" 
-                            data-price="{{ $package->price }}" 
-                            data-id="{{ $package->id }}"
-                            data-name="{{ $package->package_name }}"
+                            data-package-id="{{ $package->id }}"
+                            data-package-name="{{ $package->package_name }}"
+                            data-price="{{ $package->price }}"
                             style="border-radius: 10px; font-size: 16px;">
                         <i class="fas fa-credit-card me-2"></i>Pay Now
                     </button>
@@ -95,70 +95,189 @@
     </div>
     @endif
 </div>
+
+<!-- Hidden form for Paytm redirect -->
+<form id="paytmForm" method="POST" action="" style="display: none;">
+    <input type="hidden" name="MID" id="paytm_mid">
+    <input type="hidden" name="WEBSITE" id="paytm_website">
+    <input type="hidden" name="CHANNEL_ID" id="paytm_channel">
+    <input type="hidden" name="INDUSTRY_TYPE_ID" id="paytm_industry">
+    <input type="hidden" name="ORDER_ID" id="paytm_order_id">
+    <input type="hidden" name="CUST_ID" id="paytm_cust_id">
+    <input type="hidden" name="MOBILE_NO" id="paytm_mobile">
+    <input type="hidden" name="EMAIL" id="paytm_email">
+    <input type="hidden" name="TXN_AMOUNT" id="paytm_amount">
+    <input type="hidden" name="CALLBACK_URL" id="paytm_callback">
+    <input type="hidden" name="CHECKSUMHASH" id="paytm_checksum">
+</form>
+
+<!-- Test Payment Modal -->
+<div class="modal fade" id="testPaymentModal" tabindex="-1" aria-labelledby="testPaymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title" id="testPaymentModalLabel">
+                    <i class="fas fa-flask me-2"></i>Test Payment Mode
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <i class="fas fa-vial fa-3x text-warning mb-3"></i>
+                <h5>Test Payment</h5>
+                <p class="text-muted">This is a test environment. No real transaction will occur.</p>
+                <div class="alert alert-info">
+                    <strong>Order ID:</strong> <span id="test_order_id"></span><br>
+                    <strong>Amount:</strong> ₹<span id="test_amount"></span>
+                </div>
+                <p>Choose the payment result:</p>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-success" onclick="processTestPayment('success')">
+                        <i class="fas fa-check me-2"></i>Simulate Success
+                    </button>
+                    <button class="btn btn-danger" onclick="processTestPayment('failure')">
+                        <i class="fas fa-times me-2"></i>Simulate Failure
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form id="testCallbackForm" method="POST" action="" style="display: none;">
+    @csrf
+    <input type="hidden" name="ORDERID" id="test_callback_order_id">
+    <input type="hidden" name="TXNID" id="test_callback_txn_id">
+    <input type="hidden" name="STATUS" id="test_callback_status">
+    <input type="hidden" name="TXNAMOUNT" id="test_callback_amount">
+    <input type="hidden" name="TEST" value="true">
+</form>
 @endsection
 
 @section('scripts')
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
+        // Global variables for test payment
+        var currentTestOrderId = '';
+        var currentTestAmount = '';
+        var currentTestCallbackUrl = '';
+        var currentBtn = null;
+
         $(document).ready(function() {
             $('.pay-btn').click(function(){
+                var packageId = $(this).data('package-id');
+                var packageName = $(this).data('package-name');
                 var price = $(this).data('price');
-                var id = $(this).data('id');
-                var name = $(this).data('name');
+                var btn = $(this);
                 
-                fetch("{{ route('razorpay.order') }}", {
+                // Disable button and show loading
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Processing...');
+                
+                fetch("{{ route('paytm.initiate') }}", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
-                    body: JSON.stringify({ amount: price, id: id })
+                    body: JSON.stringify({ package_id: packageId })
                 })
                 .then(res => res.json())
                 .then(data => {
-                    let options = {
-                        key: data.key,
-                        amount: data.amount,
-                        currency: "INR",
-                        order_id: data.order_id,
-                        name: "E-Cube Careers",
-                        description: name + " Subscription",
-                        image: "{{ asset('assets/images/logo.png') }}",
-                        handler: function (response) {
-                            let form = document.createElement('form');
-                            form.method = 'POST';
-                            form.action = "{{ route('razorpay.verify') }}";
-
-                            for (let key in response) {
-                                let input = document.createElement('input');
-                                input.type = 'hidden';
-                                input.name = key;
-                                input.value = response[key];
-                                form.appendChild(input);
-                            }
-
-                            let csrf = document.createElement('input');
-                            csrf.type = 'hidden';
-                            csrf.name = '_token';
-                            csrf.value = '{{ csrf_token() }}';
-                            form.appendChild(csrf);
-
-                            document.body.appendChild(form);
-                            form.submit();
-                        },
-                        prefill: {
-                            name: "{{ Auth::user()->full_name }}",
-                            email: "{{ Auth::user()->email }}",
-                            contact: "{{ Auth::user()->mobile }}"
-                        },
-                        theme: {
-                            color: "#667eea"
+                    if (data.success) {
+                        // Check if test mode
+                        if (data.test_mode) {
+                            // Show test payment modal
+                            showTestPaymentModal(data.order_id, data.amount, data.callback_url, btn);
+                            return;
                         }
-                    };
-
-                    new Razorpay(options).open();
+                        
+                        // Fill the hidden form with Paytm parameters
+                        $('#paytm_mid').val(data.paytmParams.MID);
+                        $('#paytm_website').val(data.paytmParams.WEBSITE);
+                        $('#paytm_channel').val(data.paytmParams.CHANNEL_ID);
+                        $('#paytm_industry').val(data.paytmParams.INDUSTRY_TYPE_ID);
+                        $('#paytm_order_id').val(data.paytmParams.ORDER_ID);
+                        $('#paytm_cust_id').val(data.paytmParams.CUST_ID);
+                        $('#paytm_mobile').val(data.paytmParams.MOBILE_NO);
+                        $('#paytm_email').val(data.paytmParams.EMAIL);
+                        $('#paytm_amount').val(data.paytmParams.TXN_AMOUNT);
+                        $('#paytm_callback').val(data.paytmParams.CALLBACK_URL);
+                        $('#paytm_checksum').val(data.checksum);
+                        
+                        // Set form action and submit
+                        $('#paytmForm').attr('action', data.paytm_url);
+                        $('#paytmForm').submit();
+                    } else {
+                        alert('Failed to initiate payment. Please try again.');
+                        btn.prop('disabled', false).html('<i class="fas fa-credit-card me-2"></i>Pay Now');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Paytm service is temporarily unavailable. Please try again later or use production credentials.');
+                    btn.prop('disabled', false).html('<i class="fas fa-credit-card me-2"></i>Pay Now');
                 });
             });
         });
+
+        // Show Test Payment Modal
+        function showTestPaymentModal(orderId, amount, callbackUrl, btn) {
+            currentTestOrderId = orderId;
+            currentTestAmount = amount;
+            currentTestCallbackUrl = callbackUrl;
+            currentBtn = btn;
+            
+            $('#test_order_id').text(orderId);
+            $('#test_amount').text(amount);
+            
+            var testModal = new bootstrap.Modal(document.getElementById('testPaymentModal'));
+            testModal.show();
+            
+            // Re-enable the button
+            btn.prop('disabled', false).html('<i class="fas fa-credit-card me-2"></i>Pay Now');
+        }
+
+        // Process Test Payment
+        function processTestPayment(status) {
+            // Close the modal
+            var testModal = bootstrap.Modal.getInstance(document.getElementById('testPaymentModal'));
+            testModal.hide();
+            
+            // Show loading
+            if (currentBtn) {
+                currentBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Processing...');
+            }
+            
+            // Submit to test payment endpoint
+            fetch("{{ route('paytm.test') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ 
+                    order_id: currentTestOrderId,
+                    status: status
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Redirect to employer dashboard on success
+                    window.location.href = data.redirect;
+                } else {
+                    // Show error message on same page
+                    alert(data.message);
+                    if (currentBtn) {
+                        currentBtn.prop('disabled', false).html('<i class="fas fa-credit-card me-2"></i>Pay Now');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred during test payment processing.');
+                if (currentBtn) {
+                    currentBtn.prop('disabled', false).html('<i class="fas fa-credit-card me-2"></i>Pay Now');
+                }
+            });
+        }
     </script>
 @endsection
