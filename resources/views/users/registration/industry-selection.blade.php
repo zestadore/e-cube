@@ -28,14 +28,31 @@
                     @csrf
                     <input type="hidden" name="industry_id" id="selected_industry_id" value="{{ $selectedIndustryId }}">
                     
-                    <div class="industry-accordion" id="industryAccordion">
-                        @foreach($parentIndustries as $parentIndustry)
-                            @include('users.registration.partials.industry-item', [
-                                'industry' => $parentIndustry,
-                                'level' => 0,
-                                'selectedIndustryId' => $selectedIndustryId,
-                                'candidateCounts' => $candidateCounts
-                            ])
+                    <div class="industry-list">
+                        @foreach($parentIndustries as $industry)
+                            @php
+                                $isSelected = $selectedIndustryId == $industry->id;
+                                $candidateCount = $candidateCounts[$industry->id] ?? 0;
+                            @endphp
+                            <div class="industry-item {{ $isSelected ? 'selected' : '' }}" data-industry-id="{{ $industry->id }}">
+                                <div class="d-flex align-items-center justify-content-between p-3 border rounded mb-2">
+                                    <div class="d-flex align-items-center">
+                                        <span class="industry-name fw-medium">{{ $industry->industry_name }}</span>
+                                        @if($candidateCount > 0)
+                                            <span class="badge bg-info text-dark ms-2 d-inline-flex align-items-center" title="{{ $candidateCount }} candidate(s) registered">
+                                                <i class="fas fa-users me-1" style="font-size: 10px;"></i>
+                                                {{ $candidateCount }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <button type="button" 
+                                            class="select-industry-btn btn {{ $isSelected ? 'btn-success' : 'btn-outline-primary' }} btn-sm" 
+                                            data-industry-id="{{ $industry->id }}" 
+                                            data-industry-name="{{ $industry->industry_name }}">
+                                        {{ $isSelected ? 'Selected' : 'Select' }}
+                                    </button>
+                                </div>
+                            </div>
                         @endforeach
                     </div>
 
@@ -67,140 +84,44 @@
 
 @section('styles')
     <style>
-        .industry-accordion .accordion-item {
-            border: 1px solid #e9ecef;
-            border-radius: 0.375rem;
-            margin-bottom: 0.5rem;
-            overflow: hidden;
+        .industry-list {
+            max-height: 500px;
+            overflow-y: auto;
         }
 
-        .industry-accordion .accordion-header {
-            padding: 0;
-            background-color: #f8f9fa;
-        }
-
-        .industry-accordion .accordion-button {
-            width: 100%;
-            text-align: left;
-            padding: 1rem;
-            background-color: transparent;
-            border: none;
-            font-weight: 500;
-            color: #212529;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        .industry-item {
             transition: all 0.2s ease;
         }
 
-        .industry-accordion .accordion-button:hover {
-            background-color: #e9ecef;
+        .industry-item:hover {
+            background-color: #f8f9fa;
         }
 
-        .industry-accordion .accordion-button:focus {
-            outline: none;
-            box-shadow: none;
-        }
-
-        .industry-accordion .accordion-button .industry-content {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            flex: 1;
-        }
-
-        .industry-accordion .accordion-button .industry-name {
-            flex: 1;
-        }
-
-        .industry-accordion .accordion-button .toggle-icon {
-            transition: transform 0.2s ease;
-            margin-left: 0.5rem;
-        }
-
-        .industry-accordion .accordion-button.collapsed .toggle-icon {
-            transform: rotate(-90deg);
-        }
-
-        .industry-accordion .accordion-button .select-btn {
-            padding: 0.25rem 0.75rem;
-            font-size: 0.875rem;
-        }
-
-        .industry-accordion .accordion-collapse {
-            background-color: #ffffff;
-        }
-
-        .industry-accordion .accordion-body {
-            padding: 0.5rem 1rem 1rem;
-        }
-
-        .industry-accordion .nested-industries {
-            margin-left: 1.5rem;
-        }
-
-        .industry-accordion .nested-industries .accordion-item {
-            border-left: 3px solid #0d6efd;
-        }
-
-        .industry-accordion .level-1 .accordion-item {
-            border-left-color: #0d6efd;
-        }
-
-        .industry-accordion .level-2 .accordion-item {
-            border-left-color: #6610f2;
-        }
-
-        .industry-accordion .level-3 .accordion-item {
-            border-left-color: #20c997;
-        }
-
-        .industry-accordion .accordion-button.selected {
+        .industry-item.selected {
             background-color: #d1e7dd;
-            color: #0f5132;
+            border-color: #198754 !important;
         }
 
-        .industry-accordion .accordion-button.selected .industry-name {
+        .industry-item.selected .industry-name {
+            color: #0f5132;
             font-weight: 600;
         }
 
-        .industry-accordion .select-btn.selected {
-            background-color: #198754;
-            border-color: #198754;
+        .industry-item .border {
+            border-color: #e9ecef !important;
         }
 
-        /* No children indicator */
-        .industry-accordion .no-children {
-            padding: 1rem;
-            background-color: #f8f9fa;
-            border-radius: 0.375rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .industry-accordion .no-children:hover {
-            background-color: #e9ecef;
+        .industry-item.selected .border {
+            border-color: #198754 !important;
+            background-color: #d1e7dd;
         }
 
         /* Candidate count badge styling */
-        .industry-accordion .badge {
+        .industry-item .badge {
             font-size: 0.75rem;
             padding: 0.35em 0.65em;
             border-radius: 0.375rem;
             font-weight: 600;
-        }
-
-        .industry-accordion .badge svg {
-            margin-right: 0.25rem;
-        }
-
-        .industry-accordion .accordion-button .badge {
-            flex-shrink: 0;
-        }
-
-        .industry-accordion .no-children .badge {
-            margin-left: 0.5rem;
         }
     </style>
 @endsection
@@ -208,7 +129,7 @@
 @section('scripts')
     <script>
         $(document).ready(function() {
-            // Handle select button clicks (both accordion headers and leaf industries)
+            // Handle select button clicks
             $(document).on('click', '.select-industry-btn', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -218,30 +139,13 @@
                 
                 selectIndustry(industryId, industryName);
                 
-                // Add selected class to this button
-                $(this).removeClass('btn-outline-primary').addClass('btn-success selected').text('Selected');
+                // Update all buttons and items
+                $('.select-industry-btn').removeClass('btn-success').addClass('btn-outline-primary').text('Select');
+                $('.industry-item').removeClass('selected');
                 
-                // Add selected class to parent container (accordion-button or no-children)
-                $(this).closest('.accordion-button').addClass('selected');
-                $(this).closest('.no-children').addClass('selected');
-            });
-
-            // Toggle accordion on header click (except when clicking select button)
-            $(document).on('click', '.accordion-button', function(e) {
-                // Don't toggle if clicking the select button
-                if ($(e.target).closest('.select-industry-btn').length) {
-                    return;
-                }
-                
-                var target = $(this).data('bs-target');
-                
-                if (target) {
-                    // Toggle the collapsed class manually
-                    $(this).toggleClass('collapsed');
-                    
-                    // Toggle the collapse element
-                    $(target).collapse('toggle');
-                }
+                // Add selected class to this button and its parent item
+                $(this).removeClass('btn-outline-primary').addClass('btn-success').text('Selected');
+                $(this).closest('.industry-item').addClass('selected');
             });
 
             // Form submission validation
@@ -253,21 +157,6 @@
                     return false;
                 }
             });
-
-            // Auto-expand to show selected industry on page load
-            @if($selectedIndustryId)
-                (function() {
-                    var selectedButton = $('.select-industry-btn[data-industry-id="{{ $selectedIndustryId }}"]');
-                    if (selectedButton.length) {
-                        // Expand all parent accordions
-                        selectedButton.closest('.accordion-collapse').each(function() {
-                            var $collapse = $(this);
-                            $collapse.collapse('show');
-                            $collapse.siblings('.accordion-header').find('.accordion-button').removeClass('collapsed');
-                        });
-                    }
-                })();
-            @endif
         });
 
         // Helper function to select an industry
@@ -280,11 +169,6 @@
             
             // Enable save button
             $('#saveBtn').prop('disabled', false);
-            
-            // Remove selected class from all buttons and containers
-            $('.accordion-button').removeClass('selected');
-            $('.select-industry-btn').removeClass('selected btn-success').addClass('btn-outline-primary').text('Select');
-            $('.no-children').removeClass('selected');
         }
     </script>
 @endsection

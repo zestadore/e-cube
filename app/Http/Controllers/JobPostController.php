@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\JobPost;
 use App\Models\Qualification;
+use App\Models\Industry;
+use App\Models\CompanyProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -23,7 +25,45 @@ class JobPostController extends Controller
                           ->with('qualification')
                           ->orderBy('created_at', 'desc')
                           ->get();
-        return view('users.jobs.index', compact('jobPosts'));
+        
+        // Get the user's selected parent industry
+        $profile = CompanyProfile::where('user_id', Auth::id())->first();
+        $userIndustryId = $profile ? $profile->industry_id : null;
+        
+        // Get all child industries recursively under the user's parent industry
+        $jobIndustries = [];
+        if ($userIndustryId) {
+            $parentIndustry = Industry::with('children')->find($userIndustryId);
+            if ($parentIndustry) {
+                $jobIndustries = $this->getAllChildrenRecursive($parentIndustry);
+            }
+        }
+        
+        return view('users.jobs.index', compact('jobPosts', 'jobIndustries'));
+    }
+
+    /**
+     * Get all children industries recursively
+     */
+    private function getAllChildrenRecursive($industry, $level = 0)
+    {
+        $result = [];
+        
+        // Add current industry
+        $result[] = [
+            'id' => $industry->id,
+            'name' => str_repeat('— ', $level) . $industry->industry_name,
+            'level' => $level
+        ];
+        
+        // Get children recursively
+        if ($industry->children && $industry->children->count() > 0) {
+            foreach ($industry->children as $child) {
+                $result = array_merge($result, $this->getAllChildrenRecursive($child, $level + 1));
+            }
+        }
+        
+        return $result;
     }
 
     /**
@@ -41,7 +81,7 @@ class JobPostController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'job_title' => 'required|string|max:255',
+            'industry_id' => 'required|exists:industries,id',
             'description' => 'required|string',
             'qualification_id' => 'required|exists:qualifications,id',
             'application_start_date' => 'required|date',
@@ -51,7 +91,7 @@ class JobPostController extends Controller
 
         JobPost::create([
             'user_id' => Auth::id(),
-            'job_title' => $request->job_title,
+            'industry_id' => $request->industry_id,
             'description' => $request->description,
             'qualification_id' => $request->qualification_id,
             'application_start_date' => $request->application_start_date,
@@ -73,7 +113,7 @@ class JobPostController extends Controller
             abort(403, 'Unauthorized action.');
         }
         
-        return response()->json($job->load('qualification'));
+        return response()->json($job->load(['qualification', 'industry']));
     }
 
     /**
@@ -104,7 +144,7 @@ class JobPostController extends Controller
         }
 
         $request->validate([
-            'job_title' => 'required|string|max:255',
+            'industry_id' => 'required|exists:industries,id',
             'description' => 'required|string',
             'qualification_id' => 'required|exists:qualifications,id',
             'application_start_date' => 'required|date',
@@ -114,7 +154,7 @@ class JobPostController extends Controller
         ]);
 
         $job->update([
-            'job_title' => $request->job_title,
+            'industry_id' => $request->industry_id,
             'description' => $request->description,
             'qualification_id' => $request->qualification_id,
             'application_start_date' => $request->application_start_date,
@@ -139,5 +179,90 @@ class JobPostController extends Controller
         $job->delete();
 
         return redirect()->route('employer.jobs.index')->with('success', 'Job deleted successfully!');
+    }
+
+    /**
+     * Find talent - list candidates under employer's industry
+     */
+    public function findTalent(Request $request)
+    {
+        // Get employer's selected industry
+        $profile = CompanyProfile::where('user_id', Auth::id())->first();
+        $userIndustryId = $profile ? $profile->industry_id : null;
+        
+        // Get all industries under employer's category for filter
+        $availableIndustries = [];
+        if ($userIndustryId) {
+            $parentIndustry = Industry::with('children')->find($userIndustryId);
+            if ($parentIndustry) {
+                $availableIndustries = $this->getAllChildrenRecursive($parentIndustry);
+            }
+        }
+        // Build query for candidates
+        $query = \App\Models\User::where('role', 'employee')
+            ->where('mobile_verified_at', '!=', null)
+            ->with(['basicDetails', 'candidateExperiences.industry', 'candidateQualifications.qualification', 'candidateSkills']);
+        
+        // Filter by industry if selected
+        if ($request->filled('industry_id')) {
+            $query->whereHas('candidateExperiences', function($q) use ($request) {
+                $q->where('industry_id', $request->industry_id);
+            });
+        } elseif ($userIndustryId) {
+            // Show candidates from employer's industry category
+            $industryIds = array_column($availableIndustries, 'id');
+            $query->whereHas('candidateExperiences', function($q) use ($industryIds) {
+                $q->whereIn('industry_id', $industryIds);
+            });
+        }
+        
+        // Filter by qualification if selected
+        if ($request->filled('qualification_id')) {
+            $query->whereHas('candidateQualifications', function($q) use ($request) {
+                $q->where('qualification_id', $request->qualification_id);
+            });
+        }
+        
+        // Filter by experience years
+        if ($request->filled('experience_years')) {
+            $query->whereHas('candidateExperiences', function($q) use ($request) {
+                $q->where('years_of_experience', '>=', $request->experience_years);
+            });
+        }
+        
+        // Search by name
+        if ($request->filled('search')) {
+            $query->where(function($q) use ($request) {
+                $q->where('full_name', 'like', '%' . $request->search . '%')
+                  ->orWhere('email', 'like', '%' . $request->search . '%');
+            });
+        }
+        
+        $candidates = $query->orderBy('created_at', 'desc')->paginate(12);
+        
+        // Get qualifications for filter
+        $qualifications = Qualification::all();
+        
+        return view('users.jobs.find-talent', compact('candidates', 'availableIndustries', 'qualifications', 'userIndustryId'));
+    }
+
+    /**
+     * Show candidate details
+     */
+    public function showCandidate($id)
+    {
+        $candidate = \App\Models\User::where('role', 'employee')
+            ->where('mobile_verified_at', '!=', null)
+            ->with([
+                'basicDetails',
+                'addresses',
+                'candidateQualifications.qualification',
+                'candidateSkills.skill',
+                'candidateExperiences.industry',
+                'backgroundQuestionAnswers.question'
+            ])
+            ->findOrFail($id);
+        
+        return response()->json($candidate);
     }
 }

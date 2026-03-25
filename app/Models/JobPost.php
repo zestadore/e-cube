@@ -8,7 +8,7 @@ class JobPost extends Model
 {
     protected $fillable = [
         'user_id',
-        'job_title',
+        'industry_id',
         'description',
         'qualification_id',
         'application_start_date',
@@ -31,5 +31,10 @@ class JobPost extends Model
     public function qualification()
     {
         return $this->belongsTo(Qualification::class);
+    }
+
+    public function industry()
+    {
+        return $this->belongsTo(Industry::class);
     }
 }

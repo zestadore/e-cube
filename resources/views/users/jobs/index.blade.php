@@ -80,11 +80,15 @@
                     </div>
                 </div>
                 <div class="card-body p-4">
-                    <h5 class="card-title fw-bold mb-3">{{ $job->job_title }}</h5>
+                    <h5 class="card-title fw-bold mb-3">{{ $job->industry->industry_name ?? 'N/A' }}</h5>
                     
                     <div class="mb-3">
                         <div class="d-flex align-items-center mb-2">
-                            <i class="fas fa-graduation-cap text-primary me-2" style="width: 20px;"></i>
+                            <i class="fas fa-industry text-primary me-2" style="width: 20px;"></i>
+                            <small class="text-muted">{{ $job->industry->industry_name ?? 'N/A' }}</small>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-graduation-cap text-info me-2" style="width: 20px;"></i>
                             <small class="text-muted">{{ $job->qualification->degree ?? 'N/A' }}</small>
                         </div>
                         <div class="d-flex align-items-center mb-2">
@@ -107,7 +111,7 @@
                         <button class="btn btn-outline-secondary btn-sm flex-grow-1" onclick="editJob({{ $job->id }})">
                             <i class="fas fa-edit me-1"></i>Edit
                         </button>
-                        <button class="btn btn-outline-danger btn-sm" onclick="confirmDelete({{ $job->id }}, '{{ addslashes($job->job_title) }}')">
+                        <button class="btn btn-outline-danger btn-sm" onclick="confirmDelete({{ $job->id }}, '{{ addslashes($job->industry->industry_name ?? 'Job') }}')">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -146,11 +150,20 @@
                 <div class="modal-body p-4">
                     <div class="row">
                         <div class="col-md-12 mb-3">
-                            <label for="job_title" class="form-label fw-semibold">Job Title <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control @error('job_title') is-invalid @enderror" 
-                                   id="job_title" name="job_title" placeholder="e.g. Senior Software Engineer" 
-                                   value="{{ old('job_title') }}" required style="border-radius: 8px;">
-                            @error('job_title')
+                            <label for="industry_id" class="form-label fw-semibold">Job Industry <span class="text-danger">*</span></label>
+                            <select class="form-select @error('industry_id') is-invalid @enderror" 
+                                    id="industry_id" name="industry_id" required style="border-radius: 8px;">
+                                <option value="">Select Job Industry</option>
+                                @foreach($jobIndustries as $industry)
+                                    <option value="{{ $industry['id'] }}" {{ old('industry_id') == $industry['id'] ? 'selected' : '' }}>
+                                        {{ $industry['name'] }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @if(count($jobIndustries) == 0)
+                                <small class="text-muted">Please select your company industry in profile first.</small>
+                            @endif
+                            @error('industry_id')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -237,7 +250,7 @@
             <div class="modal-body p-4">
                 <div class="row">
                     <div class="col-md-12 mb-3">
-                        <h4 class="fw-bold text-primary mb-3" id="view_job_title"></h4>
+                        <h4 class="fw-bold text-primary mb-3" id="view_job_industry"></h4>
                         <span class="badge" id="view_job_status"></span>
                     </div>
                     
@@ -247,13 +260,13 @@
                     </div>
                     
                     <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold text-muted">Required Qualification</label>
-                        <p class="fw-semibold"><i class="fas fa-graduation-cap text-primary me-2"></i><span id="view_qualification"></span></p>
+                        <label class="form-label fw-semibold text-muted">Job Industry</label>
+                        <p class="fw-semibold"><i class="fas fa-industry text-primary me-2"></i><span id="view_industry"></span></p>
                     </div>
                     
                     <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold text-muted">Job Status</label>
-                        <p class="fw-semibold"><i class="fas fa-info-circle text-info me-2"></i><span id="view_status_text"></span></p>
+                        <label class="form-label fw-semibold text-muted">Required Qualification</label>
+                        <p class="fw-semibold"><i class="fas fa-graduation-cap text-info me-2"></i><span id="view_qualification"></span></p>
                     </div>
                     
                     <div class="col-md-4 mb-3">
@@ -305,8 +318,13 @@
                 <div class="modal-body p-4">
                     <div class="row">
                         <div class="col-md-12 mb-3">
-                            <label for="edit_job_title" class="form-label fw-semibold">Job Title <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="edit_job_title" name="job_title" required style="border-radius: 8px;">
+                            <label for="edit_industry_id" class="form-label fw-semibold">Job Industry <span class="text-danger">*</span></label>
+                            <select class="form-select" id="edit_industry_id" name="industry_id" required style="border-radius: 8px;">
+                                <option value="">Select Job Industry</option>
+                                @foreach($jobIndustries as $industry)
+                                    <option value="{{ $industry['id'] }}">{{ $industry['name'] }}</option>
+                                @endforeach
+                            </select>
                         </div>
                         
                         <div class="col-md-12 mb-3">
@@ -373,7 +391,7 @@
             <div class="modal-body p-4 text-center">
                 <i class="fas fa-trash-alt fa-4x text-danger mb-3"></i>
                 <h5 class="mb-3">Are you sure you want to delete this job?</h5>
-                <p class="text-muted mb-0" id="delete_job_title"></p>
+                <p class="text-muted mb-0" id="delete_job_industry"></p>
                 <p class="text-danger small mt-2"><i class="fas fa-info-circle me-1"></i>This action cannot be undone!</p>
             </div>
             <div class="modal-footer border-0 px-4 pb-4 justify-content-center">
@@ -411,10 +429,13 @@
         fetch(`/employer/jobs/${jobId}`)
             .then(response => response.json())
             .then(data => {
-                document.getElementById('view_job_title').textContent = data.job_title;
+                // Show industry name as title
+                const industryName = data.industry ? data.industry.industry_name : 'N/A';
+                document.getElementById('view_job_industry').textContent = industryName;
+                document.getElementById('view_industry').textContent = industryName;
+                
                 document.getElementById('view_description').textContent = data.description;
                 document.getElementById('view_qualification').textContent = data.qualification ? data.qualification.degree : 'N/A';
-                document.getElementById('view_status_text').textContent = data.status.charAt(0).toUpperCase() + data.status.slice(1);
                 
                 // Status badge styling
                 const statusBadge = document.getElementById('view_job_status');
@@ -461,7 +482,7 @@
                 document.getElementById('editJobForm').action = `/employer/jobs/${jobId}`;
                 
                 // Fill form fields
-                document.getElementById('edit_job_title').value = job.job_title;
+                document.getElementById('edit_industry_id').value = job.industry_id;
                 document.getElementById('edit_description').value = job.description;
                 document.getElementById('edit_qualification_id').value = job.qualification_id;
                 
@@ -492,8 +513,8 @@
     }
 
     // Delete Job Function
-    function confirmDelete(jobId, jobTitle) {
-        document.getElementById('delete_job_title').textContent = `"${jobTitle}"`;
+    function confirmDelete(jobId, jobIndustry) {
+        document.getElementById('delete_job_industry').textContent = `"${jobIndustry}"`;
         document.getElementById('deleteJobForm').action = `/employer/jobs/${jobId}`;
         
         var deleteModal = new bootstrap.Modal(document.getElementById('deleteJobModal'));
