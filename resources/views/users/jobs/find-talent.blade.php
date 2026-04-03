@@ -54,6 +54,13 @@
             object-fit: cover;
             filter: blur(8px);
         }
+        .modal-candidate-photo-unlocked {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            filter: none;
+        }
     </style>
 @endsection
 
@@ -286,26 +293,114 @@
                     <p class="mt-2 text-muted">Loading candidate profile...</p>
                 </div>
             </div>
-            <div class="modal-footer border-0 px-4 pb-4">
+            <div class="modal-footer border-0 px-4 pb-4" id="candidateModalFooter">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 8px;">
                     <i class="fas fa-times me-2"></i>Close
-                </button>
-                <button type="button" class="btn btn-primary" style="border-radius: 8px;" onclick="alert('Please upgrade your subscription to contact candidates!')">
-                    <i class="fas fa-envelope me-2"></i>Contact Candidate
                 </button>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Payment Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 15px;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                <h5 class="modal-title text-white" id="paymentModalLabel">
+                    <i class="fas fa-lock-open me-2"></i>Unlock Candidate Profile
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="text-center mb-4">
+                    <div class="position-relative d-inline-block mb-3">
+                        <img src="" id="paymentCandidatePhoto" alt="Candidate" class="rounded-circle shadow" style="width: 80px; height: 80px; object-fit: cover; filter: blur(5px);">
+                        <div class="position-absolute top-50 start-50 translate-middle">
+                            <i class="fas fa-lock text-white fa-lg" style="text-shadow: 0 2px 4px rgba(0,0,0,0.5);"></i>
+                        </div>
+                    </div>
+                    <h5 id="paymentCandidateName" class="fw-bold">Candidate Name</h5>
+                    <p class="text-muted small">View complete contact details</p>
+                </div>
+                
+                <div class="card bg-light border-0 mb-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Profile Unlock Fee</span>
+                            <span class="fw-bold">₹10.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>GST (18%)</span>
+                            <span>₹0</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Total Amount</span>
+                            <span class="fw-bold text-success fs-5">₹10.00</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="paymentOptions">
+                    <p class="text-muted small mb-3">Click below to proceed with payment:</p>
+                    
+                    <!-- Payment Button - Automatically handles test/production mode -->
+                    <button type="button" id="payNowBtn" class="btn btn-success w-100 mb-2 d-flex align-items-center justify-content-center" onclick="processPayment()">
+                        <i class="fas fa-lock-open me-2"></i>Pay Now - ₹10.00
+                    </button>
+                    
+                    <p class="text-muted small text-center mb-0">
+                        <i class="fas fa-shield-alt me-1"></i>Secure payment powered by Paytm
+                    </p>
+                </div>
+                
+                <!-- Test Payment Options (Only shown in test mode) -->
+                <div id="testPaymentOptions" style="display: none;">
+                    <div class="alert alert-info">
+                        <i class="fas fa-vial me-2"></i>Test Mode - Select payment result:
+                    </div>
+                    <button type="button" class="btn btn-success w-100 mb-2" onclick="processTestPaymentDirect('success')">
+                        <i class="fas fa-check me-2"></i>Simulate Successful Payment
+                    </button>
+                    <button type="button" class="btn btn-danger w-100 mb-2" onclick="processTestPaymentDirect('failure')">
+                        <i class="fas fa-times me-2"></i>Simulate Failed Payment
+                    </button>
+                </div>
+                
+                <!-- Loading State -->
+                <div id="paymentProcessing" style="display: none;">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary mb-3" role="status">
+                            <span class="visually-hidden">Processing...</span>
+                        </div>
+                        <p class="text-muted">Processing your payment...</p>
+                        <p class="small text-muted">Please do not close this window</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden Form for Paytm Submission -->
+<form id="paytmForm" method="POST" action="" style="display: none;">
+    <!-- Will be populated dynamically -->
+</form>
 @endsection
 
 @section('scripts')
 <script>
+    let currentCandidateId = null;
+    let currentCandidateData = null;
+    let currentOrderId = null;
+
     function viewCandidate(candidateId) {
+        currentCandidateId = candidateId;
         var modal = new bootstrap.Modal(document.getElementById('candidateModal'));
         modal.show();
         
-        // Reset modal body
+        // Reset modal body and footer
         document.getElementById('candidateModalBody').innerHTML = `
             <div class="text-center py-5">
                 <div class="spinner-border text-primary" role="status">
@@ -314,123 +409,23 @@
                 <p class="mt-2 text-muted">Loading candidate profile...</p>
             </div>
         `;
+        document.getElementById('candidateModalFooter').innerHTML = `
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 8px;">
+                <i class="fas fa-times me-2"></i>Close
+            </button>
+        `;
         
         // Fetch candidate details
         fetch(`/employer/candidate/${candidateId}`)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
-                const candidate = data;
-                const basicDetails = candidate.basic_details || {};
-                const qualifications = candidate.candidate_qualifications || [];
-                const experiences = candidate.candidate_experiences || [];
-                const skills = candidate.candidate_skills || [];
-                const addresses = candidate.addresses || [];
-                const bgAnswers = candidate.background_question_answers || [];
-                
-                let qualificationsHtml = '';
-                qualifications.forEach(q => {
-                    qualificationsHtml += `<span class="badge bg-info text-dark me-2 mb-2">${q.qualification?.degree || 'N/A'}</span>`;
-                });
-                
-                let experiencesHtml = '';
-                experiences.forEach(e => {
-                    experiencesHtml += `
-                        <div class="candidate-detail-item">
-                            <div class="d-flex justify-content-between">
-                                <strong>${e.industry?.industry_name || 'N/A'}</strong>
-                                <span class="badge bg-primary">${e.years_of_experience || 0} years</span>
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                let skillsHtml = '';
-                skills.forEach(s => {
-                    skillsHtml += `<span class="badge bg-secondary me-2 mb-2">${s.skill?.skill_name || 'N/A'}</span>`;
-                });
-                
-                let bgAnswersHtml = '';
-                bgAnswers.forEach(a => {
-                    bgAnswersHtml += `
-                        <div class="candidate-detail-item">
-                            <small class="text-muted">${a.question?.question || 'Question'}</small>
-                            <p class="mb-0 fw-semibold">${a.answer || 'N/A'}</p>
-                        </div>
-                    `;
-                });
-                
-                // Blur address
-                const address = addresses.length > 0 ? 'Address Hidden for Privacy' : 'Not Available';
-                
-                document.getElementById('candidateModalBody').innerHTML = `
-                    <div class="row">
-                        <!-- Left Column -->
-                        <div class="col-md-4 text-center mb-4">
-                            <div class="position-relative d-inline-block mb-3">
-                                <img src="${candidate.image_path || '/assets/images/default-avatar.png'}" 
-                                     alt="Candidate" 
-                                     class="modal-candidate-photo shadow">
-                                <div class="position-absolute top-50 start-50 translate-middle">
-                                    <i class="fas fa-lock text-white fa-2x" style="text-shadow: 0 2px 8px rgba(0,0,0,0.7);"></i>
-                                </div>
-                            </div>
-                            <h4 class="fw-bold mb-2">${candidate.full_name}</h4>
-                            <span class="badge bg-success mb-2"><i class="fas fa-check-circle me-1"></i>Verified</span>
-                            
-                            <div class="text-start mt-4">
-                                <div class="candidate-detail-item blurred-text">
-                                    <small class="text-muted"><i class="fas fa-envelope me-2"></i>Email</small>
-                                    <p class="mb-0 fw-semibold">****@****.com</p>
-                                </div>
-                                <div class="candidate-detail-item blurred-text">
-                                    <small class="text-muted"><i class="fas fa-phone me-2"></i>Phone</small>
-                                    <p class="mb-0 fw-semibold">+91 **** **** **</p>
-                                </div>
-                                <div class="candidate-detail-item blurred-text">
-                                    <small class="text-muted"><i class="fas fa-map-marker-alt me-2"></i>Address</small>
-                                    <p class="mb-0 fw-semibold">${address}</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Right Column -->
-                        <div class="col-md-8">
-                            <!-- About -->
-                            <div class="mb-4">
-                                <h6 class="fw-bold text-primary mb-3"><i class="fas fa-user me-2"></i>About</h6>
-                                <div class="candidate-detail-item">
-                                    <p class="mb-0">${basicDetails.about || 'No description available'}</p>
-                                </div>
-                            </div>
-                            
-                            <!-- Qualifications -->
-                            <div class="mb-4">
-                                <h6 class="fw-bold text-primary mb-3"><i class="fas fa-graduation-cap me-2"></i>Qualifications</h6>
-                                <div>${qualificationsHtml || '<p class="text-muted">No qualifications listed</p>'}</div>
-                            </div>
-                            
-                            <!-- Experience -->
-                            <div class="mb-4">
-                                <h6 class="fw-bold text-primary mb-3"><i class="fas fa-briefcase me-2"></i>Experience</h6>
-                                ${experiencesHtml || '<p class="text-muted">No experience listed</p>'}
-                            </div>
-                            
-                            <!-- Skills -->
-                            <div class="mb-4">
-                                <h6 class="fw-bold text-primary mb-3"><i class="fas fa-tools me-2"></i>Skills</h6>
-                                <div>${skillsHtml || '<p class="text-muted">No skills listed</p>'}</div>
-                            </div>
-                            
-                            <!-- Background Questions -->
-                            ${bgAnswersHtml ? `
-                            <div class="mb-4">
-                                <h6 class="fw-bold text-primary mb-3"><i class="fas fa-question-circle me-2"></i>Background Information</h6>
-                                ${bgAnswersHtml}
-                            </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                `;
+                currentCandidateData = data;
+                renderCandidateProfile(data);
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -443,5 +438,439 @@
                 `;
             });
     }
+
+    function renderCandidateProfile(data) {
+        const candidate = data.candidate;
+        const hasPaid = data.has_paid;
+        const viewPrice = data.view_price;
+        const basicDetails = candidate.basic_details || {};
+        const qualifications = candidate.candidate_qualifications || [];
+        const experiences = candidate.candidate_experiences || [];
+        const skills = candidate.candidate_skills || [];
+        const addresses = candidate.addresses || [];
+        const bgAnswers = candidate.background_question_answers || [];
+        
+        let qualificationsHtml = '';
+        qualifications.forEach(q => {
+            qualificationsHtml += `<span class="badge bg-info text-dark me-2 mb-2">${q.qualification?.degree || 'N/A'}</span>`;
+        });
+        
+        let experiencesHtml = '';
+        experiences.forEach(e => {
+            experiencesHtml += `
+                <div class="candidate-detail-item">
+                    <div class="d-flex justify-content-between">
+                        <strong>${e.industry?.industry_name || 'N/A'}</strong>
+                        <span class="badge bg-primary">${e.years_of_experience || 0} years</span>
+                    </div>
+                </div>
+            `;
+        });
+        
+        let skillsHtml = '';
+        skills.forEach(s => {
+            skillsHtml += `<span class="badge bg-secondary me-2 mb-2">${s.skill?.skill_name || 'N/A'}</span>`;
+        });
+        
+        let bgAnswersHtml = '';
+        bgAnswers.forEach(a => {
+            bgAnswersHtml += `
+                <div class="candidate-detail-item">
+                    <small class="text-muted">${a.question?.question || 'Question'}</small>
+                    <p class="mb-0 fw-semibold">${a.answer || 'N/A'}</p>
+                </div>
+            `;
+        });
+        
+        // Determine what to show based on payment status
+        let photoClass = hasPaid ? 'modal-candidate-photo-unlocked' : 'modal-candidate-photo';
+        let photoOverlay = hasPaid ? '' : `
+            <div class="position-absolute top-50 start-50 translate-middle">
+                <i class="fas fa-lock text-white fa-2x" style="text-shadow: 0 2px 8px rgba(0,0,0,0.7);"></i>
+            </div>
+        `;
+        
+        let emailDisplay = hasPaid ? 
+            `<div class="candidate-detail-item">
+                <small class="text-muted"><i class="fas fa-envelope me-2"></i>Email</small>
+                <p class="mb-0 fw-semibold">${candidate.email}</p>
+            </div>` :
+            `<div class="candidate-detail-item blurred-text">
+                <small class="text-muted"><i class="fas fa-envelope me-2"></i>Email</small>
+                <p class="mb-0 fw-semibold">****@****.com</p>
+            </div>`;
+        
+        let phoneDisplay = hasPaid ?
+            `<div class="candidate-detail-item">
+                <small class="text-muted"><i class="fas fa-phone me-2"></i>Phone</small>
+                <p class="mb-0 fw-semibold">${candidate.mobile}</p>
+            </div>` :
+            `<div class="candidate-detail-item blurred-text">
+                <small class="text-muted"><i class="fas fa-phone me-2"></i>Phone</small>
+                <p class="mb-0 fw-semibold">+91 **** **** **</p>
+            </div>`;
+        
+        let addressDisplay = '';
+        if (hasPaid && addresses.length > 0) {
+            const addr = addresses[0];
+            addressDisplay = `
+                <div class="candidate-detail-item">
+                    <small class="text-muted"><i class="fas fa-map-marker-alt me-2"></i>Address</small>
+                    <p class="mb-0 fw-semibold">
+                        ${addr.address || ''}, ${addr.city || ''}, ${addr.state || ''} - ${addr.pincode || ''}
+                    </p>
+                </div>
+            `;
+        } else {
+            addressDisplay = `
+                <div class="candidate-detail-item ${hasPaid ? '' : 'blurred-text'}">
+                    <small class="text-muted"><i class="fas fa-map-marker-alt me-2"></i>Address</small>
+                    <p class="mb-0 fw-semibold">${hasPaid ? 'Not Available' : 'Address Hidden'}</p>
+                </div>
+            `;
+        }
+        
+        // Update footer based on payment status
+        if (hasPaid) {
+            document.getElementById('candidateModalFooter').innerHTML = `
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 8px;">
+                    <i class="fas fa-times me-2"></i>Close
+                </button>
+                <a href="mailto:${candidate.email}" class="btn btn-primary" style="border-radius: 8px;">
+                    <i class="fas fa-envelope me-2"></i>Contact Candidate
+                </a>
+            `;
+        } else {
+            document.getElementById('candidateModalFooter').innerHTML = `
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 8px;">
+                    <i class="fas fa-times me-2"></i>Close
+                </button>
+                <button type="button" class="btn btn-success" style="border-radius: 8px;" onclick="openPaymentModal()">
+                    <i class="fas fa-unlock me-2"></i>Unlock for ₹${viewPrice}
+                </button>
+            `;
+        }
+        
+        document.getElementById('candidateModalBody').innerHTML = `
+            <div class="row">
+                <!-- Left Column -->
+                <div class="col-md-4 text-center mb-4">
+                    <div class="position-relative d-inline-block mb-3">
+                        <img src="${candidate.image_path || '/assets/images/default-avatar.png'}" 
+                             alt="Candidate" 
+                             class="${photoClass} shadow">
+                        ${photoOverlay}
+                    </div>
+                    <h4 class="fw-bold mb-2">${candidate.full_name}</h4>
+                    <span class="badge bg-success mb-2"><i class="fas fa-check-circle me-1"></i>Verified</span>
+                    
+                    <div class="text-start mt-4">
+                        ${emailDisplay}
+                        ${phoneDisplay}
+                        ${addressDisplay}
+                    </div>
+                </div>
+                
+                <!-- Right Column -->
+                <div class="col-md-8">
+                    <!-- About -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-primary mb-3"><i class="fas fa-user me-2"></i>About</h6>
+                        <div class="candidate-detail-item">
+                            <p class="mb-0">${basicDetails.about || 'No description available'}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Qualifications -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-primary mb-3"><i class="fas fa-graduation-cap me-2"></i>Qualifications</h6>
+                        <div>${qualificationsHtml || '<p class="text-muted">No qualifications listed</p>'}</div>
+                    </div>
+                    
+                    <!-- Experience -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-primary mb-3"><i class="fas fa-briefcase me-2"></i>Experience</h6>
+                        ${experiencesHtml || '<p class="text-muted">No experience listed</p>'}
+                    </div>
+                    
+                    <!-- Skills -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-primary mb-3"><i class="fas fa-tools me-2"></i>Skills</h6>
+                        <div>${skillsHtml || '<p class="text-muted">No skills listed</p>'}</div>
+                    </div>
+                    
+                    <!-- Background Questions -->
+                    ${bgAnswersHtml ? `
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-primary mb-3"><i class="fas fa-question-circle me-2"></i>Background Information</h6>
+                        ${bgAnswersHtml}
+                    </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }
+
+    function openPaymentModal() {
+        if (!currentCandidateData) return;
+        
+        const candidate = currentCandidateData.candidate;
+        
+        // Set candidate info in payment modal
+        document.getElementById('paymentCandidateName').textContent = candidate.full_name;
+        document.getElementById('paymentCandidatePhoto').src = candidate.image_path || '/assets/images/default-avatar.png';
+        
+        // Reset payment modal state
+        showPaymentOptions();
+        
+        // Hide candidate modal and show payment modal
+        bootstrap.Modal.getInstance(document.getElementById('candidateModal')).hide();
+        var paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+        paymentModal.show();
+    }
+
+    function showPaymentOptions() {
+        document.getElementById('paymentOptions').style.display = 'block';
+        document.getElementById('testPaymentOptions').style.display = 'none';
+        document.getElementById('paymentProcessing').style.display = 'none';
+    }
+
+    function showTestPaymentOptions() {
+        document.getElementById('paymentOptions').style.display = 'none';
+        document.getElementById('testPaymentOptions').style.display = 'block';
+        document.getElementById('paymentProcessing').style.display = 'none';
+    }
+
+    function showProcessingState() {
+        document.getElementById('paymentOptions').style.display = 'none';
+        document.getElementById('testPaymentOptions').style.display = 'none';
+        document.getElementById('paymentProcessing').style.display = 'block';
+    }
+
+    function processPayment() {
+        if (!currentCandidateId) {
+            alert('Candidate ID not found. Please try again.');
+            return;
+        }
+        
+        showProcessingState();
+        
+        // Send payment initiation request
+        fetch('/employer/candidate/initiate-payment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ candidate_id: currentCandidateId })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.already_paid) {
+                // Already paid, close payment modal and refresh candidate view
+                bootstrap.Modal.getInstance(document.getElementById('paymentModal')).hide();
+                viewCandidate(currentCandidateId);
+                return;
+            }
+            
+            if (data.test_mode) {
+                // In test mode, show test options (success/failure buttons)
+                currentOrderId = data.order_id;
+                showTestPaymentOptions();
+            } else if (data.success && data.paytmParams) {
+                // Production mode - redirect to Paytm
+                const form = document.getElementById('paytmForm');
+                form.innerHTML = ''; // Clear previous inputs
+                form.action = data.paytm_url;
+                
+                // Add all paytm params
+                for (const key in data.paytmParams) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    input.value = data.paytmParams[key];
+                    form.appendChild(input);
+                }
+                
+                // Add checksum
+                const checksumInput = document.createElement('input');
+                checksumInput.type = 'hidden';
+                checksumInput.name = 'CHECKSUMHASH';
+                checksumInput.value = data.checksum;
+                form.appendChild(checksumInput);
+                
+                // Submit form to Paytm
+                form.submit();
+            } else {
+                alert('Failed to initiate payment. Please try again.');
+                showPaymentOptions();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to initiate payment. Please try again.');
+            showPaymentOptions();
+        });
+    }
+
+    // Keep the old function name as an alias for backward compatibility
+    function processPaytmPayment() {
+        if (!currentCandidateId) {
+            alert('Candidate ID not found. Please try again.');
+            return;
+        }
+        
+        showProcessingState();
+        
+        // Send payment initiation request
+        fetch('/employer/candidate/initiate-payment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ candidate_id: currentCandidateId })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.already_paid) {
+                // Already paid, close payment modal and refresh candidate view
+                bootstrap.Modal.getInstance(document.getElementById('paymentModal')).hide();
+                viewCandidate(currentCandidateId);
+                return;
+            }
+            
+            if (data.test_mode) {
+                // In test mode, show test options
+                currentOrderId = data.order_id;
+                showTestPaymentOptions();
+            } else if (data.success && data.paytmParams) {
+                // Create and submit Paytm form
+                const form = document.getElementById('paytmForm');
+                form.innerHTML = ''; // Clear previous inputs
+                form.action = data.paytm_url;
+                
+                // Add all paytm params
+                for (const key in data.paytmParams) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    input.value = data.paytmParams[key];
+                    form.appendChild(input);
+                }
+                
+                // Add checksum
+                const checksumInput = document.createElement('input');
+                checksumInput.type = 'hidden';
+                checksumInput.name = 'CHECKSUMHASH';
+                checksumInput.value = data.checksum;
+                form.appendChild(checksumInput);
+                
+                // Submit form
+                form.submit();
+            } else {
+                alert('Failed to initiate payment. Please try again.');
+                showPaymentOptions();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to initiate payment. Please try again.');
+            showPaymentOptions();
+        });
+    }
+
+    function processTestPaymentDirect(status) {
+        if (!currentCandidateId) {
+            alert('Candidate ID not found. Please try again.');
+            return;
+        }
+        
+        showProcessingState();
+        
+        // First initiate payment to get order ID
+        fetch('/employer/candidate/initiate-payment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ candidate_id: currentCandidateId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.already_paid) {
+                bootstrap.Modal.getInstance(document.getElementById('paymentModal')).hide();
+                viewCandidate(currentCandidateId);
+                return;
+            }
+            
+            if (!data.order_id) {
+                throw new Error('No order ID received');
+            }
+            
+            currentOrderId = data.order_id;
+            
+            // Process test payment
+            return fetch('/employer/candidate/test-payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ order_id: currentOrderId, status: status })
+            });
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Payment successful
+                bootstrap.Modal.getInstance(document.getElementById('paymentModal')).hide();
+                viewCandidate(currentCandidateId);
+            } else {
+                alert('Payment failed: ' + (data.message || 'Unknown error'));
+                showPaymentOptions();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Payment processing failed. Please try again.');
+            showPaymentOptions();
+        });
+    }
+
+    // Handle payment modal close - refresh candidate view
+    document.getElementById('paymentModal').addEventListener('hidden.bs.modal', function () {
+        // Remove any lingering modal backdrops
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('overflow');
+        document.body.style.removeProperty('padding-right');
+        
+        if (currentCandidateId) {
+            viewCandidate(currentCandidateId);
+        }
+    });
+    
+    // Handle candidate modal close - clean up backdrops
+    document.getElementById('candidateModal').addEventListener('hidden.bs.modal', function () {
+        // Remove any lingering modal backdrops
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('overflow');
+        document.body.style.removeProperty('padding-right');
+    });
 </script>
 @endsection

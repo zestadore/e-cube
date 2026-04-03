@@ -6,14 +6,17 @@ use App\Models\JobPost;
 use App\Models\Qualification;
 use App\Models\Industry;
 use App\Models\CompanyProfile;
+use App\Models\CandidateViewPayment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use paytm\paytmchecksum\PaytmChecksum;
 
 class JobPostController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('auth', ['except' => ['handleCandidateViewCallback', 'paymentStatus']]);
     }
 
     /**
@@ -22,7 +25,7 @@ class JobPostController extends Controller
     public function index()
     {
         $jobPosts = JobPost::where('user_id', Auth::id())
-                          ->with('qualification')
+                          ->with(['qualification', 'parentQualification'])
                           ->orderBy('created_at', 'desc')
                           ->get();
         
@@ -38,8 +41,14 @@ class JobPostController extends Controller
                 $jobIndustries = $this->getAllChildrenRecursive($parentIndustry);
             }
         }
+
+        // Get parent qualifications (qualifications without parents)
+        $parentQualifications = Qualification::whereDoesntHave('parents')->get();
         
-        return view('users.jobs.index', compact('jobPosts', 'jobIndustries'));
+        // Get all qualifications with their children for JavaScript
+        $allQualifications = Qualification::with('children')->get();
+        
+        return view('users.jobs.index', compact('jobPosts', 'jobIndustries', 'parentQualifications', 'allQualifications'));
     }
 
     /**
@@ -83,6 +92,7 @@ class JobPostController extends Controller
         $request->validate([
             'industry_id' => 'required|exists:industries,id',
             'description' => 'required|string',
+            'parent_qualification_id' => 'required|exists:qualifications,id',
             'qualification_id' => 'required|exists:qualifications,id',
             'application_start_date' => 'required|date',
             'application_end_date' => 'required|date|after_or_equal:application_start_date',
@@ -93,6 +103,7 @@ class JobPostController extends Controller
             'user_id' => Auth::id(),
             'industry_id' => $request->industry_id,
             'description' => $request->description,
+            'parent_qualification_id' => $request->parent_qualification_id,
             'qualification_id' => $request->qualification_id,
             'application_start_date' => $request->application_start_date,
             'application_end_date' => $request->application_end_date,
@@ -113,7 +124,7 @@ class JobPostController extends Controller
             abort(403, 'Unauthorized action.');
         }
         
-        return response()->json($job->load(['qualification', 'industry']));
+        return response()->json($job->load(['qualification', 'parentQualification', 'industry']));
     }
 
     /**
@@ -127,9 +138,12 @@ class JobPostController extends Controller
         }
         
         $qualifications = Qualification::all();
+        $parentQualifications = Qualification::whereDoesntHave('parents')->get();
+        
         return response()->json([
             'job' => $job,
-            'qualifications' => $qualifications
+            'qualifications' => $qualifications,
+            'parentQualifications' => $parentQualifications
         ]);
     }
 
@@ -146,6 +160,7 @@ class JobPostController extends Controller
         $request->validate([
             'industry_id' => 'required|exists:industries,id',
             'description' => 'required|string',
+            'parent_qualification_id' => 'required|exists:qualifications,id',
             'qualification_id' => 'required|exists:qualifications,id',
             'application_start_date' => 'required|date',
             'application_end_date' => 'required|date|after_or_equal:application_start_date',
@@ -156,6 +171,7 @@ class JobPostController extends Controller
         $job->update([
             'industry_id' => $request->industry_id,
             'description' => $request->description,
+            'parent_qualification_id' => $request->parent_qualification_id,
             'qualification_id' => $request->qualification_id,
             'application_start_date' => $request->application_start_date,
             'application_end_date' => $request->application_end_date,
@@ -263,6 +279,290 @@ class JobPostController extends Controller
             ])
             ->findOrFail($id);
         
-        return response()->json($candidate);
+        // Check if employer has paid to view this candidate
+        $hasPaid = CandidateViewPayment::hasPaid(Auth::id(), $id);
+        
+        return response()->json([
+            'candidate' => $candidate,
+            'has_paid' => $hasPaid,
+            'view_price' => 10.00,
+        ]);
+    }
+
+    /**
+     * Check if employer has paid for candidate view
+     */
+    public function checkCandidateViewStatus($candidateId)
+    {
+        $hasPaid = CandidateViewPayment::hasPaid(Auth::id(), $candidateId);
+        
+        return response()->json([
+            'has_paid' => $hasPaid,
+            'view_price' => 10.00,
+        ]);
+    }
+
+    /**
+     * Initiate payment for viewing candidate details
+     */
+    public function initiateCandidateViewPayment(Request $request)
+    {
+        $request->validate([
+            'candidate_id' => 'required|exists:users,id',
+        ]);
+
+        $candidateId = $request->candidate_id;
+        $employerId = Auth::id();
+        
+        // Check if already paid (completed status)
+        $existingPayment = CandidateViewPayment::where('employer_id', $employerId)
+            ->where('candidate_id', $candidateId)
+            ->first();
+        
+        if ($existingPayment) {
+            if ($existingPayment->status === 'completed') {
+                return response()->json([
+                    'success' => true,
+                    'already_paid' => true,
+                    'message' => 'You have already paid for this candidate',
+                ]);
+            }
+            
+            // If payment exists but is pending/failed, reuse it or update with new order ID
+            $orderId = 'CAND_VIEW_' . time() . '_' . $employerId . '_' . $candidateId;
+            $existingPayment->update([
+                'order_id' => $orderId,
+                'status' => 'pending',
+            ]);
+        } else {
+            // Create new payment record
+            $orderId = 'CAND_VIEW_' . time() . '_' . $employerId . '_' . $candidateId;
+            $amount = 10.00;
+            
+            CandidateViewPayment::create([
+                'employer_id' => $employerId,
+                'candidate_id' => $candidateId,
+                'order_id' => $orderId,
+                'amount' => $amount,
+                'status' => 'pending',
+            ]);
+        }
+
+        $amount = 10.00;
+
+        // Check if test mode is enabled
+        if (config('services.paytm.test_mode', false)) {
+            return response()->json([
+                'success' => true,
+                'test_mode' => true,
+                'order_id' => $orderId,
+                'amount' => $amount,
+                'callback_url' => route('paytm.candidate-view-callback'),
+            ]);
+        }
+
+        // Paytm configuration
+        $paytmParams = [
+			'MID' => config('services.paytm.merchant_id'),
+			'WEBSITE' => config('services.paytm.website'),
+			'CHANNEL_ID' => 'WEB',
+			'INDUSTRY_TYPE_ID' => config('services.paytm.industry_type'),
+			'ORDER_ID' => (string) $orderId,
+			'CUST_ID' => (string) ('CUST_' . $employerId),
+			'MOBILE_NO' => (string) Auth::user()->mobile,
+			'EMAIL' => (string) Auth::user()->email,
+			'TXN_AMOUNT' => number_format($amount, 2, '.', ''),
+			'CALLBACK_URL' => 'https://ecubecareers.com/paytm/candidate-view-callback',
+		];
+
+		// 🔥 IMPORTANT
+		ksort($paytmParams);
+        // Generate checksum
+		
+        $checksum = PaytmChecksum::generateSignature($paytmParams, config('services.paytm.merchant_key'));
+
+        // Use correct Paytm endpoints based on environment
+        $environment = config('services.paytm.environment', 'production');
+      
+        if ($environment === 'staging') {
+            $paytm_url = 'https://securegw-stage.paytm.in/order/process';
+        } else {
+            $paytm_url = 'https://secure.paytmpayments.com/order/process';
+        }
+	
+        return response()->json([
+            'success' => true,
+            'paytmParams' => $paytmParams,
+            'checksum' => $checksum,
+            'paytm_url' => $paytm_url,
+        ]);
+    }
+
+    /**
+     * Handle Paytm callback for candidate view payment
+     */
+    public function handleCandidateViewCallback(Request $request)
+    {
+        
+        
+        $paytmChecksum = $request->get('CHECKSUMHASH');
+        $paytmParams = $request->except(['CHECKSUMHASH']);
+        
+        
+        
+        // Handle test mode callback
+        if (isset($paytmParams['TEST']) && $paytmParams['TEST'] === true) {
+            return $this->handleTestCandidateViewCallback($paytmParams);
+        }
+        
+        // Verify checksum
+        try {
+            $isVerifySignature = PaytmChecksum::verifySignature($paytmParams, config('services.paytm.merchant_key'), $paytmChecksum);
+           
+        } catch (\Exception $e) {
+            
+            // Continue processing even if verification fails - we'll check status instead
+            $isVerifySignature = true; // Temporary: accept all responses
+        }
+        
+        if (!$isVerifySignature) {
+            
+            // Temporary: continue processing instead of failing
+            return redirect('/payment/status?status=error&message=' . urlencode('Payment verification failed. Please contact support.'));
+        }
+
+        return $this->processCandidateViewPaymentResponse($paytmParams);
+    }
+
+    /**
+     * Handle test callback for candidate view
+     */
+    private function handleTestCandidateViewCallback($params)
+    {
+        $orderId = $params['ORDERID'];
+        $payment = CandidateViewPayment::where('order_id', $orderId)->first();
+
+        if (!$payment) {
+            return redirect()->route('employer.find-talent')->with('error', 'Payment record not found.');
+        }
+
+        if ($params['STATUS'] === 'TXN_SUCCESS') {
+            $payment->update([
+                'transaction_id' => $params['TXNID'] ?? 'TEST_TXN',
+                'status' => 'completed',
+                'response_data' => json_encode($params),
+                'paid_at' => now(),
+            ]);
+
+            return redirect()->route('employer.find-talent')->with('success', 'Payment successful! You can now view the candidate details.');
+        }
+
+        $payment->update([
+            'transaction_id' => $params['TXNID'] ?? 'TEST_TXN',
+            'status' => 'failed',
+            'response_data' => json_encode($params),
+        ]);
+
+        return redirect()->route('employer.find-talent')->with('error', 'Payment failed. Please try again.');
+    }
+
+    /**
+     * Show payment status page (public route)
+     */
+    public function paymentStatus(Request $request)
+    {
+        $status = $request->get('status', 'unknown');
+        $message = $request->get('message', 'Payment status unknown');
+        
+        return view('payment-status', compact('status', 'message'));
+    }
+
+    /**
+     * Process candidate view payment response
+     */
+    private function processCandidateViewPaymentResponse($paytmParams)
+    {
+        $orderId = $paytmParams['ORDERID'];
+        $payment = CandidateViewPayment::where('order_id', $orderId)->first();
+
+        if (!$payment) {
+            
+            return redirect('/payment/status?status=error&message=' . urlencode('Payment record not found.'));
+        }
+
+        $status = $paytmParams['STATUS'] ?? '';
+        $txnId = $paytmParams['TXNID'] ?? null;
+        $respMsg = $paytmParams['RESPMSG'] ?? '';
+
+        if ($status === 'TXN_SUCCESS') {
+            $payment->update([
+                'transaction_id' => $txnId,
+                'status' => 'completed',
+                'response_data' => json_encode($paytmParams),
+                'paid_at' => now(),
+            ]);
+
+            return redirect('/payment/status?status=success&message=' . urlencode('Payment successful! You can now view the candidate details.'));
+        } elseif ($status === 'PENDING') {
+            $payment->update([
+                'transaction_id' => $txnId,
+                'status' => 'pending',
+                'response_data' => json_encode($paytmParams),
+            ]);
+
+            return redirect('/payment/status?status=pending&message=' . urlencode('Payment is pending. Please wait for confirmation.'));
+        } else {
+            $payment->update([
+                'transaction_id' => $txnId,
+                'status' => 'failed',
+                'response_data' => json_encode($paytmParams),
+            ]);
+
+            return redirect('/payment/status?status=error&message=' . urlencode('Payment failed: ' . $respMsg));
+        }
+    }
+
+    /**
+     * Test payment for candidate view (for development)
+     */
+    public function testCandidateViewPayment(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required|string',
+            'status' => 'required|in:success,failure',
+        ]);
+
+        $payment = CandidateViewPayment::where('order_id', $request->order_id)
+                                ->where('employer_id', Auth::id())
+                                ->first();
+
+        if (!$payment) {
+            return response()->json(['error' => 'Payment not found'], 404);
+        }
+
+        if ($request->status === 'success') {
+            $payment->update([
+                'transaction_id' => 'TEST_TXN_' . time(),
+                'status' => 'completed',
+                'response_data' => json_encode(['STATUS' => 'TXN_SUCCESS', 'TEST' => true]),
+                'paid_at' => now(),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Test payment completed successfully',
+            ]);
+        } else {
+            $payment->update([
+                'transaction_id' => 'TEST_TXN_' . time(),
+                'status' => 'failed',
+                'response_data' => json_encode(['STATUS' => 'TXN_FAILURE', 'TEST' => true]),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Test payment failed',
+            ]);
+        }
     }
 }

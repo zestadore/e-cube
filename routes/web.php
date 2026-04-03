@@ -76,6 +76,11 @@ Route::middleware(['auth'])->group(function () {
         Route::post('save-industry', [App\Http\Controllers\Registration\Company\CompanyProfileController::class, 'saveIndustry'])->name('save_industry');
         Route::resource('jobs', App\Http\Controllers\JobPostController::class);
         Route::get('find-talent', [App\Http\Controllers\JobPostController::class, 'findTalent'])->name('find-talent');
+        
+        // Candidate payment routes - MUST be defined before candidate/{id} to avoid conflicts
+        Route::post('candidate/initiate-payment', [App\Http\Controllers\JobPostController::class, 'initiateCandidateViewPayment'])->name('candidate.initiate-payment');
+        Route::post('candidate/test-payment', [App\Http\Controllers\JobPostController::class, 'testCandidateViewPayment'])->name('candidate.test-payment');
+        Route::get('candidate/{id}/check-payment', [App\Http\Controllers\JobPostController::class, 'checkCandidateViewStatus'])->name('candidate.check-payment');
         Route::get('candidate/{id}', [App\Http\Controllers\JobPostController::class, 'showCandidate'])->name('candidate.show');
     });
     // 1️⃣ Verification notice page
@@ -96,5 +101,17 @@ Route::middleware(['auth'])->group(function () {
 
         return back()->with('message', 'Verification link sent!');
     })->middleware(['throttle:6,1'])->name('verification.send');
+});
+
+// Paytm Callback Routes - Must be outside auth middleware (Paytm sends POST back)
+Route::post('/paytm/candidate-view-callback', [App\Http\Controllers\JobPostController::class, 'handleCandidateViewCallback'])->name('paytm.candidate-view-callback');
+Route::get('/paytm/candidate-view-callback', [App\Http\Controllers\JobPostController::class, 'handleCandidateViewCallback']); // Handle GET as well
+
+// Public Payment Status Page (no auth required)
+Route::get('/payment/status', [App\Http\Controllers\JobPostController::class, 'paymentStatus'])->name('payment.status');
+
+// Test route to verify callback is accessible
+Route::get('/paytm/test-callback', function() {
+    return 'Callback route is working';
 });
 

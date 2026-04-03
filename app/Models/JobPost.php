@@ -10,6 +10,7 @@ class JobPost extends Model
         'user_id',
         'industry_id',
         'description',
+        'parent_qualification_id',
         'qualification_id',
         'application_start_date',
         'application_end_date',
@@ -31,6 +32,11 @@ class JobPost extends Model
     public function qualification()
     {
         return $this->belongsTo(Qualification::class);
+    }
+
+    public function parentQualification()
+    {
+        return $this->belongsTo(Qualification::class, 'parent_qualification_id');
     }
 
     public function industry()
