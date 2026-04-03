@@ -61,6 +61,45 @@
             object-fit: cover;
             filter: none;
         }
+        
+        /* PDF Page Break Styles */
+        @media print {
+            .card {
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
+            }
+            .card-header {
+                break-after: avoid !important;
+                page-break-after: avoid !important;
+            }
+            .card-body {
+                break-before: avoid !important;
+                page-break-before: avoid !important;
+            }
+            .table {
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
+            }
+            tr {
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
+            }
+            .row {
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
+            }
+            h4, h5, h6 {
+                break-after: avoid !important;
+                page-break-after: avoid !important;
+            }
+        }
+        
+        /* PDF-specific class for better page breaks */
+        .pdf-section {
+            break-inside: avoid;
+            page-break-inside: avoid;
+            margin-bottom: 20px;
+        }
     </style>
 @endsection
 
@@ -276,7 +315,7 @@
 
 <!-- Candidate Profile Modal -->
 <div class="modal fade" id="candidateModal" tabindex="-1" aria-labelledby="candidateModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content" style="border-radius: 15px;">
             <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                 <h5 class="modal-title text-white" id="candidateModalLabel">
@@ -449,38 +488,7 @@
         const skills = candidate.candidate_skills || [];
         const addresses = candidate.addresses || [];
         const bgAnswers = candidate.background_question_answers || [];
-        
-        let qualificationsHtml = '';
-        qualifications.forEach(q => {
-            qualificationsHtml += `<span class="badge bg-info text-dark me-2 mb-2">${q.qualification?.degree || 'N/A'}</span>`;
-        });
-        
-        let experiencesHtml = '';
-        experiences.forEach(e => {
-            experiencesHtml += `
-                <div class="candidate-detail-item">
-                    <div class="d-flex justify-content-between">
-                        <strong>${e.industry?.industry_name || 'N/A'}</strong>
-                        <span class="badge bg-primary">${e.years_of_experience || 0} years</span>
-                    </div>
-                </div>
-            `;
-        });
-        
-        let skillsHtml = '';
-        skills.forEach(s => {
-            skillsHtml += `<span class="badge bg-secondary me-2 mb-2">${s.skill?.skill_name || 'N/A'}</span>`;
-        });
-        
-        let bgAnswersHtml = '';
-        bgAnswers.forEach(a => {
-            bgAnswersHtml += `
-                <div class="candidate-detail-item">
-                    <small class="text-muted">${a.question?.question || 'Question'}</small>
-                    <p class="mb-0 fw-semibold">${a.answer || 'N/A'}</p>
-                </div>
-            `;
-        });
+        const backgroundQuestions = data.background_questions || {};
         
         // Determine what to show based on payment status
         let photoClass = hasPaid ? 'modal-candidate-photo-unlocked' : 'modal-candidate-photo';
@@ -490,45 +498,392 @@
             </div>
         `;
         
-        let emailDisplay = hasPaid ? 
-            `<div class="candidate-detail-item">
-                <small class="text-muted"><i class="fas fa-envelope me-2"></i>Email</small>
-                <p class="mb-0 fw-semibold">${candidate.email}</p>
-            </div>` :
-            `<div class="candidate-detail-item blurred-text">
-                <small class="text-muted"><i class="fas fa-envelope me-2"></i>Email</small>
-                <p class="mb-0 fw-semibold">****@****.com</p>
-            </div>`;
+        // Helper function to mask or show data
+        const getValue = (value, mask = '****') => hasPaid ? (value || 'N/A') : mask;
         
-        let phoneDisplay = hasPaid ?
-            `<div class="candidate-detail-item">
-                <small class="text-muted"><i class="fas fa-phone me-2"></i>Phone</small>
-                <p class="mb-0 fw-semibold">${candidate.mobile}</p>
-            </div>` :
-            `<div class="candidate-detail-item blurred-text">
-                <small class="text-muted"><i class="fas fa-phone me-2"></i>Phone</small>
-                <p class="mb-0 fw-semibold">+91 **** **** **</p>
-            </div>`;
+        // Format date of birth
+        const dob = basicDetails.dob ? new Date(basicDetails.dob).toLocaleDateString('en-IN', {
+            day: '2-digit', month: 'long', year: 'numeric'
+        }) : null;
         
-        let addressDisplay = '';
-        if (hasPaid && addresses.length > 0) {
-            const addr = addresses[0];
-            addressDisplay = `
-                <div class="candidate-detail-item">
-                    <small class="text-muted"><i class="fas fa-map-marker-alt me-2"></i>Address</small>
-                    <p class="mb-0 fw-semibold">
-                        ${addr.address || ''}, ${addr.city || ''}, ${addr.state || ''} - ${addr.pincode || ''}
-                    </p>
+        // Gender display
+        const gender = basicDetails.gender ? basicDetails.gender.charAt(0).toUpperCase() + basicDetails.gender.slice(1) : null;
+        
+        // Marital status
+        // const maritalStatus = basicDetails.marital_status ? 
+        //     basicDetails.marital_status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) : null;
+        
+        // Build addresses sections (Present and Permanent)
+        let presentAddressHtml = '';
+        let permanentAddressHtml = '';
+        
+        const presentAddr = addresses.find(a => a.type === 'present_address') || {};
+        const permanentAddr = addresses.find(a => a.type === 'permenant_address') || {};
+        
+        // Present Address
+        if (hasPaid && (presentAddr.address_1 || presentAddr.city)) {
+            presentAddressHtml = `
+                <div class="card border-0 bg-light mb-3">
+                    <div class="card-body">
+                        <h6 class="fw-bold text-primary mb-3"><i class="fas fa-home me-2"></i>Present Address</h6>
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2"><i class="fas fa-map-marker-alt text-muted me-2"></i>
+                                ${presentAddr.address_1 || ''}${presentAddr.address_2 ? ', ' + presentAddr.address_2 : ''}, 
+                                ${presentAddr.city || ''}, ${presentAddr.state || ''}, 
+                                ${presentAddr.country || ''} - ${presentAddr.zip || ''}
+                            </li>
+                            ${presentAddr.police_station ? `<li class="mb-2"><i class="fas fa-shield-alt text-muted me-2"></i>Police Station: ${presentAddr.police_station}</li>` : ''}
+                            ${presentAddr.panchayat_municipality ? `<li class="mb-2"><i class="fas fa-building text-muted me-2"></i>Panchayat/Municipality: ${presentAddr.panchayat_municipality}</li>` : ''}
+                        </ul>
+                    </div>
                 </div>
             `;
         } else {
-            addressDisplay = `
-                <div class="candidate-detail-item ${hasPaid ? '' : 'blurred-text'}">
-                    <small class="text-muted"><i class="fas fa-map-marker-alt me-2"></i>Address</small>
-                    <p class="mb-0 fw-semibold">${hasPaid ? 'Not Available' : 'Address Hidden'}</p>
+            presentAddressHtml = hasPaid ? '<p class="text-muted">No present address available</p>' : 
+                `<div class="card border-0 bg-light mb-3 blurred-text">
+                    <div class="card-body">
+                        <h6 class="fw-bold text-secondary mb-3"><i class="fas fa-lock me-2"></i>Present Address</h6>
+                        <p class="mb-0">****</p>
+                    </div>
+                </div>`;
+        }
+        
+        // Permanent Address
+        if (hasPaid && (permanentAddr.address_1 || permanentAddr.city)) {
+            permanentAddressHtml = `
+                <div class="card border-0 bg-light mb-3">
+                    <div class="card-body">
+                        <h6 class="fw-bold text-info mb-3"><i class="fas fa-home me-2"></i>Permanent Address</h6>
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2"><i class="fas fa-map-marker-alt text-muted me-2"></i>
+                                ${permanentAddr.address_1 || ''}${permanentAddr.address_2 ? ', ' + permanentAddr.address_2 : ''}, 
+                                ${permanentAddr.city || ''}, ${permanentAddr.state || ''}, 
+                                ${permanentAddr.country || ''} - ${permanentAddr.zip || ''}
+                            </li>
+                            ${permanentAddr.police_station ? `<li class="mb-2"><i class="fas fa-shield-alt text-muted me-2"></i>Police Station: ${permanentAddr.police_station}</li>` : ''}
+                            ${permanentAddr.panchayat_municipality ? `<li class="mb-2"><i class="fas fa-building text-muted me-2"></i>Panchayat/Municipality: ${permanentAddr.panchayat_municipality}</li>` : ''}
+                        </ul>
+                    </div>
                 </div>
             `;
+        } else {
+            permanentAddressHtml = hasPaid ? '<p class="text-muted">No permanent address available</p>' : 
+                `<div class="card border-0 bg-light mb-3 blurred-text">
+                    <div class="card-body">
+                        <h6 class="fw-bold text-secondary mb-3"><i class="fas fa-lock me-2"></i>Permanent Address</h6>
+                        <p class="mb-0">****</p>
+                    </div>
+                </div>`;
         }
+        
+        // Build qualifications table
+        let qualificationsHtml = '';
+        if (qualifications.length > 0) {
+            const qualRows = qualifications.map(q => `
+                <tr>
+                    <td>${q.qualification?.degree || 'N/A'}</td>
+                    <td>${hasPaid ? (q.university || '-') : '****'}</td>
+                    <td>${hasPaid ? (q.from_year || '-') : '****'} - ${hasPaid ? (q.to_year || '-') : '****'}</td>
+                    <td>${hasPaid ? (q.percentage ? q.percentage + '%' : '-') : '****'}</td>
+                    ${hasPaid && q.certificate ? `<td><a href="${q.certificate}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fas fa-file-alt"></i> View</a></td>` : '<td>-</td>'}
+                </tr>
+            `).join('');
+            
+            qualificationsHtml = `
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Qualification</th>
+                                <th>University</th>
+                                <th>Duration</th>
+                                <th>Percentage</th>
+                                <th>Certificate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${qualRows}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        } else {
+            qualificationsHtml = '<p class="text-muted">No qualifications listed</p>';
+        }
+        
+        // Build experience table
+        let experiencesHtml = '';
+        if (experiences.length > 0) {
+            const expRows = experiences.map(e => {
+                // Parse role_ids JSON if it's a string
+                let roles = [];
+                if (e.role_ids) {
+                    try {
+                        roles = typeof e.role_ids === 'string' ? JSON.parse(e.role_ids) : e.role_ids;
+                    } catch (err) {
+                        roles = [];
+                    }
+                }
+                
+                // Format roles display
+                const rolesDisplay = Array.isArray(roles) && roles.length > 0 
+                    ? roles.join(', ') 
+                    : '-';
+                
+                return `
+                <tr>
+                    <td>${e.industry?.industry_name || 'N/A'}</td>
+                    <td>${hasPaid ? rolesDisplay : '****'}</td>
+                    <td>${hasPaid ? (e.company || '-') : '****'}</td>
+                    <td>${hasPaid ? (e.from_year || '-') : '****'} - ${hasPaid ? (e.to_year || '-') : '****'}</td>
+                    <td>${hasPaid ? (e.duration || '-') : '****'}</td>
+                    ${hasPaid && e.certificate ? `<td><a href="${e.certificate}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fas fa-file-alt"></i> View</a></td>` : '<td>-</td>'}
+                </tr>
+                `;
+            }).join('');
+            
+            experiencesHtml = `
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Industry</th>
+                                <th>Roles</th>
+                                <th>Company</th>
+                                <th>Duration (Years)</th>
+                                <th>Duration</th>
+                                <th>Certificate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${expRows}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        } else {
+            experiencesHtml = '<p class="text-muted">No experience listed</p>';
+        }
+        
+        // Skills table display
+        let skillsHtml = '';
+        if (skills.length > 0) {
+            const skillRows = skills.map(s => `
+                <tr>
+                    <td>${s.skill?.skill || 'N/A'}</td>
+                    <td>${hasPaid ? (s.university || '-') : '****'}</td>
+                    <td>${hasPaid ? (s.from_year || '-') : '****'} - ${hasPaid ? (s.to_year || '-') : '****'}</td>
+                    <td>${hasPaid ? (s.percentage ? s.percentage + '%' : '-') : '****'}</td>
+                    ${hasPaid && s.certificate ? `<td><a href="${s.certificate}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fas fa-file-alt"></i> View</a></td>` : '<td>-</td>'}
+                </tr>
+            `).join('');
+            
+            skillsHtml = `
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Skill</th>
+                                <th>University/Institution</th>
+                                <th>Duration</th>
+                                <th>Percentage</th>
+                                <th>Certificate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${skillRows}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        } else {
+            skillsHtml = '<p class="text-muted">No skills listed</p>';
+        }
+        
+        // Background questions table
+        let bgAnswersHtml = '';
+        if (bgAnswers.length > 0) {
+            // Parse answers JSON if it's a string
+            let answers = {};
+            if (bgAnswers[0].answers) {
+                try {
+                    answers = typeof bgAnswers[0].answers === 'string' ? JSON.parse(bgAnswers[0].answers) : bgAnswers[0].answers;
+                } catch (err) {
+                    answers = {};
+                }
+            }
+            
+            // The answers object has question IDs (numeric) as keys
+            // backgroundQuestions contains the mapping of question ID to question text
+            const bgRows = Object.entries(answers).map(([questionId, answer]) => {
+                // Get the actual question text from backgroundQuestions, fallback to "Question #{id}" if not found
+                const questionText = backgroundQuestions[questionId] || `Question #${questionId}`;
+                
+                return `
+                <tr>
+                    <td class="fw-semibold" style="width: 40%">${questionText}</td>
+                    <td>${hasPaid ? (answer || '-') : '****'}</td>
+                </tr>
+                `;
+            }).join('');
+            
+            if (bgRows) {
+                bgAnswersHtml = `
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered">
+                            <tbody>
+                                ${bgRows}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+        }
+        
+        // Extract all basic details
+        const altMobile = basicDetails.alternate_mobile_number;
+        const whatsappNumber = basicDetails.whatsapp_number;
+        const altEmail = basicDetails.alternate_email_id;
+        const aadhar = basicDetails.aadhar_number;
+        const pan = basicDetails.pan_number;
+        const passport = basicDetails.passport_number;
+        const profession = basicDetails.profession;
+        const experience = basicDetails.experience;
+        const jobType = basicDetails.Job_type;
+        const differentlyAbled = basicDetails.differently_abled;
+        
+        // Contact Information Section
+        const contactInfo = hasPaid ? `
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-header bg-primary text-white">
+                    <i class="fas fa-address-card me-2"></i>Contact Information
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted"><i class="fas fa-envelope me-2"></i>Email</small>
+                            <p class="mb-0 fw-semibold">${candidate.email}</p>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted"><i class="fas fa-phone me-2"></i>Phone</small>
+                            <p class="mb-0 fw-semibold">${candidate.mobile}</p>
+                        </div>
+                        ${altEmail ? `
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted"><i class="fas fa-envelope-open me-2"></i>Alternate Email</small>
+                            <p class="mb-0 fw-semibold">${altEmail}</p>
+                        </div>` : ''}
+                        ${altMobile ? `
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted"><i class="fas fa-mobile-alt me-2"></i>Alternate Mobile</small>
+                            <p class="mb-0 fw-semibold">${altMobile}</p>
+                        </div>` : ''}
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted"><i class="fab fa-whatsapp me-2"></i>WhatsApp</small>
+                            <p class="mb-0 fw-semibold">
+                                <a href="https://wa.me/${(whatsappNumber || candidate.mobile)?.replace(/\D/g, '')}" target="_blank" class="text-success">
+                                    ${whatsappNumber || candidate.mobile} <i class="fas fa-external-link-alt small"></i>
+                                </a>
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted"><i class="fas fa-calendar-alt me-2"></i>Date of Birth</small>
+                            <p class="mb-0 fw-semibold">${dob || 'Not provided'}</p>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted"><i class="fas fa-venus-mars me-2"></i>Gender</small>
+                            <p class="mb-0 fw-semibold">${gender || 'Not provided'}</p>
+                        </div>
+                        ${profession ? `
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted"><i class="fas fa-briefcase me-2"></i>Profession</small>
+                            <p class="mb-0 fw-semibold">${profession}</p>
+                        </div>` : ''}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Additional Personal Details -->
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-header bg-info text-white">
+                    <i class="fas fa-id-card me-2"></i>Personal & Professional Details
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted"><i class="fas fa-user-graduate me-2"></i>Experience Level</small>
+                            <p class="mb-0 fw-semibold">${experience || 'Not specified'}</p>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted"><i class="fas fa-clock me-2"></i>Job Type</small>
+                            <p class="mb-0 fw-semibold">${jobType || 'Not specified'}</p>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted"><i class="fas fa-wheelchair me-2"></i>Differently Abled</small>
+                            <p class="mb-0 fw-semibold">${differentlyAbled || 'No'}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Identity Documents -->
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-header bg-dark text-white">
+                    <i class="fas fa-passport me-2"></i>Identity Documents
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted"><i class="fas fa-id-badge me-2"></i>Aadhar Number</small>
+                            <p class="mb-0 fw-semibold">${aadhar || 'Not provided'}</p>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted"><i class="fas fa-credit-card me-2"></i>PAN Number</small>
+                            <p class="mb-0 fw-semibold">${pan || 'Not provided'}</p>
+                        </div>
+                        ${passport ? `
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted"><i class="fas fa-plane me-2"></i>Passport Number</small>
+                            <p class="mb-0 fw-semibold">${passport}</p>
+                        </div>` : ''}
+                    </div>
+                </div>
+            </div>
+        ` : `
+            <div class="card border-0 shadow-sm mb-3 blurred-text">
+                <div class="card-header bg-secondary text-white">
+                    <i class="fas fa-lock me-2"></i>Contact Information (Locked)
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted"><i class="fas fa-envelope me-2"></i>Email</small>
+                            <p class="mb-0 fw-semibold">****@****.com</p>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted"><i class="fas fa-phone me-2"></i>Phone</small>
+                            <p class="mb-0 fw-semibold">+91 **** **** **</p>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted"><i class="fab fa-whatsapp me-2"></i>WhatsApp</small>
+                            <p class="mb-0 fw-semibold">+91 **** **** **</p>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted"><i class="fas fa-calendar-alt me-2"></i>Date of Birth</small>
+                            <p class="mb-0 fw-semibold">****</p>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted"><i class="fas fa-venus-mars me-2"></i>Gender</small>
+                            <p class="mb-0 fw-semibold">****</p>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted"><i class="fas fa-id-badge me-2"></i>Aadhar Number</small>
+                            <p class="mb-0 fw-semibold">****</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
         
         // Update footer based on payment status
         if (hasPaid) {
@@ -536,8 +891,14 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 8px;">
                     <i class="fas fa-times me-2"></i>Close
                 </button>
+                <button type="button" class="btn btn-info" style="border-radius: 8px;" onclick="printCandidateProfile()">
+                    <i class="fas fa-print me-2"></i>Print Profile
+                </button>
+                <a href="https://wa.me/${candidate.mobile?.replace(/\D/g, '')}" target="_blank" class="btn btn-success" style="border-radius: 8px;">
+                    <i class="fab fa-whatsapp me-2"></i>WhatsApp
+                </a>
                 <a href="mailto:${candidate.email}" class="btn btn-primary" style="border-radius: 8px;">
-                    <i class="fas fa-envelope me-2"></i>Contact Candidate
+                    <i class="fas fa-envelope me-2"></i>Send Email
                 </a>
             `;
         } else {
@@ -551,10 +912,11 @@
             `;
         }
         
-        document.getElementById('candidateModalBody').innerHTML = `
+        // Build the modal HTML (original full layout for display)
+        const modalHtml = `
             <div class="row">
-                <!-- Left Column -->
-                <div class="col-md-4 text-center mb-4">
+                <!-- Left Column - Profile Photo & Quick Info -->
+                <div class="col-md-3 text-center mb-4">
                     <div class="position-relative d-inline-block mb-3">
                         <img src="${candidate.image_path || '/assets/images/default-avatar.png'}" 
                              alt="Candidate" 
@@ -563,52 +925,92 @@
                     </div>
                     <h4 class="fw-bold mb-2">${candidate.full_name}</h4>
                     <span class="badge bg-success mb-2"><i class="fas fa-check-circle me-1"></i>Verified</span>
-                    
-                    <div class="text-start mt-4">
-                        ${emailDisplay}
-                        ${phoneDisplay}
-                        ${addressDisplay}
+                    ${hasPaid ? `
+                    <div class="mt-3">
+                        <a href="tel:${candidate.mobile}" class="btn btn-sm btn-outline-primary w-100 mb-2">
+                            <i class="fas fa-phone me-2"></i>Call Now
+                        </a>
+                        <a href="https://wa.me/${candidate.mobile?.replace(/\D/g, '')}" target="_blank" class="btn btn-sm btn-outline-success w-100">
+                            <i class="fab fa-whatsapp me-2"></i>WhatsApp
+                        </a>
                     </div>
+                    ` : ''}
                 </div>
                 
-                <!-- Right Column -->
-                <div class="col-md-8">
-                    <!-- About -->
-                    <div class="mb-4">
-                        <h6 class="fw-bold text-primary mb-3"><i class="fas fa-user me-2"></i>About</h6>
-                        <div class="candidate-detail-item">
-                            <p class="mb-0">${basicDetails.about || 'No description available'}</p>
+                <!-- Right Column - Detailed Information -->
+                <div class="col-md-9">
+                    <!-- About Section -->
+                    ${basicDetails.about ? `
+                    <div class="card border-0 shadow-sm mb-3">
+                        <div class="card-header bg-info text-white">
+                            <i class="fas fa-user me-2"></i>About
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-0">${basicDetails.about}</p>
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    <!-- Contact Information -->
+                    ${contactInfo}
+                    
+                    <!-- Addresses -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            ${presentAddressHtml}
+                        </div>
+                        <div class="col-md-6">
+                            ${permanentAddressHtml}
                         </div>
                     </div>
                     
                     <!-- Qualifications -->
-                    <div class="mb-4">
-                        <h6 class="fw-bold text-primary mb-3"><i class="fas fa-graduation-cap me-2"></i>Qualifications</h6>
-                        <div>${qualificationsHtml || '<p class="text-muted">No qualifications listed</p>'}</div>
+                    <div class="card border-0 shadow-sm mb-3">
+                        <div class="card-header bg-success text-white">
+                            <i class="fas fa-graduation-cap me-2"></i>Educational Qualifications
+                        </div>
+                        <div class="card-body p-0">
+                            ${qualificationsHtml}
+                        </div>
                     </div>
                     
                     <!-- Experience -->
-                    <div class="mb-4">
-                        <h6 class="fw-bold text-primary mb-3"><i class="fas fa-briefcase me-2"></i>Experience</h6>
-                        ${experiencesHtml || '<p class="text-muted">No experience listed</p>'}
+                    <div class="card border-0 shadow-sm mb-3">
+                        <div class="card-header bg-primary text-white">
+                            <i class="fas fa-briefcase me-2"></i>Work Experience
+                        </div>
+                        <div class="card-body p-0">
+                            ${experiencesHtml}
+                        </div>
                     </div>
                     
                     <!-- Skills -->
-                    <div class="mb-4">
-                        <h6 class="fw-bold text-primary mb-3"><i class="fas fa-tools me-2"></i>Skills</h6>
-                        <div>${skillsHtml || '<p class="text-muted">No skills listed</p>'}</div>
+                    <div class="card border-0 shadow-sm mb-3">
+                        <div class="card-header bg-secondary text-white">
+                            <i class="fas fa-tools me-2"></i>Skills
+                        </div>
+                        <div class="card-body">
+                            ${skillsHtml}
+                        </div>
                     </div>
                     
-                    <!-- Background Questions -->
+                    <!-- Background Information -->
                     ${bgAnswersHtml ? `
-                    <div class="mb-4">
-                        <h6 class="fw-bold text-primary mb-3"><i class="fas fa-question-circle me-2"></i>Background Information</h6>
-                        ${bgAnswersHtml}
+                    <div class="card border-0 shadow-sm mb-3">
+                        <div class="card-header bg-dark text-white">
+                            <i class="fas fa-question-circle me-2"></i>Background Information
+                        </div>
+                        <div class="card-body p-0">
+                            ${bgAnswersHtml}
+                        </div>
                     </div>
                     ` : ''}
                 </div>
             </div>
         `;
+        
+        // Set the modal content to the full layout
+        document.getElementById('candidateModalBody').innerHTML = modalHtml;
     }
 
     function openPaymentModal() {
@@ -872,5 +1274,111 @@
         document.body.style.removeProperty('overflow');
         document.body.style.removeProperty('padding-right');
     });
+
+    // Print candidate profile
+    function printCandidateProfile() {
+        // Get modal elements
+        const modal = document.getElementById('candidateModal');
+        const modalDialog = modal.querySelector('.modal-dialog');
+        const modalBody = document.getElementById('candidateModalBody');
+        const modalFooter = document.getElementById('candidateModalFooter');
+        
+        // Store original styles
+        const originalDialogClass = modalDialog.className;
+        const originalBodyOverflow = modalBody.style.overflow;
+        const originalBodyMaxHeight = modalBody.style.maxHeight;
+        const originalFooterDisplay = modalFooter.style.display;
+        
+        // Expand modal to show all content (remove scrollable restrictions)
+        modalDialog.classList.remove('modal-dialog-scrollable');
+        modalBody.style.overflow = 'visible';
+        modalBody.style.maxHeight = 'none';
+        modalFooter.style.display = 'none';
+        
+        // Add print-specific styles
+        const printStyles = document.createElement('style');
+        printStyles.id = 'print-styles';
+        printStyles.textContent = `
+            @media print {
+                body * {
+                    visibility: hidden;
+                }
+                #candidateModal, #candidateModal * {
+                    visibility: visible;
+                }
+                #candidateModal {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    width: 100%;
+                    height: auto;
+                }
+                .modal-dialog {
+                    max-width: 100% !important;
+                    margin: 0 !important;
+                }
+                .modal-content {
+                    border: none !important;
+                    box-shadow: none !important;
+                }
+                .modal-header, .modal-footer {
+                    display: none !important;
+                }
+                .modal-body {
+                    padding: 20px !important;
+                    overflow: visible !important;
+                    max-height: none !important;
+                }
+                .card {
+                    break-inside: avoid;
+                    page-break-inside: avoid;
+                    margin-bottom: 15px;
+                    border: 1px solid #dee2e6 !important;
+                    box-shadow: none !important;
+                }
+                .card-header {
+                    background-color: #f8f9fa !important;
+                    color: #333 !important;
+                    border-bottom: 1px solid #dee2e6 !important;
+                }
+                .table {
+                    break-inside: avoid;
+                    page-break-inside: avoid;
+                    width: 100% !important;
+                }
+                .blurred-text {
+                    filter: none !important;
+                }
+                .btn, .badge {
+                    display: none !important;
+                }
+                .row {
+                    display: flex;
+                    flex-wrap: wrap;
+                }
+                .col-md-3, .col-md-6, .col-md-9 {
+                    flex: 0 0 auto;
+                }
+                .col-md-3 { width: 25%; }
+                .col-md-6 { width: 50%; }
+                .col-md-9 { width: 75%; }
+            }
+        `;
+        document.head.appendChild(printStyles);
+        
+        // Wait a moment for layout to adjust then print
+        setTimeout(() => {
+            window.print();
+            
+            // Restore original styles after print
+            setTimeout(() => {
+                modalDialog.className = originalDialogClass;
+                modalBody.style.overflow = originalBodyOverflow;
+                modalBody.style.maxHeight = originalBodyMaxHeight;
+                modalFooter.style.display = originalFooterDisplay;
+                document.getElementById('print-styles').remove();
+            }, 100);
+        }, 100);
+    }
 </script>
 @endsection

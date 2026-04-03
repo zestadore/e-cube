@@ -7,6 +7,7 @@ use App\Models\Qualification;
 use App\Models\Industry;
 use App\Models\CompanyProfile;
 use App\Models\CandidateViewPayment;
+use App\Models\BackGroundQuestion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -275,9 +276,12 @@ class JobPostController extends Controller
                 'candidateQualifications.qualification',
                 'candidateSkills.skill',
                 'candidateExperiences.industry',
-                'backgroundQuestionAnswers.question'
+                'backgroundQuestionAnswers'
             ])
             ->findOrFail($id);
+        
+        // Fetch all background questions for reference
+        $backgroundQuestions = BackGroundQuestion::pluck('question', 'id')->toArray();
         
         // Check if employer has paid to view this candidate
         $hasPaid = CandidateViewPayment::hasPaid(Auth::id(), $id);
@@ -286,6 +290,7 @@ class JobPostController extends Controller
             'candidate' => $candidate,
             'has_paid' => $hasPaid,
             'view_price' => 10.00,
+            'background_questions' => $backgroundQuestions,
         ]);
     }
 
