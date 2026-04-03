@@ -269,6 +269,19 @@
                         </ul>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link {{ (request()->is('admin/payment-history'))? 'active' : '' }}" aria-current="page" href="{{ route('admin.payment-history') }}">
+                            <i class="icon">
+                                <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path opacity="0.4" d="M2 7C2 5.34315 3.34315 4 5 4H19C20.6569 4 22 5.34315 22 7V17C22 18.6569 20.6569 20 19 20H5C3.34315 20 2 18.6569 2 17V7Z" fill="currentColor"></path>
+                                    <path d="M12 11C12.5523 11 13 11.4477 13 12V16C13 16.5523 12.5523 17 12 17C11.4477 17 11 16.5523 11 16V12C11 11.4477 11.4477 11 12 11Z" fill="currentColor"></path>
+                                    <path d="M8 8C8.55228 8 9 8.44772 9 9V16C9 16.5523 8.55228 17 8 17C7.44772 17 7 16.5523 7 16V9C7 8.44772 7.44772 8 8 8Z" fill="currentColor"></path>
+                                    <path d="M16 14C16.5523 14 17 14.4477 17 15V16C17 16.5523 16.5523 17 16 17C15.4477 17 15 16.5523 15 16V15C15 14.4477 15.4477 14 16 14Z" fill="currentColor"></path>
+                                </svg>
+                            </i>
+                            <span class="item-name">Payment History</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link {{ (request()->is('admin/sliders*'))? 'collapsed' : '' }}" data-bs-toggle="collapse" href="#slider-menu" role="button" aria-expanded="false" aria-controls="slider-menu">
                             <i class="icon">
                                 <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -395,6 +408,19 @@
                                 </svg>
                             </i>
                             <span class="item-name">Company Profile</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ (request()->is('employer/payment-history'))? 'active' : '' }}" aria-current="page" href="{{ route('employer.payment-history') }}">
+                            <i class="icon">
+                                <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path opacity="0.4" d="M2 7C2 5.34315 3.34315 4 5 4H19C20.6569 4 22 5.34315 22 7V17C22 18.6569 20.6569 20 19 20H5C3.34315 20 2 18.6569 2 17V7Z" fill="currentColor"></path>
+                                    <path d="M12 11C12.5523 11 13 11.4477 13 12V16C13 16.5523 12.5523 17 12 17C11.4477 17 11 16.5523 11 16V12C11 11.4477 11.4477 11 12 11Z" fill="currentColor"></path>
+                                    <path d="M8 8C8.55228 8 9 8.44772 9 9V16C9 16.5523 8.55228 17 8 17C7.44772 17 7 16.5523 7 16V9C7 8.44772 7.44772 8 8 8Z" fill="currentColor"></path>
+                                    <path d="M16 14C16.5523 14 17 14.4477 17 15V16C17 16.5523 16.5523 17 16 17C15.4477 17 15 16.5523 15 16V15C15 14.4477 15.4477 14 16 14Z" fill="currentColor"></path>
+                                </svg>
+                            </i>
+                            <span class="item-name">Payment History</span>
                         </a>
                     </li>
                 @endcan

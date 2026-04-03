@@ -63,6 +63,8 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('events', App\Http\Controllers\Admin\EventController::class);
         Route::resource('reviews', App\Http\Controllers\Admin\ReviewController::class);
         Route::resource('users', App\Http\Controllers\Admin\UserController::class);
+        // Admin Payment History
+        Route::get('payment-history', [App\Http\Controllers\PaymentHistoryController::class, 'adminIndex'])->name('payment-history');
     });
     Route::group(['as'=>'employee.','prefix' => 'employee', 'middleware' => 'verified'], function () {
         Route::get('/', [App\Http\Controllers\HomeController::class, 'employeeDashboard'])->name('dashboard');
@@ -76,6 +78,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('save-industry', [App\Http\Controllers\Registration\Company\CompanyProfileController::class, 'saveIndustry'])->name('save_industry');
         Route::resource('jobs', App\Http\Controllers\JobPostController::class);
         Route::get('find-talent', [App\Http\Controllers\JobPostController::class, 'findTalent'])->name('find-talent');
+        // Employer Payment History
+        Route::get('payment-history', [App\Http\Controllers\PaymentHistoryController::class, 'employerIndex'])->name('payment-history');
         
         // Candidate payment routes - MUST be defined before candidate/{id} to avoid conflicts
         Route::post('candidate/initiate-payment', [App\Http\Controllers\JobPostController::class, 'initiateCandidateViewPayment'])->name('candidate.initiate-payment');

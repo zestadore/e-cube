@@ -315,7 +315,7 @@
 
 <!-- Candidate Profile Modal -->
 <div class="modal fade" id="candidateModal" tabindex="-1" aria-labelledby="candidateModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
         <div class="modal-content" style="border-radius: 15px;">
             <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                 <h5 class="modal-title text-white" id="candidateModalLabel">
@@ -585,7 +585,6 @@
                     <td>${hasPaid ? (q.university || '-') : '****'}</td>
                     <td>${hasPaid ? (q.from_year || '-') : '****'} - ${hasPaid ? (q.to_year || '-') : '****'}</td>
                     <td>${hasPaid ? (q.percentage ? q.percentage + '%' : '-') : '****'}</td>
-                    ${hasPaid && q.certificate ? `<td><a href="${q.certificate}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fas fa-file-alt"></i> View</a></td>` : '<td>-</td>'}
                 </tr>
             `).join('');
             
@@ -598,7 +597,6 @@
                                 <th>University</th>
                                 <th>Duration</th>
                                 <th>Percentage</th>
-                                <th>Certificate</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -637,7 +635,6 @@
                     <td>${hasPaid ? (e.company || '-') : '****'}</td>
                     <td>${hasPaid ? (e.from_year || '-') : '****'} - ${hasPaid ? (e.to_year || '-') : '****'}</td>
                     <td>${hasPaid ? (e.duration || '-') : '****'}</td>
-                    ${hasPaid && e.certificate ? `<td><a href="${e.certificate}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fas fa-file-alt"></i> View</a></td>` : '<td>-</td>'}
                 </tr>
                 `;
             }).join('');
@@ -652,7 +649,6 @@
                                 <th>Company</th>
                                 <th>Duration (Years)</th>
                                 <th>Duration</th>
-                                <th>Certificate</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -674,7 +670,6 @@
                     <td>${hasPaid ? (s.university || '-') : '****'}</td>
                     <td>${hasPaid ? (s.from_year || '-') : '****'} - ${hasPaid ? (s.to_year || '-') : '****'}</td>
                     <td>${hasPaid ? (s.percentage ? s.percentage + '%' : '-') : '****'}</td>
-                    ${hasPaid && s.certificate ? `<td><a href="${s.certificate}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fas fa-file-alt"></i> View</a></td>` : '<td>-</td>'}
                 </tr>
             `).join('');
             
@@ -687,7 +682,6 @@
                                 <th>University/Institution</th>
                                 <th>Duration</th>
                                 <th>Percentage</th>
-                                <th>Certificate</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1345,6 +1339,25 @@
                     break-inside: avoid;
                     page-break-inside: avoid;
                     width: 100% !important;
+                    table-layout: fixed !important;
+                }
+                .table td, .table th {
+                    word-wrap: break-word !important;
+                    white-space: normal !important;
+                    overflow: visible !important;
+                    vertical-align: top !important;
+                }
+                /* Background questions table specific styles */
+                .table tbody tr td:first-child {
+                    width: 40% !important;
+                    max-width: 40% !important;
+                }
+                .table tbody tr td:last-child {
+                    width: 60% !important;
+                    max-width: 60% !important;
+                }
+                .table-responsive {
+                    overflow: visible !important;
                 }
                 .blurred-text {
                     filter: none !important;
