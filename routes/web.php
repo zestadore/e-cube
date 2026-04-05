@@ -30,6 +30,12 @@ Route::get('/optimize', function () {
 });
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+// API Routes for hierarchical data (outside auth middleware for AJAX access)
+Route::get('/api/qualifications/{id}/children', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'getQualificationChildren']);
+Route::get('/api/qualifications/{id}/all-children', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'getAllQualificationChildren']);
+Route::get('/api/industries/{id}/roles', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'getIndustryRoles']);
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/select-option', [App\Http\Controllers\HomeController::class, 'chooseType'])->name('chooseType');
     Route::get('/register-as-job-seeker', [App\Http\Controllers\HomeController::class, 'registerAsJobSeeker'])->name('jobseeker.register');
@@ -45,6 +51,18 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/update-profile', [App\Http\Controllers\HomeController::class, 'updateProfile'])->name('profile.update');
     Route::post('/company-profile', [App\Http\Controllers\Registration\Company\CompanyProfileController::class, 'store'])->name('company.profile.store');
     Route::get('/subscription-packages', [App\Http\Controllers\HomeController::class, 'subscriptionPackages'])->name('subscription.packages');
+    
+    // Guidelines and Terms Agreement Routes
+    Route::get('/education-guidelines', [App\Http\Controllers\Registration\Candidate\TermsAgreementController::class, 'educationGuidelines'])->name('education.guidelines');
+    Route::post('/education-guidelines/agree', [App\Http\Controllers\Registration\Candidate\TermsAgreementController::class, 'agreeEducation'])->name('education.agree');
+    Route::get('/experience-guidelines', [App\Http\Controllers\Registration\Candidate\TermsAgreementController::class, 'experienceGuidelines'])->name('experience.guidelines');
+    Route::post('/experience-guidelines/agree', [App\Http\Controllers\Registration\Candidate\TermsAgreementController::class, 'agreeExperience'])->name('experience.agree');
+    
+    // Complete Profile Save Route
+    Route::post('/save-candidate-profile', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'saveCompleteProfile'])->name('save-candidate-profile');
+    
+    // Profile View Route
+    Route::get('/candidate-profile', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'viewProfile'])->name('candidate.profile');
     
     // Paytm Payment Routes
     Route::post('/paytm/initiate', [App\Http\Controllers\PaytmController::class, 'initiatePayment'])->name('paytm.initiate');

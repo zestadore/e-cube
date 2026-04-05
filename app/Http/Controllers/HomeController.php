@@ -73,7 +73,19 @@ class HomeController extends Controller
         $candidateQualifications = Auth::user()->qualifications;
         $candidateSkills = Auth::user()->skills;
         $candidateExperiences = Auth::user()->experiences;
-        return view('users.registration.candidate',compact('qualifications','skills','industries','basics','presentAddress','permanentAddress','candidateQualifications','candidateSkills','candidateExperiences'));
+        
+        // Use enhanced registration view
+        return view('users.registration.candidate-enhanced', compact(
+            'qualifications',
+            'skills',
+            'industries',
+            'basics',
+            'presentAddress',
+            'permanentAddress',
+            'candidateQualifications',
+            'candidateSkills',
+            'candidateExperiences'
+        ));
     }
 
     public function registerAsEmployer(){
@@ -84,7 +96,7 @@ class HomeController extends Controller
 
     public function employeeDashboard(){
         if(count(Auth::user()->backGroundQuestions)){
-            return view('users.dashboard.employee');
+            return view('users.dashboard.employee-enhanced');
         }else{
             return redirect()->route('employee.background-questions');
         }
