@@ -81,16 +81,14 @@ class PaytmController extends Controller
         $checksum = PaytmChecksum::generateSignature($paytmParams, config('services.paytm.merchant_key'));
 
         // Use correct Paytm endpoints based on environment
-        $environment = config('services.paytm.environment', 'staging');
+        $environment = config('services.paytm.environment', 'production');
         
-        if ($environment === 'production') {
-            // Production URLs
-            $paytm_url = 'https://securegw.paytm.in/order/process';
-            $txn_status_url = 'https://securegw.paytm.in/merchant-status/getTxnStatus';
-        } else {
-            // Staging URLs - Note: Paytm staging is often unreliable
+        if ($environment === 'staging') {
             $paytm_url = 'https://securegw-stage.paytm.in/order/process';
             $txn_status_url = 'https://securegw-stage.paytm.in/merchant-status/getTxnStatus';
+        } else {
+            $paytm_url = 'https://secure.paytmpayments.com/order/process';
+            $txn_status_url = 'https://secure.paytmpayments.com/merchant-status/getTxnStatus';
         }
 
         return response()->json([
@@ -136,7 +134,7 @@ class PaytmController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Test payment completed successfully',
-                'redirect' => route('employer.dashboard'),
+                'redirect' => $payment->user->role === 'employee' ? route('employee.dashboard') : route('employer.dashboard'),
             ]);
         } else {
             // Simulate failed payment
@@ -202,7 +200,8 @@ class PaytmController extends Controller
             $newValidity = $currentValidity->addMonths($payment->package->duration);
             $user->update(['validity' => $newValidity]);
 
-            return redirect()->route('employer.dashboard')->with('success', 'Payment successful! Your subscription has been activated.');
+            $dashboardRoute = $payment->user->role === 'employee' ? 'employee.dashboard' : 'employer.dashboard';
+            return redirect()->route($dashboardRoute)->with('success', 'Payment successful! Your subscription has been activated.');
         }
 
             return redirect()->back()->with('error', 'Payment failed. Please try again.');
@@ -240,7 +239,8 @@ class PaytmController extends Controller
             $newValidity = $currentValidity->addMonths($payment->package->duration);
             $user->update(['validity' => $newValidity]);
 
-            return redirect()->route('employer.dashboard')->with('success', 'Payment successful! Your subscription has been activated.');
+            $dashboardRoute = $payment->user->role === 'employee' ? 'employee.dashboard' : 'employer.dashboard';
+            return redirect()->route($dashboardRoute)->with('success', 'Payment successful! Your subscription has been activated.');
         } elseif ($status === 'PENDING') {
             $payment->update([
                 'transaction_id' => $txnId,
@@ -296,10 +296,10 @@ class PaytmController extends Controller
         $checksum = PaytmChecksum::generateSignature($statusParams, config('services.paytm.merchant_key'));
         $statusParams['CHECKSUMHASH'] = $checksum;
 
-        $environment = config('services.paytm.environment', 'staging');
-        $url = $environment === 'production' 
-            ? 'https://securegw.paytm.in/merchant-status/getTxnStatus' 
-            : 'https://securegw-stage.paytm.in/merchant-status/getTxnStatus';
+        $environment = config('services.paytm.environment', 'production');
+        $url = $environment === 'staging' 
+            ? 'https://securegw-stage.paytm.in/merchant-status/getTxnStatus' 
+            : 'https://secure.paytmpayments.com/merchant-status/getTxnStatus';
 
         $response = $this->makeCurlRequest($url, $statusParams);
         

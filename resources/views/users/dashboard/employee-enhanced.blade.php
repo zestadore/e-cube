@@ -185,6 +185,7 @@
             border-bottom: 2px solid #e3e6f0;
             display: flex;
             align-items: center;
+            justify-content: space-between;
         }
 
         .info-card-header i {
@@ -197,6 +198,8 @@
             margin: 0;
             font-weight: 600;
             color: #5a5c69;
+            display: flex;
+            align-items: center;
         }
 
         .info-card-body {
@@ -468,10 +471,30 @@
         .animate-fade-in {
             animation: fadeInUp 0.5s ease forwards;
         }
+
+        /* Modal Styles */
+        .modal-lg {
+            max-width: 900px;
+        }
+
+        .dynamic-entry {
+            border: 1px solid #e3e6f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f8f9fc;
+        }
     </style>
 @endsection
 
 @section('content')
+    @php
+        $qualifications = \App\Models\Qualification::whereDoesntHave('parents')->get();
+        $skillsList = \App\Models\ComputerAndOtherSkill::get();
+        $industries = \App\Models\Industry::get();
+        $hobbiesData = \App\Models\CandidateHobby::where('user_id', Auth::id())->first();
+    @endphp
+
     @if (!empty(Auth::user()->mobile_verified_at))
         <div class="container-fluid py-4">
             <!-- Welcome Banner -->
@@ -524,7 +547,11 @@
             </div>
 
             <!-- Subscription Alert -->
-            @if (Auth::user()?->validity === null || Auth::user()?->validity->isPast())
+            @php
+                $userValidity = Auth::user()?->validity;
+                $validityDate = $userValidity ? \Carbon\Carbon::parse($userValidity) : null;
+            @endphp
+            @if ($validityDate === null || $validityDate->isPast())
                 <div class="subscription-alert animate-fade-in">
                     <div class="d-flex align-items-center">
                         <i class="fas fa-crown me-4"></i>
@@ -567,9 +594,11 @@
                 <div class="col-lg-3">
                     <!-- Basic Details Card -->
                     <div class="info-card animate-fade-in">
-                        <div class="info-card-header">
-                            <i class="fas fa-user-circle"></i>
-                            <h4>Basic Information</h4>
+                        <div class="info-card-header" style="justify-content: space-between;">
+                            <h4><i class="fas fa-user-circle"></i>Basic Information</h4>
+                            <button class="btn btn-sm btn-outline-primary" onclick="openEditModal('basic')" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
                         </div>
                         <div class="info-card-body">
                             <div class="info-item">
@@ -619,9 +648,11 @@
 
                     <!-- Present Address -->
                     <div class="info-card animate-fade-in" style="animation-delay: 0.1s;">
-                        <div class="info-card-header">
-                            <i class="fas fa-map-marker-alt text-success"></i>
-                            <h4>Present Address</h4>
+                        <div class="info-card-header" style="justify-content: space-between;">
+                            <h4><i class="fas fa-map-marker-alt text-success"></i>Present Address</h4>
+                            <button class="btn btn-sm btn-outline-primary" onclick="openEditModal('address')" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
                         </div>
                         <div class="info-card-body">
                             @if(Auth::user()->presentAddress)
@@ -650,9 +681,11 @@
 
                     <!-- Permanent Address -->
                     <div class="info-card animate-fade-in" style="animation-delay: 0.2s;">
-                        <div class="info-card-header">
-                            <i class="fas fa-home text-info"></i>
-                            <h4>Permanent Address</h4>
+                        <div class="info-card-header" style="justify-content: space-between;">
+                            <h4><i class="fas fa-home text-info"></i>Permanent Address</h4>
+                            <button class="btn btn-sm btn-outline-primary" onclick="openEditModal('address')" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
                         </div>
                         <div class="info-card-body">
                             @if(Auth::user()->permanentAddress)
@@ -686,7 +719,9 @@
                     <div class="timeline-card animate-fade-in">
                         <div class="timeline-card-header">
                             <h4><i class="fas fa-graduation-cap"></i>Education & Qualifications</h4>
-                            <a href="{{route('jobseeker.register')}}" class="btn btn-sm btn-outline-primary">Edit</a>
+                            <button class="btn btn-sm btn-outline-primary" onclick="openEditModal('education')" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
                         </div>
                         <div class="timeline-card-body">
                             @if(Auth::user()->qualifications->isNotEmpty())
@@ -707,7 +742,6 @@
                                 <div class="empty-state">
                                     <i class="fas fa-graduation-cap"></i>
                                     <p>No qualifications added yet</p>
-                                    <a href="{{route('jobseeker.register')}}" class="btn btn-sm btn-primary mt-2">Add Education</a>
                                 </div>
                             @endif
                         </div>
@@ -717,20 +751,21 @@
                     <div class="timeline-card animate-fade-in" style="animation-delay: 0.1s;">
                         <div class="timeline-card-header">
                             <h4><i class="fas fa-tools"></i>Skills & Expertise</h4>
-                            <a href="{{route('jobseeker.register')}}" class="btn btn-sm btn-outline-primary">Edit</a>
+                            <button class="btn btn-sm btn-outline-primary" onclick="openEditModal('skills')" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
                         </div>
                         <div class="timeline-card-body">
                             @if(Auth::user()->skills->isNotEmpty())
                                 <div class="skill-tags">
                                     @foreach(Auth::user()->skills as $skill)
-                                        <span class="skill-tag">{{$skill->skill->skill ?? 'Unknown'}}</span>
+                                        <span class="skill-tag">{{$skill->skill->skill ?? 'Unknown'}} ({{$skill->proficiency}})</span>
                                     @endforeach
                                 </div>
                             @else
                                 <div class="empty-state">
                                     <i class="fas fa-tools"></i>
                                     <p>No skills added yet</p>
-                                    <a href="{{route('jobseeker.register')}}" class="btn btn-sm btn-primary mt-2">Add Skills</a>
                                 </div>
                             @endif
                         </div>
@@ -740,7 +775,9 @@
                     <div class="timeline-card animate-fade-in" style="animation-delay: 0.2s;">
                         <div class="timeline-card-header">
                             <h4><i class="fas fa-briefcase"></i>Work Experience</h4>
-                            <a href="{{route('jobseeker.register')}}" class="btn btn-sm btn-outline-primary">Edit</a>
+                            <button class="btn btn-sm btn-outline-primary" onclick="openEditModal('experience')" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
                         </div>
                         <div class="timeline-card-body">
                             @if(Auth::user()->experiences->isNotEmpty())
@@ -766,7 +803,6 @@
                                 <div class="empty-state">
                                     <i class="fas fa-briefcase"></i>
                                     <p>No work experience added yet</p>
-                                    <a href="{{route('jobseeker.register')}}" class="btn btn-sm btn-primary mt-2">Add Experience</a>
                                 </div>
                             @endif
                         </div>
@@ -782,11 +818,14 @@
                             <h4>Quick Actions</h4>
                         </div>
                         <div class="info-card-body">
-                            <a href="{{route('jobseeker.register')}}" class="btn btn-gradient w-100 mb-3">
-                                <i class="fas fa-edit me-2"></i>Edit Profile
+                            <a href="{{route('candidate.profile')}}" class="btn btn-gradient w-100 mb-3">
+                                <i class="fas fa-eye me-2"></i>View Profile
                             </a>
                             <a href="{{route('subscription.packages')}}" class="btn btn-outline-success w-100 mb-3">
                                 <i class="fas fa-crown me-2"></i>Subscription
+                            </a>
+                            <a href="{{route('employee.payment-history')}}" class="btn btn-outline-info w-100 mb-3">
+                                <i class="fas fa-history me-2"></i>Payment History
                             </a>
                             <a href="{{route('change.password')}}" class="btn btn-outline-secondary w-100">
                                 <i class="fas fa-lock me-2"></i>Change Password
@@ -801,12 +840,15 @@
                             <h4>Subscription</h4>
                         </div>
                         <div class="info-card-body text-center">
-                            @if(Auth::user()?->validity && !Auth::user()?->validity->isPast())
+                            @php
+                                $subscriptionValidity = Auth::user()?->validity ? \Carbon\Carbon::parse(Auth::user()->validity) : null;
+                            @endphp
+                            @if($subscriptionValidity && !$subscriptionValidity->isPast())
                                 <div class="mb-3">
                                     <i class="fas fa-check-circle text-success fa-3x"></i>
                                 </div>
                                 <h5 class="text-success">Active</h5>
-                                <p class="text-muted">Valid until {{Auth::user()?->validity->format('d M Y')}}</p>
+                                <p class="text-muted">Valid until {{$subscriptionValidity->format('d M Y')}}</p>
                             @else
                                 <div class="mb-3">
                                     <i class="fas fa-exclamation-circle text-warning fa-3x"></i>
@@ -819,26 +861,40 @@
                     </div>
 
                     <!-- Hobbies -->
-                    @php
-                        $hobbies = \App\Models\CandidateHobby::where('user_id', Auth::id())->first();
-                    @endphp
-                    @if($hobbies)
+                    @if($hobbiesData)
                     <div class="info-card animate-fade-in" style="animation-delay: 0.5s;">
-                        <div class="info-card-header">
-                            <i class="fas fa-heart text-danger"></i>
-                            <h4>Hobbies & Interests</h4>
+                        <div class="info-card-header" style="justify-content: space-between;">
+                            <h4><i class="fas fa-heart text-danger"></i>Hobbies & Interests</h4>
+                            <button class="btn btn-sm btn-outline-primary" onclick="openEditModal('hobbies')" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
                         </div>
                         <div class="info-card-body">
-                            @if($hobbies->description)
-                                <div class="mb-3">{!! $hobbies->description !!}</div>
+                            @if($hobbiesData->description)
+                                <div class="mb-3">{!! $hobbiesData->description !!}</div>
                             @endif
-                            @if($hobbies->interests)
+                            @if($hobbiesData->interests)
                                 <div class="skill-tags">
-                                    @foreach(explode(',', $hobbies->interests) as $interest)
+                                    @foreach(explode(',', $hobbiesData->interests) as $interest)
                                         <span class="skill-tag" style="background: #fce4ec; color: #c2185b;">{{trim($interest)}}</span>
                                     @endforeach
                                 </div>
                             @endif
+                        </div>
+                    </div>
+                    @else
+                    <div class="info-card animate-fade-in" style="animation-delay: 0.5s;">
+                        <div class="info-card-header" style="justify-content: space-between;">
+                            <h4><i class="fas fa-heart text-danger"></i>Hobbies & Interests</h4>
+                            <button class="btn btn-sm btn-outline-primary" onclick="openEditModal('hobbies')" title="Add">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <div class="info-card-body">
+                            <div class="empty-state">
+                                <i class="fas fa-heart"></i>
+                                <p>No hobbies added yet</p>
+                            </div>
                         </div>
                     </div>
                     @endif
@@ -848,19 +904,18 @@
 
         <!-- Floating Action Buttons -->
         <div class="fab-container">
-            <a href="{{route('jobseeker.register')}}" class="fab-btn primary" title="Edit Profile">
-                <i class="fas fa-edit"></i>
-                <span class="tooltip">Edit Profile</span>
+            <a href="{{route('candidate.profile')}}" class="fab-btn info" title="View Profile">
+                <i class="fas fa-user"></i>
+                <span class="tooltip">View Profile</span>
             </a>
             <a href="{{route('subscription.packages')}}" class="fab-btn success" title="Subscription">
                 <i class="fas fa-crown"></i>
                 <span class="tooltip">Subscription</span>
             </a>
-            <a href="{{route('candidate.profile')}}" class="fab-btn info" title="View Profile">
-                <i class="fas fa-user"></i>
-                <span class="tooltip">View Profile</span>
-            </a>
         </div>
+
+        <!-- Edit Modals -->
+        @include('users.dashboard.partials.edit-modals')
     @else
         <div class="container py-5">
             <div class="alert alert-danger text-center p-5 rounded-3">
@@ -885,5 +940,23 @@
             }, 300);
         }
     });
+
+    // Modal Management
+    function openEditModal(type) {
+        const modalMap = {
+            'basic': 'editBasicModal',
+            'address': 'editAddressModal',
+            'education': 'editEducationModal',
+            'skills': 'editSkillsModal',
+            'experience': 'editExperienceModal',
+            'hobbies': 'editHobbiesModal'
+        };
+        
+        const modalId = modalMap[type];
+        if (modalId) {
+            const modal = new bootstrap.Modal(document.getElementById(modalId));
+            modal.show();
+        }
+    }
 </script>
 @endsection

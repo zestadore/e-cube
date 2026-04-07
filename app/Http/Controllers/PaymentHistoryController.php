@@ -71,6 +71,44 @@ class PaymentHistoryController extends Controller
     }
     
     /**
+     * Display payment history for employee (own subscription payments only)
+     */
+    public function employeeIndex()
+    {
+        $user = Auth::user();
+        
+        // Get subscription payments for employee
+        $subscriptionPayments = PaymentHistory::with('package')
+            ->where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($payment) {
+                return [
+                    'id' => $payment->id,
+                    'date' => $payment->created_at,
+                    'type' => 'Subscription',
+                    'description' => $payment->package ? $payment->package->package_name : 'Subscription Package',
+                    'amount' => $payment->amount,
+                    'status' => $payment->status,
+                    'order_id' => $payment->order_id,
+                    'transaction_id' => $payment->transaction_id,
+                ];
+            });
+        
+        // Calculate totals
+        $totalSpent = $subscriptionPayments->where('status', 'completed')->sum('amount');
+        $totalTransactions = $subscriptionPayments->count();
+        $completedTransactions = $subscriptionPayments->where('status', 'completed')->count();
+        
+        return view('users.payments.employee-history', compact(
+            'subscriptionPayments',
+            'totalSpent',
+            'totalTransactions',
+            'completedTransactions'
+        ));
+    }
+    
+    /**
      * Display all payment history for admin
      */
     public function adminIndex()

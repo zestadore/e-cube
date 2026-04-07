@@ -615,4 +615,267 @@ class BasicDetailsController extends Controller
             ]
         );
     }
+
+    // ==================== UPDATE METHODS FOR EMPLOYEE DASHBOARD ====================
+
+    /**
+     * Update basic information
+     */
+    public function updateBasic(Request $request)
+    {
+        try {
+            $request->validate([
+                'dob' => 'required|date',
+                'gender' => 'required|string',
+                'aadhar_number' => 'required',
+                'experience' => 'required',
+                'Job_type' => 'required',
+                'differently_abled' => 'required',
+            ]);
+
+            $basicDetails = BasicDetails::where('user_id', Auth::id())->first();
+            
+            $data = $request->except(['_token']);
+            
+            if ($basicDetails) {
+                $basicDetails->update($data);
+            } else {
+                $data['user_id'] = Auth::id();
+                BasicDetails::create($data);
+            }
+
+            return response()->json(['success' => true, 'message' => 'Basic information updated successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Update address information
+     */
+    public function updateAddress(Request $request)
+    {
+        try {
+            $request->validate([
+                'permanent_address_1' => 'required',
+                'permanent_city' => 'required',
+                'permanent_state' => 'required',
+                'permanent_zip' => 'required',
+                'permanent_country' => 'required',
+                'permanent_police_station' => 'required',
+                'permanent_panchayat_municipality' => 'required',
+                'present_address_1' => 'required',
+                'present_city' => 'required',
+                'present_state' => 'required',
+                'present_zip' => 'required',
+                'present_country' => 'required',
+                'present_police_station' => 'required',
+                'present_panchayat_municipality' => 'required',
+            ]);
+
+            // Update Present Address
+            Address::updateOrCreate(
+                ['user_id' => Auth::id(), 'type' => 'present_address'],
+                [
+                    'address_1' => $request->present_address_1,
+                    'address_2' => $request->present_address_2,
+                    'landmark' => $request->present_landmark,
+                    'city' => $request->present_city,
+                    'state' => $request->present_state,
+                    'zip' => $request->present_zip,
+                    'country' => $request->present_country,
+                    'police_station' => $request->present_police_station,
+                    'panchayat_municipality' => $request->present_panchayat_municipality,
+                ]
+            );
+
+            // Update Permanent Address
+            Address::updateOrCreate(
+                ['user_id' => Auth::id(), 'type' => 'permenant_address'],
+                [
+                    'address_1' => $request->permanent_address_1,
+                    'address_2' => $request->permanent_address_2,
+                    'landmark' => $request->permanent_landmark,
+                    'city' => $request->permanent_city,
+                    'state' => $request->permanent_state,
+                    'zip' => $request->permanent_zip,
+                    'country' => $request->permanent_country,
+                    'police_station' => $request->permanent_police_station,
+                    'panchayat_municipality' => $request->permanent_panchayat_municipality,
+                ]
+            );
+
+            return response()->json(['success' => true, 'message' => 'Addresses updated successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Update education information
+     */
+    public function updateEducation(Request $request)
+    {
+        try {
+            $request->validate([
+                'education' => 'required|array|min:1',
+                'education.*.qualification_id' => 'required',
+                'education.*.university' => 'required|string',
+                'education.*.institution' => 'required|string',
+                'education.*.from_year' => 'required|integer',
+                'education.*.to_year' => 'required|integer',
+            ]);
+
+            DB::beginTransaction();
+
+            // Delete existing qualifications
+            CandidateQualification::where('user_id', Auth::id())->delete();
+
+            // Insert new qualifications
+            foreach ($request->education as $index => $edu) {
+                $certificatePath = null;
+                
+                // Handle certificate file upload
+                if ($request->hasFile("education.{$index}.certificate")) {
+                    $certificatePath = $request->file("education.{$index}.certificate")->store('candidate/qualifications', 'public');
+                }
+
+                CandidateQualification::create([
+                    'user_id' => Auth::id(),
+                    'qualification_id' => $edu['qualification_id'],
+                    'university' => $edu['university'],
+                    'institution' => $edu['institution'] ?? null,
+                    'college' => $edu['college'] ?? null,
+                    'from_year' => $edu['from_year'],
+                    'to_year' => $edu['to_year'],
+                    'percentage' => $edu['percentage'] ?? null,
+                    'certificate' => $certificatePath,
+                ]);
+            }
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Education updated successfully']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Update skills information
+     */
+    public function updateSkills(Request $request)
+    {
+        try {
+            $request->validate([
+                'skills' => 'required|array|min:1',
+                'skills.*.skill_id' => 'required',
+                'skills.*.proficiency' => 'required',
+            ]);
+
+            DB::beginTransaction();
+
+            // Delete existing skills
+            CandidateSkill::where('user_id', Auth::id())->delete();
+
+            // Insert new skills
+            foreach ($request->skills as $index => $skill) {
+                $certificatePath = null;
+                
+                // Handle certificate file upload
+                if ($request->hasFile("skills.{$index}.certificate")) {
+                    $certificatePath = $request->file("skills.{$index}.certificate")->store('candidate/skills', 'public');
+                }
+
+                CandidateSkill::create([
+                    'user_id' => Auth::id(),
+                    'skill_id' => $skill['skill_id'],
+                    'proficiency' => $skill['proficiency'],
+                    'certificate' => $certificatePath,
+                ]);
+            }
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Skills updated successfully']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Update experience information
+     */
+    public function updateExperience(Request $request)
+    {
+        try {
+            $request->validate([
+                'experience' => 'required|array|min:1',
+                'experience.*.industry_id' => 'required',
+                'experience.*.company' => 'required|string',
+                'experience.*.from_year' => 'required|integer',
+                'experience.*.to_year' => 'required',
+            ]);
+
+            DB::beginTransaction();
+
+            // Delete existing experiences
+            CandidateExperience::where('user_id', Auth::id())->delete();
+
+            // Insert new experiences
+            foreach ($request->experience as $index => $exp) {
+                $certificatePath = null;
+                
+                // Handle certificate file upload
+                if ($request->hasFile("experience.{$index}.certificate")) {
+                    $certificatePath = $request->file("experience.{$index}.certificate")->store('candidate/experiences', 'public');
+                }
+
+                CandidateExperience::create([
+                    'user_id' => Auth::id(),
+                    'industry_id' => $exp['industry_id'],
+                    'role_ids' => json_encode($exp['role_ids'] ?? []),
+                    'company' => $exp['company'],
+                    'location' => $exp['location'] ?? null,
+                    'from_year' => $exp['from_year'],
+                    'to_year' => ($exp['to_year'] ?? null) === 'current' ? null : ($exp['to_year'] ?? null),
+                    'duration' => $exp['duration'] ?? null,
+                    'responsibilities' => $exp['responsibilities'] ?? null,
+                    'achievements' => $exp['achievements'] ?? null,
+                    'present_salary' => $exp['present_salary'] ?? null,
+                    'expected_salary' => $exp['expected_salary'] ?? null,
+                    'is_current' => ($exp['to_year'] ?? null) === 'current',
+                    'certificate' => $certificatePath,
+                ]);
+            }
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Experience updated successfully']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Update hobbies information
+     */
+    public function updateHobbies(Request $request)
+    {
+        try {
+            $hobbiesData = $request->input('hobbies');
+            
+            CandidateHobby::updateOrCreate(
+                ['user_id' => Auth::id()],
+                [
+                    'description' => $hobbiesData['description'] ?? null,
+                    'interests' => $hobbiesData['interests'] ?? null,
+                ]
+            );
+
+            return response()->json(['success' => true, 'message' => 'Hobbies updated successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
 }

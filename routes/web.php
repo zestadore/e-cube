@@ -88,6 +88,17 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [App\Http\Controllers\HomeController::class, 'employeeDashboard'])->name('dashboard');
         Route::get('background-questions', [App\Http\Controllers\HomeController::class, 'backGroundQuestion'])->name('background-questions');
         Route::post('save-background-question', [App\Http\Controllers\HomeController::class, 'saveBackgroundQuestion'])->name('save-background-question');
+        
+        // Edit profile routes
+        Route::post('update-basic', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'updateBasic'])->name('update-basic');
+        Route::post('update-address', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'updateAddress'])->name('update-address');
+        Route::post('update-education', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'updateEducation'])->name('update-education');
+        Route::post('update-skills', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'updateSkills'])->name('update-skills');
+        Route::post('update-experience', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'updateExperience'])->name('update-experience');
+        Route::post('update-hobbies', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'updateHobbies'])->name('update-hobbies');
+        
+        // Employee Payment History
+        Route::get('payment-history', [App\Http\Controllers\PaymentHistoryController::class, 'employeeIndex'])->name('payment-history');
     });
     Route::group(['as'=>'employer.','prefix' => 'employer', 'middleware' => 'verified'], function () {
         Route::get('/', [App\Http\Controllers\HomeController::class, 'employerDashboard'])->name('dashboard');
@@ -136,4 +147,3 @@ Route::get('/payment/status', [App\Http\Controllers\JobPostController::class, 'p
 Route::get('/paytm/test-callback', function() {
     return 'Callback route is working';
 });
-
