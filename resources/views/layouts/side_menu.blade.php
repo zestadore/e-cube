@@ -384,6 +384,19 @@
                 @endcan
                 @can('isEmployee')
                     <li class="nav-item">
+                        <a class="nav-link {{ request()->is('employee/find-jobs*') ? 'active' : '' }}" aria-current="page" href="{{ route('employee.find-jobs') }}">
+                            <i class="icon">
+                                <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path opacity="0.4" d="M21 7V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V7C3 4 4.5 2 8 2H16C19.5 2 21 4 21 7Z" fill="currentColor"></path>
+                                    <path d="M17.5 12C17.5 11.1716 16.8284 10.5 16 10.5H8C7.17157 10.5 6.5 11.1716 6.5 12C6.5 12.8284 7.17157 13.5 8 13.5H16C16.8284 13.5 17.5 12.8284 17.5 12Z" fill="currentColor"></path>
+                                    <path d="M6.5 9C6.5 8.17157 7.17157 7.5 8 7.5H16C16.8284 7.5 17.5 8.17157 17.5 9C17.5 9.82843 16.8284 10.5 16 10.5H8C7.17157 10.5 6.5 9.82843 6.5 9Z" fill="currentColor"></path>
+                                    <path d="M6.5 15C6.5 14.1716 7.17157 13.5 8 13.5H16C16.8284 13.5 17.5 14.1716 17.5 15C17.5 15.8284 16.8284 16.5 16 16.5H8C7.17157 16.5 6.5 15.8284 6.5 15Z" fill="currentColor"></path>
+                                </svg>
+                            </i>
+                            <span class="item-name">Find Jobs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link {{ request()->is('employee/background-questions') ? 'active' : '' }}" aria-current="page" href="{{ route('employee.background-questions') }}">
                             <i class="icon">
                                 <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

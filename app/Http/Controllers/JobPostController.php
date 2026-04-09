@@ -570,4 +570,97 @@ class JobPostController extends Controller
             ]);
         }
     }
+
+    /**
+     * Find jobs - list job posts for employees
+     */
+    public function findJobs(Request $request)
+    {
+        // Get employee's industries from their experiences
+        $employee = \App\Models\User::where('id', Auth::id())
+            ->with(['candidateExperiences.industry', 'candidateQualifications.qualification'])
+            ->first();
+        
+        $employeeIndustryIds = $employee->candidateExperiences->pluck('industry_id')->filter()->unique()->toArray();
+        
+        // Get all child industries recursively for the employee's industries
+        $availableIndustries = [];
+        if (!empty($employeeIndustryIds)) {
+            foreach ($employeeIndustryIds as $industryId) {
+                $industry = Industry::with('children')->find($industryId);
+                if ($industry) {
+                    $children = $this->getAllChildrenRecursive($industry);
+                    $availableIndustries = array_merge($availableIndustries, $children);
+                }
+            }
+            // Remove duplicates based on id
+            $availableIndustries = collect($availableIndustries)->unique('id')->values()->all();
+        }
+        
+        // If no industries from experience, get all industries
+        if (empty($availableIndustries)) {
+            $rootIndustries = Industry::whereNull('parent_id')->with('children')->get();
+            foreach ($rootIndustries as $industry) {
+                $availableIndustries = array_merge($availableIndustries, $this->getAllChildrenRecursive($industry));
+            }
+        }
+        
+        $industryIds = array_column($availableIndustries, 'id');
+        
+        // Build query for job posts
+        $query = JobPost::with(['user.companyProfile', 'industry', 'qualification', 'parentQualification'])
+            ->whereIn('industry_id', $industryIds)
+            ->where('status', '!=', 'expired');
+        
+        // Filter by industry if selected
+        if ($request->filled('industry_id')) {
+            $query->where('industry_id', $request->industry_id);
+        }
+        
+        // Filter by qualification if selected
+        if ($request->filled('qualification_id')) {
+            $query->where(function($q) use ($request) {
+                $q->where('qualification_id', $request->qualification_id)
+                  ->orWhere('parent_qualification_id', $request->qualification_id);
+            });
+        }
+        
+        // Filter by status if selected
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        } else {
+            // Default to active jobs
+            $query->where('status', 'active');
+        }
+        
+        // Search by description
+        if ($request->filled('search')) {
+            $query->where('description', 'like', '%' . $request->search . '%');
+        }
+        
+        $jobPosts = $query->orderBy('created_at', 'desc')->paginate(12);
+        
+        // Count active jobs
+        $activeJobs = JobPost::whereIn('industry_id', $industryIds)
+            ->where('status', 'active')
+            ->count();
+        
+        // Get qualifications for filter
+        $qualifications = Qualification::all();
+        
+        return view('users.jobs.search-jobs', compact('jobPosts', 'availableIndustries', 'qualifications', 'activeJobs'));
+    }
+
+    /**
+     * Show job details for employee view
+     */
+    public function showJobForEmployee($id)
+    {
+        $job = JobPost::with(['user.companyProfile.industry', 'industry', 'qualification', 'parentQualification'])
+            ->findOrFail($id);
+        
+        return response()->json([
+            'job' => $job,
+        ]);
+    }
 }

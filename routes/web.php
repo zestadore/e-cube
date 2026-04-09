@@ -99,6 +99,10 @@ Route::middleware(['auth'])->group(function () {
         
         // Employee Payment History
         Route::get('payment-history', [App\Http\Controllers\PaymentHistoryController::class, 'employeeIndex'])->name('payment-history');
+        
+        // Job Search Routes for Employees
+        Route::get('find-jobs', [App\Http\Controllers\JobPostController::class, 'findJobs'])->name('find-jobs');
+        Route::get('job/{id}', [App\Http\Controllers\JobPostController::class, 'showJobForEmployee'])->name('job.show');
     });
     Route::group(['as'=>'employer.','prefix' => 'employer', 'middleware' => 'verified'], function () {
         Route::get('/', [App\Http\Controllers\HomeController::class, 'employerDashboard'])->name('dashboard');

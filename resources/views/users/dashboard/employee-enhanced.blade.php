@@ -818,7 +818,10 @@
                             <h4>Quick Actions</h4>
                         </div>
                         <div class="info-card-body">
-                            <a href="{{route('candidate.profile')}}" class="btn btn-gradient w-100 mb-3">
+                            <a href="{{route('employee.find-jobs')}}" class="btn btn-gradient w-100 mb-3">
+                                <i class="fas fa-briefcase me-2"></i>Find Jobs
+                            </a>
+                            <a href="{{route('candidate.profile')}}" class="btn btn-outline-primary w-100 mb-3">
                                 <i class="fas fa-eye me-2"></i>View Profile
                             </a>
                             <a href="{{route('subscription.packages')}}" class="btn btn-outline-success w-100 mb-3">
