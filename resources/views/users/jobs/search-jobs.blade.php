@@ -306,11 +306,45 @@
                     <p class="mt-2 text-muted">Loading job details...</p>
                 </div>
             </div>
-            <div class="modal-footer border-0 px-4 pb-4">
+            <div class="modal-footer border-0 px-4 pb-4" id="jobModalFooter">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 8px;">
                     <i class="fas fa-times me-2"></i>Close
                 </button>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Apply Job Modal -->
+<div class="modal fade" id="applyModal" tabindex="-1" aria-labelledby="applyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 15px;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                <h5 class="modal-title text-white" id="applyModalLabel">
+                    <i class="fas fa-paper-plane me-2"></i>Apply for Job
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="applyForm" method="POST">
+                @csrf
+                <div class="modal-body p-4">
+                    <input type="hidden" id="applyJobId" name="job_id">
+                    <div class="mb-3">
+                        <label for="coverLetter" class="form-label fw-semibold">Cover Letter (Optional)</label>
+                        <textarea class="form-control" id="coverLetter" name="cover_letter" rows="5" placeholder="Write a brief cover letter to introduce yourself..."></textarea>
+                        <div class="form-text">Maximum 2000 characters</div>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>Your profile information will be shared with the employer.
+                    </div>
+                </div>
+                <div class="modal-footer border-0 px-4 pb-4">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success" id="applySubmitBtn">
+                        <i class="fas fa-paper-plane me-2"></i>Submit Application
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -355,9 +389,14 @@
             });
     }
 
+    let currentJobId = null;
+    let hasApplied = false;
+
     function renderJobDetails(data) {
         const job = data.job;
         const company = job.user?.company_profile;
+        currentJobId = job.id;
+        hasApplied = data.has_applied;
         
         // Format dates
         const appStart = new Date(job.application_start_date).toLocaleDateString('en-IN', {
@@ -385,6 +424,22 @@
         
         // Status badge
         const statusClass = job.status === 'active' ? 'status-active' : 'status-inactive';
+        
+        // Update footer based on application status
+        const footerHtml = hasApplied ? 
+            `<button type="button" class="btn btn-success" disabled style="border-radius: 8px;">
+                <i class="fas fa-check me-2"></i>Already Applied
+            </button>` :
+            `<button type="button" class="btn btn-success" onclick="openApplyModal()" style="border-radius: 8px;">
+                <i class="fas fa-paper-plane me-2"></i>Apply Now
+            </button>`;
+        
+        document.getElementById('jobModalFooter').innerHTML = `
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 8px;">
+                <i class="fas fa-times me-2"></i>Close
+            </button>
+            ${footerHtml}
+        `;
         
         const modalHtml = `
             <div class="row">
@@ -510,9 +565,75 @@
         document.getElementById('jobModalBody').innerHTML = modalHtml;
     }
 
+    function openApplyModal() {
+        // Hide job modal
+        bootstrap.Modal.getInstance(document.getElementById('jobModal')).hide();
+        
+        // Set job ID in apply form
+        document.getElementById('applyJobId').value = currentJobId;
+        document.getElementById('coverLetter').value = '';
+        
+        // Show apply modal
+        var applyModal = new bootstrap.Modal(document.getElementById('applyModal'));
+        applyModal.show();
+    }
+
+    // Handle apply form submission
+    document.getElementById('applyForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const coverLetter = document.getElementById('coverLetter').value;
+        const submitBtn = document.getElementById('applySubmitBtn');
+        
+        // Disable submit button
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Submitting...';
+        
+        fetch(`/employee/job/${currentJobId}/apply`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ cover_letter: coverLetter })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Hide apply modal
+            bootstrap.Modal.getInstance(document.getElementById('applyModal')).hide();
+            
+            if (data.success) {
+                // Show success message
+                alert(data.message);
+                // Refresh job view to show "Already Applied"
+                viewJob(currentJobId);
+            } else {
+                alert(data.message || 'Failed to submit application. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to submit application. Please try again.');
+        })
+        .finally(() => {
+            // Re-enable submit button
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Submit Application';
+        });
+    });
+
     // Handle job modal close - clean up backdrops
     document.getElementById('jobModal').addEventListener('hidden.bs.modal', function () {
         // Remove any lingering modal backdrops
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('overflow');
+        document.body.style.removeProperty('padding-right');
+    });
+
+    // Handle apply modal close - clean up backdrops
+    document.getElementById('applyModal').addEventListener('hidden.bs.modal', function () {
         const backdrops = document.querySelectorAll('.modal-backdrop');
         backdrops.forEach(backdrop => backdrop.remove());
         document.body.classList.remove('modal-open');

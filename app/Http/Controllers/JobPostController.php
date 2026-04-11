@@ -8,6 +8,7 @@ use App\Models\Industry;
 use App\Models\CompanyProfile;
 use App\Models\CandidateViewPayment;
 use App\Models\BackGroundQuestion;
+use App\Models\JobApplication;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -659,8 +660,173 @@ class JobPostController extends Controller
         $job = JobPost::with(['user.companyProfile.industry', 'industry', 'qualification', 'parentQualification'])
             ->findOrFail($id);
         
+        // Check if user has already applied
+        $hasApplied = JobApplication::where('job_post_id', $id)
+            ->where('user_id', Auth::id())
+            ->exists();
+        
         return response()->json([
             'job' => $job,
+            'has_applied' => $hasApplied,
+        ]);
+    }
+
+    /**
+     * Apply for a job
+     */
+    public function applyForJob(Request $request, $jobId)
+    {
+        $request->validate([
+            'cover_letter' => 'nullable|string|max:2000',
+        ]);
+
+        $job = JobPost::findOrFail($jobId);
+
+        // Check if job is active
+        if ($job->status !== 'active') {
+            return response()->json([
+                'success' => false,
+                'message' => 'This job is no longer accepting applications.',
+            ], 400);
+        }
+
+        // Check if application period is open
+        $now = now();
+        if ($now < $job->application_start_date || $now > $job->application_end_date) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Application period is closed.',
+            ], 400);
+        }
+
+        // Check if already applied
+        $existingApplication = JobApplication::where('job_post_id', $jobId)
+            ->where('user_id', Auth::id())
+            ->first();
+
+        if ($existingApplication) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You have already applied for this job.',
+            ], 400);
+        }
+
+        // Create application
+        JobApplication::create([
+            'job_post_id' => $jobId,
+            'user_id' => Auth::id(),
+            'cover_letter' => $request->cover_letter,
+            'status' => 'pending',
+            'applied_at' => now(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Application submitted successfully!',
+        ]);
+    }
+
+    /**
+     * Get applications for employer's jobs
+     */
+    public function getEmployerApplications(Request $request)
+    {
+        $query = JobApplication::with(['jobPost.industry', 'jobPost.qualification', 'user.basicDetails', 'user.candidateQualifications.qualification'])
+            ->whereHas('jobPost', function($q) {
+                $q->where('user_id', Auth::id());
+            });
+
+        // Filter by job
+        if ($request->filled('job_id')) {
+            $query->where('job_post_id', $request->job_id);
+        }
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Filter by candidate name
+        if ($request->filled('search')) {
+            $query->whereHas('user', function($q) use ($request) {
+                $q->where('full_name', 'like', '%' . $request->search . '%')
+                  ->orWhere('email', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        $applications = $query->orderBy('applied_at', 'desc')->paginate(15);
+
+        // Get employer's jobs for filter
+        $jobs = JobPost::where('user_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Count statistics
+        $stats = [
+            'total' => JobApplication::whereHas('jobPost', function($q) {
+                $q->where('user_id', Auth::id());
+            })->count(),
+            'pending' => JobApplication::whereHas('jobPost', function($q) {
+                $q->where('user_id', Auth::id());
+            })->where('status', 'pending')->count(),
+            'shortlisted' => JobApplication::whereHas('jobPost', function($q) {
+                $q->where('user_id', Auth::id());
+            })->where('status', 'shortlisted')->count(),
+            'hired' => JobApplication::whereHas('jobPost', function($q) {
+                $q->where('user_id', Auth::id());
+            })->where('status', 'hired')->count(),
+            'rejected' => JobApplication::whereHas('jobPost', function($q) {
+                $q->where('user_id', Auth::id());
+            })->where('status', 'rejected')->count(),
+        ];
+
+        return view('users.jobs.applications', compact('applications', 'jobs', 'stats'));
+    }
+
+    /**
+     * Update application status
+     */
+    public function updateApplicationStatus(Request $request, $applicationId)
+    {
+        $request->validate([
+            'status' => 'required|in:pending,shortlisted,rejected,hired',
+            'notes' => 'nullable|string|max:2000',
+        ]);
+
+        $application = JobApplication::with('jobPost')
+            ->whereHas('jobPost', function($q) {
+                $q->where('user_id', Auth::id());
+            })
+            ->findOrFail($applicationId);
+
+        $application->update([
+            'status' => $request->status,
+            'employer_notes' => $request->notes,
+        ]);
+
+        return redirect()->back()->with('success', 'Application status updated successfully!');
+    }
+
+    /**
+     * Get application details for employer
+     */
+    public function getApplicationDetails($applicationId)
+    {
+        $application = JobApplication::with([
+            'jobPost.industry', 
+            'jobPost.qualification', 
+            'user.basicDetails', 
+            'user.candidateQualifications.qualification',
+            'user.candidateExperiences.industry',
+            'user.candidateSkills.skill'
+        ])
+            ->whereHas('jobPost', function($q) {
+                $q->where('user_id', Auth::id());
+            })
+            ->findOrFail($applicationId);
+
+        return response()->json([
+            'application' => $application,
         ]);
     }
 }

@@ -83,6 +83,11 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('users', App\Http\Controllers\Admin\UserController::class);
         // Admin Payment History
         Route::get('payment-history', [App\Http\Controllers\PaymentHistoryController::class, 'adminIndex'])->name('payment-history');
+        
+        // Admin Job Applications
+        Route::get('applications', [App\Http\Controllers\Admin\JobApplicationController::class, 'index'])->name('applications.index');
+        Route::get('applications/{id}', [App\Http\Controllers\Admin\JobApplicationController::class, 'show'])->name('applications.show');
+        Route::delete('applications/{id}', [App\Http\Controllers\Admin\JobApplicationController::class, 'destroy'])->name('applications.destroy');
     });
     Route::group(['as'=>'employee.','prefix' => 'employee', 'middleware' => 'verified'], function () {
         Route::get('/', [App\Http\Controllers\HomeController::class, 'employeeDashboard'])->name('dashboard');
@@ -103,6 +108,7 @@ Route::middleware(['auth'])->group(function () {
         // Job Search Routes for Employees
         Route::get('find-jobs', [App\Http\Controllers\JobPostController::class, 'findJobs'])->name('find-jobs');
         Route::get('job/{id}', [App\Http\Controllers\JobPostController::class, 'showJobForEmployee'])->name('job.show');
+        Route::post('job/{id}/apply', [App\Http\Controllers\JobPostController::class, 'applyForJob'])->name('job.apply');
     });
     Route::group(['as'=>'employer.','prefix' => 'employer', 'middleware' => 'verified'], function () {
         Route::get('/', [App\Http\Controllers\HomeController::class, 'employerDashboard'])->name('dashboard');
@@ -113,6 +119,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('find-talent', [App\Http\Controllers\JobPostController::class, 'findTalent'])->name('find-talent');
         // Employer Payment History
         Route::get('payment-history', [App\Http\Controllers\PaymentHistoryController::class, 'employerIndex'])->name('payment-history');
+        
+        // Job Applications Routes for Employers
+        Route::get('applications', [App\Http\Controllers\JobPostController::class, 'getEmployerApplications'])->name('applications');
+        Route::get('application/{id}', [App\Http\Controllers\JobPostController::class, 'getApplicationDetails'])->name('application.details');
+        Route::post('application/{id}/status', [App\Http\Controllers\JobPostController::class, 'updateApplicationStatus'])->name('application.status');
         
         // Candidate payment routes - MUST be defined before candidate/{id} to avoid conflicts
         Route::post('candidate/initiate-payment', [App\Http\Controllers\JobPostController::class, 'initiateCandidateViewPayment'])->name('candidate.initiate-payment');

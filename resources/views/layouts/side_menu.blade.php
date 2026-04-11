@@ -269,6 +269,18 @@
                         </ul>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link {{ (request()->is('admin/applications*'))? 'active' : '' }}" aria-current="page" href="{{ route('admin.applications.index') }}">
+                            <i class="icon">
+                                <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path opacity="0.4" d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" fill="currentColor"></path>
+                                    <path d="M12 6C12.5523 6 13 6.44772 13 7V13C13 13.5523 12.5523 14 12 14C11.4477 14 11 13.5523 11 13V7C11 6.44772 11.4477 6 12 6Z" fill="currentColor"></path>
+                                    <path d="M12 16C12.5523 16 13 16.4477 13 17C13 17.5523 12.5523 18 12 18C11.4477 18 11 17.5523 11 17C11 16.4477 11.4477 16 12 16Z" fill="currentColor"></path>
+                                </svg>
+                            </i>
+                            <span class="item-name">Applications</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link {{ (request()->is('admin/payment-history'))? 'active' : '' }}" aria-current="page" href="{{ route('admin.payment-history') }}">
                             <i class="icon">
                                 <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -434,6 +446,18 @@
                                 </svg>
                             </i>
                             <span class="item-name">Company Profile</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->is('employer/applications*') ? 'active' : '' }}" aria-current="page" href="{{ route('employer.applications') }}">
+                            <i class="icon">
+                                <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path opacity="0.4" d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" fill="currentColor"></path>
+                                    <path d="M12 6C12.5523 6 13 6.44772 13 7V13C13 13.5523 12.5523 14 12 14C11.4477 14 11 13.5523 11 13V7C11 6.44772 11.4477 6 12 6Z" fill="currentColor"></path>
+                                    <path d="M12 16C12.5523 16 13 16.4477 13 17C13 17.5523 12.5523 18 12 18C11.4477 18 11 17.5523 11 17C11 16.4477 11.4477 16 12 16Z" fill="currentColor"></path>
+                                </svg>
+                            </i>
+                            <span class="item-name">Applications</span>
                         </a>
                     </li>
                     <li class="nav-item">
