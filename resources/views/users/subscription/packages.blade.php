@@ -26,26 +26,31 @@
         <div class="col-md-4 mb-4">
             <div class="card border-0 shadow-sm h-100" style="border-radius: 15px; overflow: hidden;">
                 <div class="card-header text-center py-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
-                    <h4 class="text-white mb-0 fw-bold">{{ $package->package_name }}</h4>
+                    {{-- <h4 class="text-white mb-0 fw-bold">{{ $package->name }}</h4> --}}
                     <div class="mt-2">
                         <span class="badge bg-white text-primary px-3 py-2" style="font-size: 14px;">
-                            <i class="fas fa-clock me-1"></i>{{ $package->validity }} Days
+                            <i class="fas fa-clock me-1"></i>{{ $package->name }}
                         </span>
                     </div>
                 </div>
                 <div class="card-body p-4">
                     <div class="text-center mb-3">
+                        @if($package->original_price)
+                            <h5 class="mb-1 text-muted">
+                                <del>₹{{ number_format($package->original_price) }}</del>
+                            </h5>
+                        @endif
                         <h2 class="mb-0 fw-bold text-primary">₹{{ number_format($package->price) }}</h2>
                         <small class="text-muted">{{ $package->duration }} Month{{ $package->duration > 1 ? 's' : '' }}</small>
                     </div>
                     
                     @if($package->description)
-                    <div class="package-description mb-3">
-                        <p class="text-muted small mb-0" style="line-height: 1.5;">{{ $package->description }}</p>
+                    <div class="package-description mb-3 text-start">
+                        {!! $package->description !!}
                     </div>
                     @endif
                     
-                    <div class="features-list text-start mb-4">
+                    {{-- <div class="features-list text-start mb-4">
                         <div class="d-flex align-items-center mb-2">
                             <i class="fas fa-check-circle text-success me-2" style="font-size: 14px;"></i>
                             <small>Full access to candidate database</small>
@@ -66,11 +71,11 @@
                             <i class="fas fa-check-circle text-success me-2" style="font-size: 14px;"></i>
                             <small>Valid for {{ $package->validity }} days</small>
                         </div>
-                    </div>
+                    </div> --}}
 
                     <button class="btn btn-primary w-100 fw-bold py-3 pay-btn" 
                             data-package-id="{{ $package->id }}"
-                            data-package-name="{{ $package->package_name }}"
+                            data-package-name="{{ $package->name }}"
                             data-price="{{ $package->price }}"
                             style="border-radius: 10px; font-size: 16px;">
                         <i class="fas fa-credit-card me-2"></i>Pay Now

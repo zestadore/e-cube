@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('styles')
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet" />
 @endsection
 @section('content')
     <div class="conatiner-fluid content-inner mt-n5 py-0">
@@ -35,9 +36,10 @@
                                 <table id="item-table" class="table table-striped" role="grid" data-bs-toggle="data-table">
                                     <thead>
                                         <tr class="ligth">
-                                            <th>Slno.</th>
+                                    <th>Slno.</th>
                                             <th>Name</th>
                                             <th>Duration(Months)</th>
+                                            <th>Original Price</th>
                                             <th>Price</th>
                                             <th>Type</th>
                                             <th style="min-width: 100px">Action</th>
@@ -74,8 +76,12 @@
                             </select>
                         </div>
                         <x-InputBox class="form-control {{ $errors->has('duration') ? ' is-invalid' : '' }}" title="Duration(in months)" name="duration" id="duration" type="text" required="True"/>
-                        <x-InputBox class="form-control {{ $errors->has('price') ? ' is-invalid' : '' }}" title="Price" name="price" id="price" type="number" required="True"/>
-                        <x-InputBox class="form-control {{ $errors->has('description') ? ' is-invalid' : '' }}" title="Description" name="description" id="description" type="textarea" required="False"/>
+                        <x-InputBox class="form-control {{ $errors->has('original_price') ? ' is-invalid' : '' }}" title="Original Price (Optional)" name="original_price" id="original_price" type="number" required="False"/>
+                        <x-InputBox class="form-control {{ $errors->has('price') ? ' is-invalid' : '' }}" title="Price (Offer Price)" name="price" id="price" type="number" required="True"/>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea class="form-control" name="description" id="description" rows="5"></textarea>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -89,11 +95,34 @@
 @section('scripts')
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
     <script>
+        // Initialize Summernote when modal is shown
+        $('#addModal').on('shown.bs.modal', function () {
+            if (!$('#description').hasClass('note-editor')) {
+                $('#description').summernote({
+                    height: 200,
+                    toolbar: [
+                        ['style', ['style']],
+                        ['font', ['bold', 'underline', 'clear']],
+                        ['color', ['color']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['table', ['table']],
+                        ['insert', ['link']],
+                        ['view', ['fullscreen', 'codeview', 'help']]
+                    ]
+                });
+            }
+        });
+
         $('#addQualificationButton').click(function(){
             $('#addForm')[0].reset();
             $('#id').val('');
             $('#addModal').modal('show');
+            // Reset summernote after modal is shown
+            setTimeout(function() {
+                $('#description').summernote('code', '');
+            }, 200);
         });
         function drawTable()
         {
@@ -116,6 +145,7 @@
                     },
                     {data: 'name', name: 'name'},
                     {data: 'duration',name: 'duration'},
+                    {data: 'original_price',name: 'original_price'},
                     {data: 'price',name: 'price'},
                     {data: 'type',name: 'type'},
                     {data: 'action', name: 'action', orderable: false, searchable: false},
@@ -170,10 +200,14 @@
                     $('#id').val(response.id);
                     $('#name').val(response.name);
                     $('#duration').val(response.duration);
+                    $('#original_price').val(response.original_price);
                     $('#price').val(response.price);
                     $('#type').val(response.type);
-                    $('#description').val(response.description);
                     $('#addModal').modal('show');
+                    // Set summernote content after modal is shown
+                    setTimeout(function() {
+                        $('#description').summernote('code', response.description);
+                    }, 200);
                 }
             });
         }

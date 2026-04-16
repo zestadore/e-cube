@@ -24,6 +24,7 @@ class SubscriptionPackageValidation extends FormRequest
         return [
             'name' => 'required',
             'price' => 'required|numeric',
+            'original_price' => 'nullable|numeric',
             'duration' => 'required|numeric',
             'id' => 'nullable|exists:subscription_packages,id',
             'type' => 'required|in:employee,employer',
