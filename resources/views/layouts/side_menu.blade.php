@@ -31,7 +31,7 @@
                 </li>
                 @can('isAdmin')
                     <li class="nav-item">
-                        <a class="nav-link {{ (request()->is('admin/users*'))? 'collapsed' : '' }}" data-bs-toggle="collapse" href="#horizontal-menu-users" role="button" aria-expanded="false" aria-controls="horizontal-menu">
+                        <a class="nav-link {{ (request()->is('admin/users*'))? 'active' : '' }}" aria-current="page" href="{{ route('admin.users.index') }}">
                             <i class="icon">
                                 <svg width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-20">
                                     <path opacity="0.4" d="M9.15257 21.5584C9.15257 21.5584 9.15257 21.5584 9.15257 21.5584C6.19502 21.5584 3.80029 19.1637 3.80029 16.2061V15.2717C3.80029 14.3844 4.46589 13.6046 5.34602 13.5053C6.81876 13.3379 8.53702 13.1779 9.15257 13.1779C9.76812 13.1779 11.4864 13.3379 12.9591 13.5053C13.8392 13.6046 14.5048 14.3844 14.5048 15.2717V16.2061C14.5048 19.1637 12.1101 21.5584 9.15257 21.5584Z" fill="currentColor"></path>
@@ -41,30 +41,10 @@
                                 </svg>
                             </i>
                             <span class="item-name">Users</span>
-                            <i class="right-icon">
-                                <svg class="icon-18" xmlns="http://www.w3.org/2000/svg" width="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                </svg>
-                            </i>
                         </a>
-                        <ul class="sub-nav collapse" id="horizontal-menu-users" data-bs-parent="#sidebar-menu">
-                            <li class="nav-item">
-                                <a class="nav-link {{ (request()->is('admin/users'))? 'active' : '' }}" href="{{ route('admin.users.index') }}">
-                                    <i class="icon">
-                                        <svg class="icon-10" xmlns="http://www.w3.org/2000/svg" width="10" viewBox="0 0 24 24" fill="currentColor">
-                                            <g>
-                                            <circle cx="12" cy="12" r="8" fill="currentColor"></circle>
-                                            </g>
-                                        </svg>
-                                    </i>
-                                    <i class="sidenav-mini-icon"> L </i>
-                                    <span class="item-name"> List </span>
-                                </a>
-                            </li>
-                        </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ (request()->is('admin/industry*'))? 'collapsed' : '' }}" data-bs-toggle="collapse" href="#horizontal-menu" role="button" aria-expanded="false" aria-controls="horizontal-menu">
+                        <a class="nav-link {{ (request()->is('admin/industry*'))? 'active' : '' }}" aria-current="page" href="{{ route('admin.industry.index') }}">
                             <i class="icon">
                                 <svg width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-20">
                                     <path opacity="0.4" d="M2 7.5C2 6.43913 2.42143 5.42172 3.17157 4.67157C3.92172 3.92143 4.93913 3.5 6 3.5H10.5C11.5609 3.5 12.5783 3.92143 13.3284 4.67157C14.0786 5.42172 14.5 6.43913 14.5 7.5V12C14.5 13.0609 14.0786 14.0783 13.3284 14.8284C12.5783 15.5786 11.5609 16 10.5 16H6C4.93913 16 3.92172 15.5786 3.17157 14.8284C2.42143 14.0783 2 13.0609 2 12V7.5Z" fill="currentColor"></path>
@@ -73,43 +53,10 @@
                                 </svg>
                             </i>
                             <span class="item-name">Industry/Roles</span>
-                            <i class="right-icon">
-                                <svg class="icon-18" xmlns="http://www.w3.org/2000/svg" width="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                </svg>
-                            </i>
                         </a>
-                        <ul class="sub-nav collapse" id="horizontal-menu" data-bs-parent="#sidebar-menu">
-                            <li class="nav-item">
-                                <a class="nav-link {{ (request()->is('admin/industry'))? 'active' : '' }}" href="{{ route('admin.industry.index') }}">
-                                    <i class="icon">
-                                        <svg class="icon-10" xmlns="http://www.w3.org/2000/svg" width="10" viewBox="0 0 24 24" fill="currentColor">
-                                            <g>
-                                            <circle cx="12" cy="12" r="8" fill="currentColor"></circle>
-                                            </g>
-                                        </svg>
-                                    </i>
-                                    <i class="sidenav-mini-icon"> L </i>
-                                    <span class="item-name"> List </span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {{ (request()->is('admin/industry/create'))? 'active' : '' }}" href="{{ route('admin.industry.create') }}">
-                                    <i class="icon">
-                                        <svg class="icon-10" xmlns="http://www.w3.org/2000/svg" width="10" viewBox="0 0 24 24" fill="currentColor">
-                                            <g>
-                                            <circle cx="12" cy="12" r="8" fill="currentColor"></circle>
-                                            </g>
-                                        </svg>
-                                    </i>
-                                    <i class="sidenav-mini-icon"> C </i>
-                                    <span class="item-name"> Create </span>
-                                </a>
-                            </li>
-                        </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ (request()->is('admin/qualification*'))? 'collapsed' : '' }}" data-bs-toggle="collapse" href="#qualification-menu" role="button" aria-expanded="false" aria-controls="qualification-menu">
+                        <a class="nav-link {{ (request()->is('admin/qualification*'))? 'active' : '' }}" aria-current="page" href="{{ route('admin.qualification.index') }}">
                             <i class="icon">
                                 <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path opacity="0.4" d="M12 2.5C10.0109 2.5 8.10322 3.29018 6.6967 4.6967C5.29018 6.10322 4.5 8.01088 4.5 10V16.25C4.5 17.2446 4.89509 18.1984 5.59835 18.9016C6.30161 19.6049 7.25544 20 8.25 20H8.5C9.05228 20 9.5 19.5523 9.5 19V15C9.5 14.4477 9.05228 14 8.5 14H8.25C7.836 14 7.5 13.664 7.5 13.25V10C7.5 8.80653 7.97411 7.66193 8.81802 6.81802C9.66193 5.97411 10.8065 5.5 12 5.5C13.1935 5.5 14.3381 5.97411 15.182 6.81802C16.0259 7.66193 16.5 8.80653 16.5 10V13.25C16.5 13.664 16.164 14 15.75 14H15.5C14.9477 14 14.5 14.4477 14.5 15V19C14.5 19.5523 14.9477 20 15.5 20H15.75C16.7446 20 17.6984 19.6049 18.4016 18.9016C19.1049 18.1984 19.5 17.2446 19.5 16.25V10C19.5 8.01088 18.7098 6.10322 17.3033 4.6967C15.8968 3.29018 13.9891 2.5 12 2.5Z" fill="currentColor"></path>
@@ -118,30 +65,10 @@
                                 </svg>
                             </i>
                             <span class="item-name">Qualifications</span>
-                            <i class="right-icon">
-                                <svg class="icon-18" xmlns="http://www.w3.org/2000/svg" width="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                </svg>
-                            </i>
                         </a>
-                        <ul class="sub-nav collapse" id="qualification-menu" data-bs-parent="#sidebar-menu">
-                            <li class="nav-item">
-                                <a class="nav-link {{ (request()->is('admin/qualification'))? 'active' : '' }}" href="{{ route('admin.qualification.index') }}">
-                                    <i class="icon">
-                                        <svg class="icon-10" xmlns="http://www.w3.org/2000/svg" width="10" viewBox="0 0 24 24" fill="currentColor">
-                                            <g>
-                                            <circle cx="12" cy="12" r="8" fill="currentColor"></circle>
-                                            </g>
-                                        </svg>
-                                    </i>
-                                    <i class="sidenav-mini-icon"> L </i>
-                                    <span class="item-name"> List </span>
-                                </a>
-                            </li>
-                        </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ (request()->is('admin/computer-and-other-skill*'))? 'collapsed' : '' }}" data-bs-toggle="collapse" href="#skills-menu" role="button" aria-expanded="false" aria-controls="skills-menu">
+                        <a class="nav-link {{ (request()->is('admin/computer-and-other-skill*'))? 'active' : '' }}" aria-current="page" href="{{ route('admin.computer-and-other-skill.index') }}">
                             <i class="icon">
                                 <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path opacity="0.4" d="M3 6C3 4.34315 4.34315 3 6 3H18C19.6569 3 21 4.34315 21 6V14C21 15.6569 19.6569 17 18 17H6C4.34315 17 3 15.6569 3 14V6Z" fill="currentColor"></path>
@@ -150,30 +77,10 @@
                                 </svg>
                             </i>
                             <span class="item-name">Computer/Other Skills</span>
-                            <i class="right-icon">
-                                <svg class="icon-18" xmlns="http://www.w3.org/2000/svg" width="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                </svg>
-                            </i>
                         </a>
-                        <ul class="sub-nav collapse" id="skills-menu" data-bs-parent="#sidebar-menu">
-                            <li class="nav-item">
-                                <a class="nav-link {{ (request()->is('admin/computer-and-other-skill'))? 'active' : '' }}" href="{{ route('admin.computer-and-other-skill.index') }}">
-                                    <i class="icon">
-                                        <svg class="icon-10" xmlns="http://www.w3.org/2000/svg" width="10" viewBox="0 0 24 24" fill="currentColor">
-                                            <g>
-                                            <circle cx="12" cy="12" r="8" fill="currentColor"></circle>
-                                            </g>
-                                        </svg>
-                                    </i>
-                                    <i class="sidenav-mini-icon"> L </i>
-                                    <span class="item-name"> List </span>
-                                </a>
-                            </li>
-                        </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ (request()->is('admin/background-question*'))? 'collapsed' : '' }}" data-bs-toggle="collapse" href="#question-menu" role="button" aria-expanded="false" aria-controls="question-menu">
+                        <a class="nav-link {{ (request()->is('admin/background-question*'))? 'active' : '' }}" aria-current="page" href="{{ route('admin.background-question.index') }}">
                             <i class="icon">
                                 <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path opacity="0.4" d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" fill="currentColor"></path>
@@ -182,30 +89,10 @@
                                 </svg>
                             </i>
                             <span class="item-name">Background Questions</span>
-                            <i class="right-icon">
-                                <svg class="icon-18" xmlns="http://www.w3.org/2000/svg" width="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                </svg>
-                            </i>
                         </a>
-                        <ul class="sub-nav collapse" id="question-menu" data-bs-parent="#sidebar-menu">
-                            <li class="nav-item">
-                                <a class="nav-link {{ (request()->is('admin/background-question'))? 'active' : '' }}" href="{{ route('admin.background-question.index') }}">
-                                    <i class="icon">
-                                        <svg class="icon-10" xmlns="http://www.w3.org/2000/svg" width="10" viewBox="0 0 24 24" fill="currentColor">
-                                            <g>
-                                            <circle cx="12" cy="12" r="8" fill="currentColor"></circle>
-                                            </g>
-                                        </svg>
-                                    </i>
-                                    <i class="sidenav-mini-icon"> L </i>
-                                    <span class="item-name"> List </span>
-                                </a>
-                            </li>
-                        </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ (request()->is('admin/subscription-packages*'))? 'collapsed' : '' }}" data-bs-toggle="collapse" href="#package-menu" role="button" aria-expanded="false" aria-controls="question-menu">
+                        <a class="nav-link {{ (request()->is('admin/subscription-packages*'))? 'active' : '' }}" aria-current="page" href="{{ route('admin.subscription-packages.index') }}">
                             <i class="icon">
                                 <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path opacity="0.4" d="M20 7L14.5 2.5C13.6716 1.67157 12.404 1.17157 11 1.17157H7C5.34315 1.17157 4 2.51472 4 4.17157V8.17157C4 9.82843 5.34315 11.1716 7 11.1716H10.5C11.8807 11.1716 13 10.0523 13 8.67157V7.17157C13 6.61929 13.4477 6.17157 14 6.17157H17C17.5523 6.17157 18 6.61929 18 7.17157V9.17157C18 9.72386 17.5523 10.1716 17 10.1716H12L12 22H20C21.1046 22 22 21.1046 22 20V9C22 8.17157 21.1716 7 20 7Z" fill="currentColor"></path>
@@ -214,30 +101,10 @@
                                 </svg>
                             </i>
                             <span class="item-name">Subscription Packages</span>
-                            <i class="right-icon">
-                                <svg class="icon-18" xmlns="http://www.w3.org/2000/svg" width="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                </svg>
-                            </i>
                         </a>
-                        <ul class="sub-nav collapse" id="package-menu" data-bs-parent="#sidebar-menu">
-                            <li class="nav-item">
-                                <a class="nav-link {{ (request()->is('admin/subscription-packages'))? 'active' : '' }}" href="{{ route('admin.subscription-packages.index') }}">
-                                    <i class="icon">
-                                        <svg class="icon-10" xmlns="http://www.w3.org/2000/svg" width="10" viewBox="0 0 24 24" fill="currentColor">
-                                            <g>
-                                            <circle cx="12" cy="12" r="8" fill="currentColor"></circle>
-                                            </g>
-                                        </svg>
-                                    </i>
-                                    <i class="sidenav-mini-icon"> L </i>
-                                    <span class="item-name"> List </span>
-                                </a>
-                            </li>
-                        </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ (request()->is('admin/payment-methods*'))? 'collapsed' : '' }}" data-bs-toggle="collapse" href="#payment-method-menu" role="button" aria-expanded="false" aria-controls="payment-method-menu">
+                        <a class="nav-link {{ (request()->is('admin/payment-methods*'))? 'active' : '' }}" aria-current="page" href="{{ route('admin.payment-methods.index') }}">
                             <i class="icon">
                                 <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path opacity="0.4" d="M2 8C2 6.34315 3.34315 5 5 5H19C20.6569 5 22 6.34315 22 8V16C22 17.6569 20.6569 19 19 19H5C3.34315 19 2 17.6569 2 16V8Z" fill="currentColor"></path>
@@ -246,27 +113,7 @@
                                 </svg>
                             </i>
                             <span class="item-name">Payment Methods</span>
-                            <i class="right-icon">
-                                <svg class="icon-18" xmlns="http://www.w3.org/2000/svg" width="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                </svg>
-                            </i>
                         </a>
-                        <ul class="sub-nav collapse" id="payment-method-menu" data-bs-parent="#sidebar-menu">
-                            <li class="nav-item">
-                                <a class="nav-link {{ (request()->is('admin/payment-methods'))? 'active' : '' }}" href="{{ route('admin.payment-methods.index') }}">
-                                    <i class="icon">
-                                        <svg class="icon-10" xmlns="http://www.w3.org/2000/svg" width="10" viewBox="0 0 24 24" fill="currentColor">
-                                            <g>
-                                            <circle cx="12" cy="12" r="8" fill="currentColor"></circle>
-                                            </g>
-                                        </svg>
-                                    </i>
-                                    <i class="sidenav-mini-icon"> L </i>
-                                    <span class="item-name"> List </span>
-                                </a>
-                            </li>
-                        </ul>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {{ (request()->is('admin/applications*'))? 'active' : '' }}" aria-current="page" href="{{ route('admin.applications.index') }}">
@@ -294,7 +141,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ (request()->is('admin/sliders*'))? 'collapsed' : '' }}" data-bs-toggle="collapse" href="#slider-menu" role="button" aria-expanded="false" aria-controls="slider-menu">
+                        <a class="nav-link {{ (request()->is('admin/sliders*'))? 'active' : '' }}" aria-current="page" href="{{ route('admin.sliders.index') }}">
                             <i class="icon">
                                 <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path opacity="0.4" d="M2 6C2 4.34315 3.34315 3 5 3H19C20.6569 3 22 4.34315 22 6V18C22 19.6569 20.6569 21 19 21H5C3.34315 21 2 19.6569 2 18V6Z" fill="currentColor"></path>
@@ -304,30 +151,10 @@
                                 </svg>
                             </i>
                             <span class="item-name">Sliders</span>
-                            <i class="right-icon">
-                                <svg class="icon-18" xmlns="http://www.w3.org/2000/svg" width="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                </svg>
-                            </i>
                         </a>
-                        <ul class="sub-nav collapse" id="slider-menu" data-bs-parent="#sidebar-menu">
-                            <li class="nav-item">
-                                <a class="nav-link {{ (request()->is('admin/sliders'))? 'active' : '' }}" href="{{ route('admin.sliders.index') }}">
-                                    <i class="icon">
-                                        <svg class="icon-10" xmlns="http://www.w3.org/2000/svg" width="10" viewBox="0 0 24 24" fill="currentColor">
-                                            <g>
-                                            <circle cx="12" cy="12" r="8" fill="currentColor"></circle>
-                                            </g>
-                                        </svg>
-                                    </i>
-                                    <i class="sidenav-mini-icon"> L </i>
-                                    <span class="item-name"> List </span>
-                                </a>
-                            </li>
-                        </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ (request()->is('admin/events*'))? 'collapsed' : '' }}" data-bs-toggle="collapse" href="#event-menu" role="button" aria-expanded="false" aria-controls="event-menu">
+                        <a class="nav-link {{ (request()->is('admin/events*'))? 'active' : '' }}" aria-current="page" href="{{ route('admin.events.index') }}">
                             <i class="icon">
                                 <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path opacity="0.4" d="M2 9C2 7.34315 3.34315 6 5 6H19C20.6569 6 22 7.34315 22 9V19C22 20.6569 20.6569 22 19 22H5C3.34315 22 2 20.6569 2 19V9Z" fill="currentColor"></path>
@@ -338,30 +165,10 @@
                                 </svg>
                             </i>
                             <span class="item-name">Events</span>
-                            <i class="right-icon">
-                                <svg class="icon-18" xmlns="http://www.w3.org/2000/svg" width="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                </svg>
-                            </i>
                         </a>
-                        <ul class="sub-nav collapse" id="event-menu" data-bs-parent="#sidebar-menu">
-                            <li class="nav-item">
-                                <a class="nav-link {{ (request()->is('admin/events'))? 'active' : '' }}" href="{{ route('admin.events.index') }}">
-                                    <i class="icon">
-                                        <svg class="icon-10" xmlns="http://www.w3.org/2000/svg" width="10" viewBox="0 0 24 24" fill="currentColor">
-                                            <g>
-                                            <circle cx="12" cy="12" r="8" fill="currentColor"></circle>
-                                            </g>
-                                        </svg>
-                                    </i>
-                                    <i class="sidenav-mini-icon"> L </i>
-                                    <span class="item-name"> List </span>
-                                </a>
-                            </li>
-                        </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ (request()->is('admin/reviews*'))? 'collapsed' : '' }}" data-bs-toggle="collapse" href="#review-menu" role="button" aria-expanded="false" aria-controls="review-menu">
+                        <a class="nav-link {{ (request()->is('admin/reviews*'))? 'active' : '' }}" aria-current="page" href="{{ route('admin.reviews.index') }}">
                             <i class="icon">
                                 <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path opacity="0.4" d="M12 17C16.4183 17 20 13.4183 20 9C20 4.58172 16.4183 1 12 1C7.58172 1 4 4.58172 4 9C4 13.4183 7.58172 17 12 17Z" fill="currentColor"></path>
@@ -371,27 +178,7 @@
                                 </svg>
                             </i>
                             <span class="item-name">Reviews</span>
-                            <i class="right-icon">
-                                <svg class="icon-18" xmlns="http://www.w3.org/2000/svg" width="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                </svg>
-                            </i>
                         </a>
-                        <ul class="sub-nav collapse" id="review-menu" data-bs-parent="#sidebar-menu">
-                            <li class="nav-item">
-                                <a class="nav-link {{ (request()->is('admin/reviews'))? 'active' : '' }}" href="{{ route('admin.reviews.index') }}">
-                                    <i class="icon">
-                                        <svg class="icon-10" xmlns="http://www.w3.org/2000/svg" width="10" viewBox="0 0 24 24" fill="currentColor">
-                                            <g>
-                                            <circle cx="12" cy="12" r="8" fill="currentColor"></circle>
-                                            </g>
-                                        </svg>
-                                    </i>
-                                    <i class="sidenav-mini-icon"> L </i>
-                                    <span class="item-name"> List </span>
-                                </a>
-                            </li>
-                        </ul>
                     </li>
                 @endcan
                 @can('isEmployee')
