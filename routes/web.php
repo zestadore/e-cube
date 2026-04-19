@@ -110,11 +110,17 @@ Route::middleware(['auth'])->group(function () {
         Route::get('job/{id}', [App\Http\Controllers\JobPostController::class, 'showJobForEmployee'])->name('job.show');
         Route::post('job/{id}/apply', [App\Http\Controllers\JobPostController::class, 'applyForJob'])->name('job.apply');
     });
+    // Employer routes that require auth but NOT email verification (for initial registration flow)
+    Route::group(['as'=>'employer.','prefix' => 'employer', 'middleware' => 'auth'], function () {
+        // Industry selection - available before email verification
+        Route::get('select-industry', [App\Http\Controllers\Registration\Company\CompanyProfileController::class, 'selectIndustry'])->name('select_industry');
+        Route::post('save-industry', [App\Http\Controllers\Registration\Company\CompanyProfileController::class, 'saveIndustry'])->name('save_industry');
+    });
+    
+    // Employer routes that require email verification
     Route::group(['as'=>'employer.','prefix' => 'employer', 'middleware' => 'verified'], function () {
         Route::get('/', [App\Http\Controllers\HomeController::class, 'employerDashboard'])->name('dashboard');
         Route::get('company-profile', [App\Http\Controllers\Registration\Company\CompanyProfileController::class, 'index'])->name('company_profile');
-        Route::get('select-industry', [App\Http\Controllers\Registration\Company\CompanyProfileController::class, 'selectIndustry'])->name('select_industry');
-        Route::post('save-industry', [App\Http\Controllers\Registration\Company\CompanyProfileController::class, 'saveIndustry'])->name('save_industry');
         Route::resource('jobs', App\Http\Controllers\JobPostController::class);
         Route::get('find-talent', [App\Http\Controllers\JobPostController::class, 'findTalent'])->name('find-talent');
         // Employer Payment History
@@ -122,6 +128,7 @@ Route::middleware(['auth'])->group(function () {
         
         // Job Applications Routes for Employers
         Route::get('applications', [App\Http\Controllers\JobPostController::class, 'getEmployerApplications'])->name('applications');
+        Route::get('applications/job/{jobId}', [App\Http\Controllers\JobPostController::class, 'getJobApplications'])->name('applications.job');
         Route::get('application/{id}', [App\Http\Controllers\JobPostController::class, 'getApplicationDetails'])->name('application.details');
         Route::post('application/{id}/status', [App\Http\Controllers\JobPostController::class, 'updateApplicationStatus'])->name('application.status');
         

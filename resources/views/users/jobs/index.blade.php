@@ -251,7 +251,7 @@
 
 <!-- View Job Modal -->
 <div class="modal fade" id="viewJobModal" tabindex="-1" aria-labelledby="viewJobModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content" style="border-radius: 15px;">
             <div class="modal-header" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
                 <h5 class="modal-title text-white" id="viewJobModalLabel">
@@ -260,6 +260,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
+                <!-- Job Details Section -->
                 <div class="row">
                     <div class="col-md-12 mb-3">
                         <h4 class="fw-bold text-primary mb-3" id="view_job_industry"></h4>
@@ -305,6 +306,50 @@
                         <label class="form-label fw-semibold text-muted">Last Updated</label>
                         <p class="fw-semibold"><i class="fas fa-sync text-secondary me-2"></i><span id="view_updated_at"></span></p>
                     </div>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Applications Section -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold text-primary mb-0">
+                                <i class="fas fa-users me-2"></i>Applications
+                            </h5>
+                            <span class="badge bg-info" id="applications_count">0 Applications</span>
+                        </div>
+                        
+                <div id="applications_table_container">
+                            <!-- Applications table will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 px-4 pb-4">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 8px;">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Application Details Modal (Nested inside View Job Modal) -->
+<div class="modal fade" id="applicationDetailModal" tabindex="-1" aria-labelledby="applicationDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content" style="border-radius: 15px;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <h5 class="modal-title text-white" id="applicationDetailModalLabel">
+                    <i class="fas fa-user-circle me-2"></i>Candidate Application Details
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4" id="applicationDetailBody">
+                <!-- Content will be loaded dynamically -->
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Loading application details...</p>
                 </div>
             </div>
             <div class="modal-footer border-0 px-4 pb-4">
@@ -566,6 +611,9 @@
                 document.getElementById('view_created_at').textContent = createdAt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
                 document.getElementById('view_updated_at').textContent = updatedAt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
                 
+                // Render applications table
+                renderApplicationsTable(data.applications || []);
+                
                 var viewModal = new bootstrap.Modal(document.getElementById('viewJobModal'));
                 viewModal.show();
             })
@@ -573,6 +621,119 @@
                 console.error('Error:', error);
                 alert('Failed to load job details. Please try again.');
             });
+    }
+
+    // Render applications table
+    function renderApplicationsTable(applications) {
+        const container = document.getElementById('applications_table_container');
+        const countBadge = document.getElementById('applications_count');
+        
+        // Update count badge
+        const count = applications.length;
+        countBadge.textContent = `${count} Application${count !== 1 ? 's' : ''}`;
+        
+        if (count === 0) {
+            container.innerHTML = `
+                <div class="text-center py-4 text-muted">
+                    <i class="fas fa-inbox fa-3x mb-3"></i>
+                    <p class="mb-0">No applications received for this job yet.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // Generate table HTML
+        let tableHtml = `
+            <div class="table-responsive">
+                <table class="table table-hover table-striped" style="border-radius: 8px; overflow: hidden;">
+                    <thead class="table-dark">
+                        <tr>
+                            <th style="width: 50px;">#</th>
+                            <th>Candidate</th>
+                            <th>Qualification</th>
+                            <th>Applied Date</th>
+                            <th>Status</th>
+                            <th style="width: 150px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        applications.forEach((app, index) => {
+            const candidate = app.user;
+            const fullName = candidate ? candidate.full_name : 'Unknown';
+            const email = candidate ? candidate.email : 'N/A';
+            const avatar = candidate && candidate.image_path 
+                ? `<img src="${candidate.image_path}" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" onerror="this.src='{{ asset('assets/images/default-avatar.png') }}'; this.onerror=null;">`
+                : `<div class="rounded-circle d-flex align-items-center justify-content-center" 
+                       style="width: 40px; height: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                     <i class="fas fa-user"></i>
+                   </div>`;
+            
+            // Get qualifications
+            let qualifications = 'N/A';
+            if (candidate && candidate.candidate_qualifications && candidate.candidate_qualifications.length > 0) {
+                qualifications = candidate.candidate_qualifications.map(q => q.qualification?.degree || 'N/A').join(', ');
+                if (qualifications.length > 30) {
+                    qualifications = qualifications.substring(0, 30) + '...';
+                }
+            }
+            
+            // Format date
+            const appliedDate = app.applied_at 
+                ? new Date(app.applied_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+                : 'N/A';
+            
+            // Status badge
+            let statusBadge = '';
+            switch(app.status) {
+                case 'pending':
+                    statusBadge = '<span class="badge bg-warning text-dark">Pending</span>';
+                    break;
+                case 'shortlisted':
+                    statusBadge = '<span class="badge bg-info">Shortlisted</span>';
+                    break;
+                case 'hired':
+                    statusBadge = '<span class="badge bg-success">Hired</span>';
+                    break;
+                case 'rejected':
+                    statusBadge = '<span class="badge bg-danger">Rejected</span>';
+                    break;
+                default:
+                    statusBadge = `<span class="badge bg-secondary">${app.status}</span>`;
+            }
+            
+            tableHtml += `
+                <tr>
+                    <td class="align-middle">${index + 1}</td>
+                    <td class="align-middle">
+                        <div class="d-flex align-items-center">
+                            ${avatar}
+                            <div class="ms-3">
+                                <div class="fw-semibold">${fullName}</div>
+                                <small class="text-muted">${email}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="align-middle text-muted">${qualifications}</td>
+                    <td class="align-middle text-muted">${appliedDate}</td>
+                    <td class="align-middle">${statusBadge}</td>
+                    <td class="align-middle">
+                        <button class="btn btn-sm btn-outline-primary" onclick="viewApplicationDetail(${app.id})">
+                            <i class="fas fa-eye me-1"></i>View
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        tableHtml += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+        
+        container.innerHTML = tableHtml;
     }
 
     // Edit Job Function
@@ -633,6 +794,209 @@
         
         var deleteModal = new bootstrap.Modal(document.getElementById('deleteJobModal'));
         deleteModal.show();
+    }
+
+    // View Application Detail Function
+    function viewApplicationDetail(applicationId) {
+        // Show loading state
+        document.getElementById('applicationDetailBody').innerHTML = `
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2 text-muted">Loading application details...</p>
+            </div>
+        `;
+        
+        // Show the modal
+        var appDetailModal = new bootstrap.Modal(document.getElementById('applicationDetailModal'));
+        appDetailModal.show();
+        
+        // Fetch application details
+        fetch(`/employer/application/${applicationId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to load application details');
+                }
+                return response.json();
+            })
+            .then(data => {
+                renderApplicationDetail(data.application);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('applicationDetailBody').innerHTML = `
+                    <div class="text-center py-5 text-danger">
+                        <i class="fas fa-exclamation-circle fa-3x mb-3"></i>
+                        <h5>Failed to load application details</h5>
+                        <p class="text-muted">Please try again later</p>
+                    </div>
+                `;
+            });
+    }
+
+    // Render Application Detail
+    function renderApplicationDetail(application) {
+        const candidate = application.user;
+        const job = application.job_post;
+        
+        // Get candidate info
+        const fullName = candidate ? candidate.full_name : 'Unknown';
+        const email = candidate ? candidate.email : 'N/A';
+        const mobile = candidate ? candidate.mobile : 'N/A';
+        const avatar = candidate && candidate.image_path 
+            ? `<img src="${candidate.image_path}" class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover; border: 3px solid #667eea;" onerror="this.src='{{ asset('assets/images/default-avatar.png') }}'; this.onerror=null;">`
+            : `<div class="rounded-circle mb-3 d-flex align-items-center justify-content-center" 
+                   style="width: 100px; height: 100px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 40px; margin: 0 auto;">
+                 <i class="fas fa-user"></i>
+               </div>`;
+        
+        // Get qualifications
+        let qualificationsHtml = '';
+        if (candidate && candidate.candidate_qualifications && candidate.candidate_qualifications.length > 0) {
+            qualificationsHtml = candidate.candidate_qualifications.map(q => `
+                <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded">
+                    <div>
+                        <strong>${q.qualification?.degree || 'N/A'}</strong>
+                        ${q.university ? `<br><small class="text-muted">${q.university}</small>` : ''}
+                    </div>
+                    ${q.percentage ? `<span class="badge bg-primary">${q.percentage}%</span>` : ''}
+                </div>
+            `).join('');
+        } else {
+            qualificationsHtml = '<p class="text-muted">No qualifications listed</p>';
+        }
+        
+        // Get experiences
+        let experiencesHtml = '';
+        if (candidate && candidate.candidate_experiences && candidate.candidate_experiences.length > 0) {
+            experiencesHtml = candidate.candidate_experiences.map(exp => `
+                <div class="mb-2 p-2 bg-light rounded">
+                    <div class="d-flex justify-content-between">
+                        <strong>${exp.industry?.industry_name || 'N/A'}</strong>
+                        <small class="text-muted">${exp.from_year} - ${exp.to_year || 'Present'}</small>
+                    </div>
+                    ${exp.company ? `<small class="text-muted">${exp.company}</small>` : ''}
+                    ${exp.years_of_experience ? `<br><small class="text-info">${exp.years_of_experience} years experience</small>` : ''}
+                </div>
+            `).join('');
+        } else {
+            experiencesHtml = '<p class="text-muted">No experience listed</p>';
+        }
+        
+        // Status badge
+        let statusBadge = '';
+        let statusClass = '';
+        switch(application.status) {
+            case 'pending':
+                statusBadge = 'Pending';
+                statusClass = 'bg-warning text-dark';
+                break;
+            case 'shortlisted':
+                statusBadge = 'Shortlisted';
+                statusClass = 'bg-info';
+                break;
+            case 'hired':
+                statusBadge = 'Hired';
+                statusClass = 'bg-success';
+                break;
+            case 'rejected':
+                statusBadge = 'Rejected';
+                statusClass = 'bg-danger';
+                break;
+            default:
+                statusBadge = application.status;
+                statusClass = 'bg-secondary';
+        }
+        
+        // Applied date
+        const appliedDate = application.applied_at 
+            ? new Date(application.applied_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+            : 'N/A';
+        
+        // Cover letter
+        const coverLetterHtml = application.cover_letter 
+            ? `<div class="card border-0 bg-light mb-3">
+                 <div class="card-body">
+                     <h6 class="fw-bold text-dark mb-2"><i class="fas fa-file-alt me-2"></i>Cover Letter</h6>
+                     <p class="mb-0" style="white-space: pre-wrap;">${application.cover_letter}</p>
+                 </div>
+               </div>`
+            : '';
+        
+        // Employer notes
+        const notesHtml = application.employer_notes 
+            ? `<div class="card border-0 bg-light">
+                 <div class="card-body">
+                     <h6 class="fw-bold text-warning mb-2"><i class="fas fa-sticky-note me-2"></i>Your Notes</h6>
+                     <p class="mb-0">${application.employer_notes}</p>
+                 </div>
+               </div>`
+            : '';
+        
+        // Generate full HTML
+        const html = `
+            <div class="row">
+                <!-- Candidate Profile Card -->
+                <div class="col-md-4 text-center mb-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body p-4">
+                            ${avatar}
+                            <h4 class="fw-bold mb-1">${fullName}</h4>
+                            <p class="text-muted mb-2">
+                                <i class="fas fa-envelope me-1"></i>${email}
+                            </p>
+                            <p class="text-muted mb-3">
+                                <i class="fas fa-phone me-1"></i>${mobile}
+                            </p>
+                            <span class="badge ${statusClass} fs-6 px-3 py-2">${statusBadge}</span>
+                            
+                            <hr class="my-3">
+                            
+                            <div class="text-start">
+                                <small class="text-muted d-block mb-1"><i class="fas fa-calendar me-1"></i>Applied: ${appliedDate}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Details Column -->
+                <div class="col-md-8">
+                    <!-- Job Info -->
+                    <div class="card border-0 bg-light mb-3">
+                        <div class="card-body">
+                            <h6 class="fw-bold text-primary mb-2"><i class="fas fa-briefcase me-2"></i>Applied Position</h6>
+                            <p class="mb-1 fw-semibold">${job.industry?.industry_name || 'N/A'}</p>
+                            <p class="small text-muted mb-0">${job.description}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Qualifications -->
+                    <div class="card border-0 bg-light mb-3">
+                        <div class="card-body">
+                            <h6 class="fw-bold text-success mb-2"><i class="fas fa-graduation-cap me-2"></i>Qualifications</h6>
+                            ${qualificationsHtml}
+                        </div>
+                    </div>
+                    
+                    <!-- Experience -->
+                    <div class="card border-0 bg-light mb-3">
+                        <div class="card-body">
+                            <h6 class="fw-bold text-info mb-2"><i class="fas fa-briefcase me-2"></i>Experience</h6>
+                            ${experiencesHtml}
+                        </div>
+                    </div>
+                    
+                    <!-- Cover Letter -->
+                    ${coverLetterHtml}
+                    
+                    <!-- Employer Notes -->
+                    ${notesHtml}
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('applicationDetailBody').innerHTML = html;
     }
 </script>
 @endsection

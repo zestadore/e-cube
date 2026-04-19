@@ -126,7 +126,14 @@ class JobPostController extends Controller
             abort(403, 'Unauthorized action.');
         }
         
-        return response()->json($job->load(['qualification', 'parentQualification', 'industry']));
+        // Load job with applications and candidate details
+        $job->load(['qualification', 'parentQualification', 'industry', 'applications' => function($query) {
+            $query->with(['user' => function($q) {
+                $q->with(['basicDetails', 'candidateQualifications.qualification']);
+            }])->orderBy('applied_at', 'desc');
+        }]);
+        
+        return response()->json($job);
     }
 
     /**
@@ -207,6 +214,7 @@ class JobPostController extends Controller
         // Get employer's selected industry
         $profile = CompanyProfile::where('user_id', Auth::id())->first();
         $userIndustryId = $profile ? $profile->industry_id : null;
+        $userIndustryName = null;
         
         // Get all industries under employer's category for filter
         $availableIndustries = [];
@@ -214,17 +222,19 @@ class JobPostController extends Controller
             $parentIndustry = Industry::with('children')->find($userIndustryId);
             if ($parentIndustry) {
                 $availableIndustries = $this->getAllChildrenRecursive($parentIndustry);
+                $userIndustryName = $parentIndustry->industry_name;
             }
         }
+        
         // Build query for candidates
         $query = \App\Models\User::where('role', 'employee')
             ->where('mobile_verified_at', '!=', null)
             ->with(['basicDetails', 'candidateExperiences.industry', 'candidateQualifications.qualification', 'candidateSkills']);
         
-        // Filter by industry if selected
-        if ($request->filled('industry_id')) {
+        // Filter by sub-industry if selected
+        if ($request->filled('sub_industry_id')) {
             $query->whereHas('candidateExperiences', function($q) use ($request) {
-                $q->where('industry_id', $request->industry_id);
+                $q->where('industry_id', $request->sub_industry_id);
             });
         } elseif ($userIndustryId) {
             // Show candidates from employer's industry category
@@ -261,7 +271,7 @@ class JobPostController extends Controller
         // Get qualifications for filter
         $qualifications = Qualification::all();
         
-        return view('users.jobs.find-talent', compact('candidates', 'availableIndustries', 'qualifications', 'userIndustryId'));
+        return view('users.jobs.find-talent', compact('candidates', 'availableIndustries', 'qualifications', 'userIndustryId', 'userIndustryName'));
     }
 
     /**
@@ -749,7 +759,8 @@ class JobPostController extends Controller
         // Filter by candidate name
         if ($request->filled('search')) {
             $query->whereHas('user', function($q) use ($request) {
-                $q->where('full_name', 'like', '%' . $request->search . '%')
+                $q->where('first_name', 'like', '%' . $request->search . '%')
+                  ->orWhere('last_name', 'like', '%' . $request->search . '%')
                   ->orWhere('email', 'like', '%' . $request->search . '%');
             });
         }
@@ -827,6 +838,29 @@ class JobPostController extends Controller
 
         return response()->json([
             'application' => $application,
+        ]);
+    }
+
+    /**
+     * Get applications for a specific job (AJAX)
+     */
+    public function getJobApplications($jobId)
+    {
+        $job = JobPost::where('id', $jobId)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+
+        $applications = JobApplication::with([
+            'user' => function($q) {
+                $q->with(['basicDetails', 'candidateQualifications.qualification']);
+            }
+        ])
+            ->where('job_post_id', $jobId)
+            ->orderBy('applied_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'applications' => $applications,
         ]);
     }
 }

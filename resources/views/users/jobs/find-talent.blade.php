@@ -164,18 +164,40 @@
                     <i class="fas fa-filter text-primary me-2"></i>Filters
                 </h5>
                 <form method="GET" action="{{ route('employer.find-talent') }}">
-                    <!-- Industry Filter -->
+                    <!-- Industry Filter - Read Only (Employer's Registered Industry) -->
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Industry</label>
-                        <select name="industry_id" class="form-select">
-                            <option value="">All Industries</option>
+                        <label class="form-label fw-semibold">Industry Category</label>
+                        @if($userIndustryName)
+                            <div class="form-control bg-light d-flex align-items-center justify-content-between" style="cursor: not-allowed;">
+                                <span><i class="fas fa-building text-primary me-2"></i>{{ $userIndustryName }}</span>
+                                <span class="badge bg-success">Registered</span>
+                            </div>
+                            <small class="text-muted">Your registered industry category</small>
+                            <input type="hidden" name="industry_id" value="{{ $userIndustryId }}">
+                        @else
+                            <div class="alert alert-warning mb-0">
+                                <i class="fas fa-exclamation-triangle me-2"></i>No industry selected. Please update your company profile.
+                            </div>
+                        @endif
+                    </div>
+                    
+                    <!-- Sub-Industry Filter (Optional) -->
+                    @if(count($availableIndustries) > 1)
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Sub-Industry <small class="text-muted">(Optional)</small></label>
+                        <select name="sub_industry_id" class="form-select">
+                            <option value="">All Sub-Industries</option>
                             @foreach($availableIndustries as $industry)
-                                <option value="{{ $industry['id'] }}" {{ request('industry_id') == $industry['id'] ? 'selected' : '' }}>
-                                    {{ $industry['name'] }}
-                                </option>
+                                @if($industry['id'] != $userIndustryId)
+                                    <option value="{{ $industry['id'] }}" {{ request('sub_industry_id') == $industry['id'] ? 'selected' : '' }}>
+                                        {{ $industry['name'] }}
+                                    </option>
+                                @endif
                             @endforeach
                         </select>
+                        <small class="text-muted">Filter by specific sub-industry</small>
                     </div>
+                    @endif
 
                     <!-- Qualification Filter -->
                     <div class="mb-3">
@@ -233,7 +255,8 @@
                                 <div class="position-relative d-inline-block mb-3">
                                     <img src="{{ $candidate->image_path ?? asset('assets/images/default-avatar.png') }}" 
                                          alt="Candidate" 
-                                         class="candidate-photo shadow-sm">
+                                         class="candidate-photo shadow-sm"
+                                         onerror="this.src='{{ asset('assets/images/default-avatar.png') }}'; this.onerror=null;">
                                     <div class="position-absolute top-50 start-50 translate-middle">
                                         <i class="fas fa-lock text-white fa-lg" style="text-shadow: 0 2px 4px rgba(0,0,0,0.5);"></i>
                                     </div>
@@ -914,7 +937,8 @@
                     <div class="position-relative d-inline-block mb-3">
                         <img src="${candidate.image_path || '/assets/images/default-avatar.png'}" 
                              alt="Candidate" 
-                             class="${photoClass} shadow">
+                             class="${photoClass} shadow"
+                             onerror="this.src='/assets/images/default-avatar.png'; this.onerror=null;">
                         ${photoOverlay}
                     </div>
                     <h4 class="fw-bold mb-2">${candidate.full_name}</h4>

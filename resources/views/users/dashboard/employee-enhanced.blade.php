@@ -509,7 +509,10 @@
                         </p>
                     </div>
                     <div class="col-md-4 text-end">
-                        <img src="{{Auth::user()->image_path}}" alt="Profile" class="profile-avatar-large">
+                        <img src="{{Auth::user()->image_path ?? asset('assets/images/default-avatar.png')}}" 
+                             alt="Profile" 
+                             class="profile-avatar-large"
+                             onerror="this.src='{{ asset('assets/images/default-avatar.png') }}'; this.onerror=null;">
                     </div>
                 </div>
             </div>

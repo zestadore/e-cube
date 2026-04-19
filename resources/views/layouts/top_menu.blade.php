@@ -197,7 +197,10 @@
             </li>
             <li class="nav-item dropdown">
                 <a class="py-0 nav-link d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <img src="{{Auth::user()->image_path}}" alt="User-Profile" class="theme-color-default-img img-fluid avatar avatar-50 avatar-rounded">
+                <img src="{{Auth::user()->image_path ?? asset('assets/images/default-avatar.png')}}" 
+                     alt="User-Profile" 
+                     class="theme-color-default-img img-fluid avatar avatar-50 avatar-rounded"
+                     onerror="this.src='{{ asset('assets/images/default-avatar.png') }}'; this.onerror=null;">
                 <div class="caption ms-3 d-none d-md-block ">
                     <h6 class="mb-0 caption-title">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</h6>
                     <p class="mb-0 caption-sub-title">{{ ucfirst(Auth::user()->role)}}</p>

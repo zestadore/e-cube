@@ -175,7 +175,8 @@
                                     @if($application->user && $application->user->image_path)
                                         <img src="{{ $application->user->image_path }}" 
                                              alt="Candidate" 
-                                             class="candidate-avatar me-3">
+                                             class="candidate-avatar me-3"
+                                             onerror="this.src='{{ asset('assets/images/default-avatar.png') }}'; this.onerror=null;">
                                     @else
                                         <div class="candidate-avatar-placeholder me-3">
                                             <i class="fas fa-user"></i>
@@ -393,7 +394,7 @@
                 <!-- Candidate Info -->
                 <div class="col-md-4 text-center mb-4">
                     ${candidate.image_path ? 
-                        `<img src="${candidate.image_path}" class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">` :
+                        `<img src="${candidate.image_path}" class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;" onerror="this.src='{{ asset('assets/images/default-avatar.png') }}'; this.onerror=null;">` :
                         `<div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" 
                              style="width: 100px; height: 100px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 40px;">
                             <i class="fas fa-user"></i>

@@ -49,7 +49,10 @@
                             <div class="d-flex flex-wrap align-items-center justify-content-between">
                                 <div class="d-flex flex-wrap align-items-center">
                                     <div class="profile-img position-relative me-3 mb-3 mb-lg-0 profile-logo profile-logo1">
-                                        <img src="{{Auth::user()->image_path}}" alt="User-Profile" class="theme-color-default-img img-fluid rounded-pill avatar-100">
+                                        <img src="{{Auth::user()->image_path ?? asset('assets/images/default-avatar.png')}}" 
+                                             alt="User-Profile" 
+                                             class="theme-color-default-img img-fluid rounded-pill avatar-100"
+                                             onerror="this.src='{{ asset('assets/images/default-avatar.png') }}'; this.onerror=null;">
                                     </div>
                                     <div class="d-flex flex-wrap align-items-center mb-3 mb-sm-0">
                                         <h4 class="me-2 h4">{{Auth::user()->full_name}}</h4>
@@ -369,7 +372,10 @@
                         </div>
                         <div class="card-body">
                             <div class="user-profile">
-                                <img src="{{Auth::user()->image_path}}" alt="profile-img" class="rounded-pill avatar-130 img-fluid">
+                                <img src="{{Auth::user()->image_path ?? asset('assets/images/default-avatar.png')}}" 
+                                     alt="profile-img" 
+                                     class="rounded-pill avatar-130 img-fluid"
+                                     onerror="this.src='{{ asset('assets/images/default-avatar.png') }}'; this.onerror=null;">
                             </div>
                         </div>
                     </div>

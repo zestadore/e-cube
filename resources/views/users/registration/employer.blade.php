@@ -155,18 +155,34 @@
                             <div class="input-group">
                                 <input type="hidden" name="industry_id" id="industry_id" value="{{ $profile->industry_id ?? 0 }}">
                                 <input type="text" 
-                                    class="form-control {{ $errors->has('industry_id') ? 'is-invalid' : '' }}" 
+                                    class="form-control {{ $profile && $profile->industry_id ? 'bg-light' : '' }} {{ $errors->has('industry_id') ? 'is-invalid' : '' }}" 
                                     id="industry_display" 
                                     value="{{ $profile && $profile->industry_id ? $profile->industry->industry_name : 'No industry selected' }}" 
-                                    readonly>
-                                <button type="button" class="btn btn-outline-primary" id="selectIndustryBtn">
-                                    Select Industry
-                                </button>
+                                    readonly 
+                                    style="{{ $profile && $profile->industry_id ? 'cursor: not-allowed;' : '' }}">
+                                
+                                @if($profile && $profile->industry_id)
+                                    {{-- Industry already selected - show locked icon --}}
+                                    <span class="input-group-text bg-light text-muted">
+                                        <i class="fas fa-lock"></i>
+                                    </span>
+                                @else
+                                    {{-- No industry selected yet - show select button --}}
+                                    <button type="button" class="btn btn-outline-primary" id="selectIndustryBtn">
+                                        Select Industry
+                                    </button>
+                                @endif
                             </div>
                             @if($errors->has('industry_id'))
                                 <div class="invalid-feedback">
                                     {{ $errors->first('industry_id') }}
                                 </div>
+                            @endif
+                            
+                            @if($profile && $profile->industry_id)
+                                <small class="text-muted">Industry cannot be changed after registration. Contact admin for changes.</small>
+                            @else
+                                <small class="text-muted">Please select an industry to complete registration.</small>
                             @endif
                         </div>
                     </div>
