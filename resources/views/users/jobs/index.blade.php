@@ -150,10 +150,10 @@
                 <div class="modal-body p-4">
                     <div class="row">
                         <div class="col-md-12 mb-3">
-                            <label for="industry_id" class="form-label fw-semibold">Job Industry <span class="text-danger">*</span></label>
+                            <label for="industry_id" class="form-label fw-semibold">Job Role <span class="text-danger">*</span></label>
                             <select class="form-select @error('industry_id') is-invalid @enderror" 
                                     id="industry_id" name="industry_id" required style="border-radius: 8px;">
-                                <option value="">Select Job Industry</option>
+                                <option value="">Select Job Role</option>
                                 @foreach($jobIndustries as $industry)
                                     <option value="{{ $industry['id'] }}" {{ old('industry_id') == $industry['id'] ? 'selected' : '' }}>
                                         {{ $industry['name'] }}
@@ -273,7 +273,7 @@
                     </div>
                     
                     <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold text-muted">Job Industry</label>
+                        <label class="form-label fw-semibold text-muted">Job Role</label>
                         <p class="fw-semibold"><i class="fas fa-industry text-primary me-2"></i><span id="view_industry"></span></p>
                     </div>
                     
@@ -375,9 +375,9 @@
                 <div class="modal-body p-4">
                     <div class="row">
                         <div class="col-md-12 mb-3">
-                            <label for="edit_industry_id" class="form-label fw-semibold">Job Industry <span class="text-danger">*</span></label>
+                            <label for="edit_industry_id" class="form-label fw-semibold">Job Role <span class="text-danger">*</span></label>
                             <select class="form-select" id="edit_industry_id" name="industry_id" required style="border-radius: 8px;">
-                                <option value="">Select Job Industry</option>
+                                <option value="">Select Job Role</option>
                                 @foreach($jobIndustries as $industry)
                                     <option value="{{ $industry['id'] }}">{{ $industry['name'] }}</option>
                                 @endforeach

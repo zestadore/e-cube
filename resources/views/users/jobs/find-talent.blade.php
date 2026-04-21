@@ -184,9 +184,9 @@
                     <!-- Sub-Industry Filter (Optional) -->
                     @if(count($availableIndustries) > 1)
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Sub-Industry <small class="text-muted">(Optional)</small></label>
+                        <label class="form-label fw-semibold">Job Roles <small class="text-muted">(Optional)</small></label>
                         <select name="sub_industry_id" class="form-select">
-                            <option value="">All Sub-Industries</option>
+                            <option value="">All Job Roles</option>
                             @foreach($availableIndustries as $industry)
                                 @if($industry['id'] != $userIndustryId)
                                     <option value="{{ $industry['id'] }}" {{ request('sub_industry_id') == $industry['id'] ? 'selected' : '' }}>
