@@ -391,7 +391,42 @@ class BasicDetailsController extends Controller
     }
 
     /**
-     * Get qualification children for AJAX
+     * Get candidate profile data as JSON for modal
+     */
+    public function getProfileData()
+    {
+        $user = Auth::user();
+        $basics = $user->basics;
+        $presentAddress = $user->presentAddress;
+        $permanentAddress = $user->permanentAddress;
+        $candidateQualifications = $user->qualifications()->with('qualification')->get();
+        $candidateSkills = $user->skills()->with('skill')->get();
+        $candidateExperiences = $user->experiences()->with('industry')->get();
+        $hobbies = CandidateHobby::where('user_id', $user->id)->first();
+
+        return response()->json([
+            'user' => [
+                'id' => $user->id,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'full_name' => $user->first_name . ' ' . $user->last_name,
+                'email' => $user->email,
+                'mobile' => $user->mobile,
+                'image_path' => $user->image_path,
+                'signature_image' => $user->signature_image,
+            ],
+            'basics' => $basics,
+            'present_address' => $presentAddress,
+            'permanent_address' => $permanentAddress,
+            'qualifications' => $candidateQualifications,
+            'skills' => $candidateSkills,
+            'experiences' => $candidateExperiences,
+            'hobbies' => $hobbies,
+        ]);
+    }
+
+    /**
+     * Get qualification direct children for AJAX (Level by Level)
      */
     public function getQualificationChildren($id)
     {
@@ -400,7 +435,7 @@ class BasicDetailsController extends Controller
             return response()->json([]);
         }
         
-        $children = $qualification->children()->get(['id', 'degree as name']);
+        $children = $qualification->children()->get(['qualifications.id', 'qualifications.degree as name']);
         return response()->json($children);
     }
 
@@ -461,6 +496,23 @@ class BasicDetailsController extends Controller
             ];
         });
         return response()->json($roles);
+    }
+
+    /**
+     * Get industry skills for AJAX
+     */
+    public function getIndustrySkills($id)
+    {
+        $industry = \App\Models\Industry::find($id);
+        if (!$industry) {
+            return response()->json([]);
+        }
+        
+        $skills = \App\Models\ComputerAndOtherSkill::where('industry_id', $id)
+            ->orWhereNull('industry_id')
+            ->get(['id', 'skill as name']);
+            
+        return response()->json($skills);
     }
 
     // Helper methods
@@ -559,7 +611,7 @@ class BasicDetailsController extends Controller
             \App\Models\CandidateExperience::create([
                 'user_id' => Auth::id(),
                 'industry_id' => $exp['industry_id'],
-                'role_ids' => json_encode($exp['role_ids'] ?? []),
+                'role_ids' => json_encode([$exp['role_id'] ?? null]),
                 'company' => $exp['company'],
                 'location' => $exp['location'] ?? null,
                 'from_year' => $exp['from_year'],
@@ -834,7 +886,7 @@ class BasicDetailsController extends Controller
                 CandidateExperience::create([
                     'user_id' => Auth::id(),
                     'industry_id' => $exp['industry_id'],
-                    'role_ids' => json_encode($exp['role_ids'] ?? []),
+                    'role_ids' => json_encode([$exp['role_id'] ?? null]),
                     'company' => $exp['company'],
                     'location' => $exp['location'] ?? null,
                     'from_year' => $exp['from_year'],

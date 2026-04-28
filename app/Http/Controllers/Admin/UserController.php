@@ -18,6 +18,10 @@ class UserController extends Controller
             if ($search) {
                 $data->where('first_name', 'like', '%' . $search . '%');
             }
+            $role = $request->role;
+            if ($role) {
+                $data->where('role', $role);
+            }
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('user', function ($row) {

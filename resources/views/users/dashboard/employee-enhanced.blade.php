@@ -824,9 +824,9 @@
                             <a href="{{route('employee.find-jobs')}}" class="btn btn-gradient w-100 mb-3">
                                 <i class="fas fa-briefcase me-2"></i>Find Jobs
                             </a>
-                            <a href="{{route('candidate.profile')}}" class="btn btn-outline-primary w-100 mb-3">
+                            <button class="btn btn-outline-primary w-100 mb-3" onclick="openViewProfileModal()">
                                 <i class="fas fa-eye me-2"></i>View Profile
-                            </a>
+                            </button>
                             <a href="{{route('subscription.packages')}}" class="btn btn-outline-success w-100 mb-3">
                                 <i class="fas fa-crown me-2"></i>Subscription
                             </a>
@@ -910,14 +910,45 @@
 
         <!-- Floating Action Buttons -->
         <div class="fab-container">
-            <a href="{{route('candidate.profile')}}" class="fab-btn info" title="View Profile">
+            <button class="fab-btn info" onclick="openViewProfileModal()" title="View Profile">
                 <i class="fas fa-user"></i>
                 <span class="tooltip">View Profile</span>
-            </a>
+            </button>
             <a href="{{route('subscription.packages')}}" class="fab-btn success" title="Subscription">
                 <i class="fas fa-crown"></i>
                 <span class="tooltip">Subscription</span>
             </a>
+        </div>
+
+        <!-- View Profile Modal -->
+        <div class="modal fade" id="viewProfileModal" tabindex="-1" aria-labelledby="viewProfileModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                <div class="modal-content" style="border-radius: 15px;">
+                    <div class="modal-header" style="background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);">
+                        <h5 class="modal-title text-white" id="viewProfileModalLabel">
+                            <i class="fas fa-user-circle me-2"></i>My Profile
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4" id="viewProfileModalBody">
+                        <!-- Content loaded via AJAX -->
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2 text-muted">Loading profile details...</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 px-4 pb-4">
+                        <a href="{{route('candidate.profile')}}" class="btn btn-primary">
+                            <i class="fas fa-external-link-alt me-2"></i>View Full Page
+                        </a>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 8px;">
+                            <i class="fas fa-times me-2"></i>Close
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Edit Modals -->
@@ -964,5 +995,247 @@
             modal.show();
         }
     }
+
+    // View Profile Modal
+    function openViewProfileModal() {
+        const modal = new bootstrap.Modal(document.getElementById('viewProfileModal'));
+        modal.show();
+        
+        // Reset modal body
+        document.getElementById('viewProfileModalBody').innerHTML = `
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2 text-muted">Loading profile details...</p>
+            </div>
+        `;
+        
+        // Fetch profile details
+        fetch('{{ route("api.candidate.profile") }}')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                renderProfileDetails(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('viewProfileModalBody').innerHTML = `
+                    <div class="text-center py-5 text-danger">
+                        <i class="fas fa-exclamation-circle fa-3x mb-3"></i>
+                        <h5>Failed to load profile details</h5>
+                        <p class="text-muted">Please try again later</p>
+                    </div>
+                `;
+            });
+    }
+
+    function renderProfileDetails(data) {
+        const user = data.user;
+        const basics = data.basics;
+        const presentAddress = data.present_address;
+        const permanentAddress = data.permanent_address;
+        const qualifications = data.qualifications;
+        const skills = data.skills;
+        const experiences = data.experiences;
+        const hobbies = data.hobbies;
+        
+        let html = `
+            <div class="row">
+                <!-- Profile Header -->
+                <div class="col-12 text-center mb-4">
+                    ${user.image_path ? 
+                        `<img src="${user.image_path}" class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover; border: 4px solid #4e73df;" onerror="this.src='{{ asset('assets/images/default-avatar.png') }}'; this.onerror=null;">` :
+                        `<div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" 
+                             style="width: 100px; height: 100px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 40px;">
+                            <i class="fas fa-user"></i>
+                        </div>`
+                    }
+                    <h4 class="fw-bold mb-1">${user.full_name || 'Unknown'}</h4>
+                    <p class="text-muted mb-2">${user.email || 'N/A'}</p>
+                    <p class="text-muted mb-2"><i class="fas fa-phone me-1"></i>${user.mobile || 'N/A'}</p>
+                    ${basics?.profession ? `<span class="badge bg-success">${basics.profession}</span>` : ''}
+                </div>
+                
+                <!-- Basic Information -->
+                <div class="col-md-6 mb-3">
+                    <div class="card border-0 bg-light h-100">
+                        <div class="card-body">
+                            <h6 class="fw-bold text-primary mb-3"><i class="fas fa-user me-2"></i>Basic Information</h6>
+                            <div class="mb-2"><strong>Date of Birth:</strong> ${basics?.dob || 'Not provided'}</div>
+                            <div class="mb-2"><strong>Gender:</strong> ${basics?.gender || 'Not provided'}</div>
+                            <div class="mb-2"><strong>Aadhar:</strong> ${basics?.aadhar_number || 'Not provided'}</div>
+                            <div class="mb-2"><strong>PAN:</strong> ${basics?.pan_number || 'Not provided'}</div>
+                            <div class="mb-2"><strong>Passport:</strong> ${basics?.passport_number || 'Not provided'}</div>
+                            <div class="mb-2"><strong>Job Type:</strong> ${basics?.Job_type || 'Not specified'}</div>
+                            <div class="mb-2"><strong>Experience:</strong> ${basics?.experience || 'Not specified'}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Contact Information -->
+                <div class="col-md-6 mb-3">
+                    <div class="card border-0 bg-light h-100">
+                        <div class="card-body">
+                            <h6 class="fw-bold text-info mb-3"><i class="fas fa-address-book me-2"></i>Contact Details</h6>
+                            <div class="mb-2"><strong>Email:</strong> ${user.email || 'N/A'}</div>
+                            <div class="mb-2"><strong>Mobile:</strong> ${user.mobile || 'N/A'}</div>
+                            <div class="mb-2"><strong>Alt. Mobile:</strong> ${basics?.alternate_mobile_number || 'Not provided'}</div>
+                            <div class="mb-2"><strong>WhatsApp:</strong> ${basics?.whatsapp_number || 'Not provided'}</div>
+                            <div class="mb-2"><strong>Alt. Email:</strong> ${basics?.alternate_email_id || 'Not provided'}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Addresses -->
+                <div class="col-md-6 mb-3">
+                    <div class="card border-0 bg-light h-100">
+                        <div class="card-body">
+                            <h6 class="fw-bold text-success mb-3"><i class="fas fa-map-marker-alt me-2"></i>Present Address</h6>
+                            ${presentAddress ? `
+                                <p class="mb-1">${presentAddress.address_1 || ''} ${presentAddress.address_2 || ''}</p>
+                                <p class="mb-1">${presentAddress.city || ''}, ${presentAddress.state || ''} - ${presentAddress.zip || ''}</p>
+                                <p class="mb-1">${presentAddress.country || ''}</p>
+                                <p class="mb-0"><strong>Police Station:</strong> ${presentAddress.police_station || 'N/A'}</p>
+                            ` : '<p class="text-muted">No address added</p>'}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <div class="card border-0 bg-light h-100">
+                        <div class="card-body">
+                            <h6 class="fw-bold text-warning mb-3"><i class="fas fa-home me-2"></i>Permanent Address</h6>
+                            ${permanentAddress ? `
+                                <p class="mb-1">${permanentAddress.address_1 || ''} ${permanentAddress.address_2 || ''}</p>
+                                <p class="mb-1">${permanentAddress.city || ''}, ${permanentAddress.state || ''} - ${permanentAddress.zip || ''}</p>
+                                <p class="mb-1">${permanentAddress.country || ''}</p>
+                                <p class="mb-0"><strong>Police Station:</strong> ${permanentAddress.police_station || 'N/A'}</p>
+                            ` : '<p class="text-muted">No address added</p>'}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Qualifications -->
+                ${qualifications?.length > 0 ? `
+                <div class="col-12 mb-3">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="fw-bold text-success mb-3"><i class="fas fa-graduation-cap me-2"></i>Education & Qualifications</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-borderless mb-0">
+                                    <tbody>
+                                        ${qualifications.map(q => `
+                                            <tr>
+                                                <td><strong>${q.qualification?.degree || 'N/A'}</strong></td>
+                                                <td>${q.university || '-'}</td>
+                                                <td>${q.institution || '-'}</td>
+                                                <td>${q.from_year} - ${q.to_year}</td>
+                                                <td>${q.percentage ? q.percentage + '%' : '-'}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+                
+                <!-- Experience -->
+                ${experiences?.length > 0 ? `
+                <div class="col-12 mb-3">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="fw-bold text-info mb-3"><i class="fas fa-briefcase me-2"></i>Work Experience</h6>
+                            ${experiences.map(exp => `
+                                <div class="mb-3 pb-3 border-bottom">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <strong class="text-primary">${exp.company || 'N/A'}</strong>
+                                            <p class="mb-1 text-muted">${exp.industry?.industry_name || 'Unknown Industry'}</p>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-info">${exp.from_year} - ${exp.to_year || 'Present'}</span>
+                                            ${exp.duration ? `<span class="badge bg-secondary ms-1">${exp.duration}</span>` : ''}
+                                        </div>
+                                    </div>
+                                    ${exp.responsibilities ? `<div class="mt-2"><strong>Responsibilities:</strong> ${exp.responsibilities}</div>` : ''}
+                                    ${exp.achievements ? `<div class="mt-1"><strong>Achievements:</strong> ${exp.achievements}</div>` : ''}
+                                    ${exp.present_salary ? `<span class="badge bg-warning text-dark me-1">Present: ₹${Number(exp.present_salary).toLocaleString()}</span>` : ''}
+                                    ${exp.expected_salary ? `<span class="badge bg-primary">Expected: ₹${Number(exp.expected_salary).toLocaleString()}</span>` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+                
+                <!-- Skills -->
+                ${skills?.length > 0 ? `
+                <div class="col-12 mb-3">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="fw-bold text-dark mb-3"><i class="fas fa-tools me-2"></i>Skills</h6>
+                            <div class="d-flex flex-wrap gap-2">
+                                ${skills.map(s => `
+                                    <span class="badge bg-success" style="font-size: 14px; padding: 8px 15px;">
+                                        ${s.skill?.skill || 'Unknown'} ${s.proficiency ? `(${s.proficiency})` : ''}
+                                    </span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+                
+                <!-- Hobbies -->
+                ${hobbies ? `
+                <div class="col-12 mb-3">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="fw-bold text-danger mb-3"><i class="fas fa-heart me-2"></i>Hobbies & Interests</h6>
+                            ${hobbies.description ? `<div class="mb-2">${hobbies.description}</div>` : ''}
+                            ${hobbies.interests ? `
+                                <div class="d-flex flex-wrap gap-2">
+                                    ${hobbies.interests.split(',').map(i => `
+                                        <span class="badge bg-danger" style="font-size: 12px;">${i.trim()}</span>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+                
+                <!-- Digital Signature -->
+                ${user.signature_image ? `
+                <div class="col-12 mb-3">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body text-center">
+                            <h6 class="fw-bold text-secondary mb-3"><i class="fas fa-signature me-2"></i>Digital Signature</h6>
+                            <img src="${user.signature_image}" alt="Signature" style="max-width: 300px; border: 1px solid #ddd; padding: 10px; background: #fff;">
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+            </div>
+        `;
+        
+        document.getElementById('viewProfileModalBody').innerHTML = html;
+    }
+
+    // Handle modal close - clean up backdrops
+    document.getElementById('viewProfileModal').addEventListener('hidden.bs.modal', function () {
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('overflow');
+        document.body.style.removeProperty('padding-right');
+    });
 </script>
 @endsection

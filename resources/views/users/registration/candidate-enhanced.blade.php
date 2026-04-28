@@ -671,11 +671,11 @@
                             </div>
                             
                             <div class="row">
-                                <!-- Main Parent Selection -->
-                                <div class="col-md-6">
+                                <!-- Level 1: Education Level (Parent) -->
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label class="form-label">Education Level <span class="text-danger">*</span></label>
-                                        <select class="form-select edu-main-parent" name="education[{index}][main_parent]" required onchange="loadAllChildren(this)">
+                                        <select class="form-select edu-level-1" name="education[{index}][level_1]" required onchange="loadLevel2(this)">
                                             <option value="">Select Education Level</option>
                                             @foreach($qualifications->where('parents', '[]') as $mainQual)
                                                 <option value="{{ $mainQual->id }}">{{ $mainQual->degree }}</option>
@@ -684,14 +684,24 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Specific Qualification (Hierarchical) -->
-                                <div class="col-md-6">
+                                <!-- Level 2: Intermediate Qualification -->
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Intermediate Qualification <span class="text-danger">*</span></label>
+                                        <select class="form-select edu-level-2" name="education[{index}][level_2]" required disabled onchange="loadLevel3(this)">
+                                            <option value="">Select Level 1 First</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <!-- Level 3: Final Qualification -->
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label class="form-label">Specific Qualification <span class="text-danger">*</span></label>
-                                        <select class="form-select edu-qualification" name="education[{index}][qualification_id]" required disabled>
-                                            <option value="">Select Education Level First</option>
+                                        <select class="form-select edu-level-3" name="education[{index}][qualification_id]" required disabled>
+                                            <option value="">Select Level 2 First</option>
                                         </select>
-                                        <small class="text-muted">Shows all sub-options with "-" prefixes</small>
+                                        <small class="text-muted">This will be saved as your qualification</small>
                                     </div>
                                 </div>
                             </div>
@@ -805,14 +815,13 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Job Roles (Multiple Select) -->
+                                <!-- Job Roles (Single Select) -->
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="form-label">Job Roles <span class="text-danger">*</span></label>
-                                        <select class="form-select exp-roles" name="experience[{index}][role_ids][]" multiple required disabled>
+                                        <label class="form-label">Job Role <span class="text-danger">*</span></label>
+                                        <select class="form-select exp-roles" name="experience[{index}][role_id]" required disabled>
                                             <option value="">Select Industry First</option>
                                         </select>
-                                        <small class="text-muted">Hold Ctrl/Cmd to select multiple roles</small>
                                     </div>
                                 </div>
                             </div>
@@ -882,25 +891,6 @@
                                 <textarea class="form-control summernote-achievements" name="experience[{index}][achievements]" rows="3"></textarea>
                             </div>
 
-                            <!-- Skills Achieved -->
-                            <div class="form-group">
-                                <label class="form-label">Skills Achieved <small class="text-muted">(Select up to 10)</small></label>
-                                <div class="skills-selector border rounded p-3" style="max-height: 200px; overflow-y: auto;">
-                                    <div class="row">
-                                        @foreach($skills as $skill)
-                                        <div class="col-md-4 mb-2">
-                                            <div class="form-check">
-                                                <input class="form-check-input exp-skill" type="checkbox" name="experience[{index}][skills][]" value="{{ $skill->id }}" id="skill_{index}_{{ $skill->id }}">
-                                                <label class="form-check-label" for="skill_{index}_{{ $skill->id }}">
-                                                    {{ $skill->skill }}
-                                                </label>
-                                            </div>
-                                        </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            </div>
-
                             <!-- Salary Fields -->
                             <div class="row salary-fields">
                                 <div class="col-md-6">
@@ -938,7 +928,7 @@
                             <!-- Skill entries will be added here -->
                         </div>
                         <div class="text-center mt-3">
-                            <button type="button" class="btn btn-outline-info" onclick="addSkillEntry()">
+                            <button type="button" class="btn btn-outline-info" onclick="addSkillEntry()" id="add-skill-btn">
                                 <i class="fas fa-plus me-2"></i>Add Skill
                             </button>
                         </div>
@@ -946,40 +936,49 @@
 
                     <!-- Skill Template -->
                     <template id="skill-template">
-                        <div class="skill-entry row align-items-end mb-3" data-index="{index}">
-                            <div class="col-md-5">
-                                <div class="form-group mb-0">
-                                    <label class="form-label">Skill <span class="text-danger">*</span></label>
-                                    <select class="form-select" name="skills[{index}][skill_id]" required>
-                                        <option value="">Select Skill</option>
-                                        @foreach($skills as $skill)
-                                            <option value="{{ $skill->id }}">{{ $skill->skill }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group mb-0">
-                                    <label class="form-label">Proficiency <span class="text-danger">*</span></label>
-                                    <select class="form-select" name="skills[{index}][proficiency]" required>
-                                        <option value="">Select</option>
-                                        <option value="Beginner">Beginner</option>
-                                        <option value="Intermediate">Intermediate</option>
-                                        <option value="Advanced">Advanced</option>
-                                        <option value="Expert">Expert</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group mb-0">
-                                    <label class="form-label">Certificate (Optional)</label>
-                                    <input type="file" class="form-control" name="skills[{index}][certificate]" accept=".pdf,.jpg,.jpeg,.png">
-                                </div>
-                            </div>
-                            <div class="col-md-1">
+                        <div class="skill-entry form-section-card mb-3" data-index="{index}" style="border-left-color: #36b9cc;">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="mb-0">Skill #{number}</h6>
                                 <button type="button" class="btn btn-danger btn-sm" onclick="removeSkillEntry(this)">
                                     <i class="fas fa-trash"></i>
                                 </button>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group mb-0">
+                                        <label class="form-label">Job Role <span class="text-danger">*</span></label>
+                                        <select class="form-select skill-role-select" name="skills[{index}][role_id]" required onchange="loadSkillsForEntry(this)">
+                                            <option value="">Select Job Role</option>
+                                            <!-- Options will be populated from experience section -->
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group mb-0">
+                                        <label class="form-label">Skill <span class="text-danger">*</span></label>
+                                        <select class="form-select skill-select" name="skills[{index}][skill_id]" required disabled>
+                                            <option value="">Select Job Role First</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group mb-0">
+                                        <label class="form-label">Proficiency <span class="text-danger">*</span></label>
+                                        <select class="form-select" name="skills[{index}][proficiency]" required>
+                                            <option value="">Select</option>
+                                            <option value="Beginner">Beginner</option>
+                                            <option value="Intermediate">Intermediate</option>
+                                            <option value="Advanced">Advanced</option>
+                                            <option value="Expert">Expert</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group mb-0">
+                                        <label class="form-label">Certificate (Optional)</label>
+                                        <input type="file" class="form-control" name="skills[{index}][certificate]" accept=".pdf,.jpg,.jpeg,.png">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </template>
@@ -1271,47 +1270,88 @@
         });
     }
 
-    function loadAllChildren(select) {
+    function loadLevel2(select) {
         const parentId = select.value;
         const entry = select.closest('.education-entry');
-        const qualSelect = entry.querySelector('.edu-qualification');
+        const level2Select = entry.querySelector('.edu-level-2');
+        const level3Select = entry.querySelector('.edu-level-3');
         
-        qualSelect.innerHTML = '<option value="">Select Specific Qualification</option>';
+        // Reset level 2 and 3
+        level2Select.innerHTML = '<option value="">Select Level 1 First</option>';
+        level3Select.innerHTML = '<option value="">Select Level 2 First</option>';
+        level2Select.disabled = true;
+        level3Select.disabled = true;
         
         if (!parentId) {
-            qualSelect.disabled = true;
             return;
         }
 
         // Show loading
-        qualSelect.innerHTML = '<option value="">Loading...</option>';
-        qualSelect.disabled = true;
+        level2Select.innerHTML = '<option value="">Loading...</option>';
 
-        // AJAX call to get ALL children recursively with hierarchy
-        fetch(`/api/qualifications/${parentId}/all-children`)
+        // AJAX call to get direct children only
+        fetch(`/api/qualifications/${parentId}/children`)
             .then(res => res.json())
             .then(data => {
-                qualSelect.innerHTML = '<option value="">Select Specific Qualification</option>';
+                level2Select.innerHTML = '<option value="">Select Intermediate Qualification</option>';
                 
                 if (data.length > 0) {
                     data.forEach(item => {
-                        // Add prefix based on level (- for level 1, -- for level 2, etc.)
-                        let prefix = '';
-                        for (let i = 0; i < item.level; i++) {
-                            prefix += '- ';
-                        }
-                        qualSelect.innerHTML += `<option value="${item.id}">${prefix}${item.name}</option>`;
+                        level2Select.innerHTML += `<option value="${item.id}">${item.name}</option>`;
                     });
-                    qualSelect.disabled = false;
+                    level2Select.disabled = false;
                 } else {
-                    // If no children, use the parent itself
-                    qualSelect.innerHTML = `<option value="${parentId}">${select.options[select.selectedIndex].text}</option>`;
-                    qualSelect.disabled = false;
+                    // If no children at level 2, use level 1 itself as the final qualification
+                    // This handles cases where there might be only 2 levels
+                    level2Select.innerHTML = `<option value="${parentId}">${select.options[select.selectedIndex].text}</option>`;
+                    level2Select.disabled = false;
+                    // Also enable level 3 with the same value
+                    level3Select.innerHTML = `<option value="${parentId}" selected>${select.options[select.selectedIndex].text}</option>`;
+                    level3Select.disabled = false;
                 }
             })
             .catch(error => {
-                console.error('Error loading qualifications:', error);
-                qualSelect.innerHTML = '<option value="">Error loading options</option>';
+                console.error('Error loading level 2 qualifications:', error);
+                level2Select.innerHTML = '<option value="">Error loading options</option>';
+            });
+    }
+
+    function loadLevel3(select) {
+        const parentId = select.value;
+        const entry = select.closest('.education-entry');
+        const level3Select = entry.querySelector('.edu-level-3');
+        
+        // Reset level 3
+        level3Select.innerHTML = '<option value="">Select Level 2 First</option>';
+        level3Select.disabled = true;
+        
+        if (!parentId) {
+            return;
+        }
+
+        // Show loading
+        level3Select.innerHTML = '<option value="">Loading...</option>';
+
+        // AJAX call to get direct children only
+        fetch(`/api/qualifications/${parentId}/children`)
+            .then(res => res.json())
+            .then(data => {
+                level3Select.innerHTML = '<option value="">Select Specific Qualification</option>';
+                
+                if (data.length > 0) {
+                    data.forEach(item => {
+                        level3Select.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+                    });
+                    level3Select.disabled = false;
+                } else {
+                    // If no children at level 3, use level 2 itself as the final qualification
+                    level3Select.innerHTML = `<option value="${parentId}">${select.options[select.selectedIndex].text}</option>`;
+                    level3Select.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading level 3 qualifications:', error);
+                level3Select.innerHTML = '<option value="">Error loading options</option>';
             });
     }
 
@@ -1395,7 +1435,7 @@
         fetch(`/api/industries/${industryId}/roles`)
             .then(res => res.json())
             .then(data => {
-                rolesSelect.innerHTML = '';
+                rolesSelect.innerHTML = '<option value="">Select Job Role</option>';
                 if (data.length > 0) {
                     data.forEach(role => {
                         rolesSelect.innerHTML += `<option value="${role.id}">${role.name}</option>`;
@@ -1432,23 +1472,98 @@
     // ==================== SKILLS FUNCTIONS ====================
     let skillCount = 0;
 
+    function getJobRolesFromExperience() {
+        const roles = [];
+        const experienceEntries = document.querySelectorAll('.experience-entry');
+        
+        experienceEntries.forEach(entry => {
+            const roleSelectElement = entry.querySelector('.exp-roles');
+            if (roleSelectElement) {
+                const selectedOption = roleSelectElement.options[roleSelectElement.selectedIndex];
+                if (selectedOption && selectedOption.value) {
+                    // Check if already added
+                    if (!roles.some(r => r.id === selectedOption.value)) {
+                        roles.push({
+                            id: selectedOption.value,
+                            name: selectedOption.text
+                        });
+                    }
+                }
+            }
+        });
+        
+        return roles;
+    }
+
+    function populateJobRolesForEntry(roleSelect) {
+        const roles = getJobRolesFromExperience();
+        
+        roleSelect.innerHTML = '<option value="">Select Job Role</option>';
+        
+        if (roles.length > 0) {
+            roles.forEach(role => {
+                roleSelect.innerHTML += `<option value="${role.id}">${role.name}</option>`;
+            });
+        } else {
+            roleSelect.innerHTML = '<option value="">No job roles found. Please add experience first.</option>';
+        }
+    }
+
+    function loadSkillsForEntry(roleSelect) {
+        const roleId = roleSelect.value;
+        const entry = roleSelect.closest('.skill-entry');
+        const skillSelect = entry.querySelector('.skill-select');
+        
+        if (!roleId) {
+            skillSelect.innerHTML = '<option value="">Select Job Role First</option>';
+            skillSelect.disabled = true;
+            return;
+        }
+
+        // Show loading
+        skillSelect.innerHTML = '<option value="">Loading...</option>';
+        skillSelect.disabled = true;
+
+        // Fetch skills for this role
+        fetch(`/api/industries/${roleId}/skills`)
+            .then(res => res.json())
+            .then(data => {
+                skillSelect.innerHTML = '<option value="">Select Skill</option>';
+                
+                if (data.length > 0) {
+                    data.forEach(skill => {
+                        skillSelect.innerHTML += `<option value="${skill.id}">${skill.name}</option>`;
+                    });
+                    skillSelect.disabled = false;
+                } else {
+                    skillSelect.innerHTML = '<option value="">No skills available for this role</option>';
+                    skillSelect.disabled = true;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading skills:', error);
+                skillSelect.innerHTML = '<option value="">Error loading skills</option>';
+                skillSelect.disabled = true;
+            });
+    }
+
     function addSkillEntry() {
         skillCount++;
         const template = document.getElementById('skill-template').innerHTML;
-        const html = template.replace(/{index}/g, skillCount);
+        const html = template.replace(/{index}/g, skillCount).replace(/{number}/g, skillCount);
         const container = document.getElementById('skills-container');
         const div = document.createElement('div');
         div.innerHTML = html;
-        container.appendChild(div.firstElementChild);
+        const entry = div.firstElementChild;
+        container.appendChild(entry);
+        
+        // Populate job roles for this entry
+        const roleSelect = entry.querySelector('.skill-role-select');
+        populateJobRolesForEntry(roleSelect);
     }
 
     function removeSkillEntry(btn) {
-        const entries = document.querySelectorAll('.skill-entry');
-        if (entries.length > 1) {
-            btn.closest('.skill-entry').remove();
-        } else {
-            alert('You must have at least one skill entry');
-        }
+        btn.closest('.skill-entry').remove();
     }
 
     // ==================== SIGNATURE FUNCTIONS ====================

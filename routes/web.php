@@ -35,6 +35,7 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::get('/api/qualifications/{id}/children', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'getQualificationChildren']);
 Route::get('/api/qualifications/{id}/all-children', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'getAllQualificationChildren']);
 Route::get('/api/industries/{id}/roles', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'getIndustryRoles']);
+Route::get('/api/industries/{id}/skills', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'getIndustrySkills']);
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/select-option', [App\Http\Controllers\HomeController::class, 'chooseType'])->name('chooseType');
@@ -63,6 +64,7 @@ Route::middleware(['auth'])->group(function () {
     
     // Profile View Route
     Route::get('/candidate-profile', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'viewProfile'])->name('candidate.profile');
+    Route::get('/api/candidate-profile', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'getProfileData'])->name('api.candidate.profile');
     
     // Paytm Payment Routes
     Route::post('/paytm/initiate', [App\Http\Controllers\PaytmController::class, 'initiatePayment'])->name('paytm.initiate');

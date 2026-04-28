@@ -17,8 +17,15 @@
                             <div class="table-responsive">
                                 <form id="filterfordatatable" style="padding: 5px;" class="form-horizontal" onsubmit="event.preventDefault();">
                                     <div class="row ">
-                                        <div class="col">
+                                        <div class="col-md-4">
                                             <input type="text" name="search" class="form-control" placeholder="Search with name">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <select name="role" class="form-select">
+                                                <option value="">All Users</option>
+                                                <option value="employee">Employee</option>
+                                                <option value="employer">Employer</option>
+                                            </select>
                                         </div>
                                     </div>
                                 </form><br>
@@ -61,6 +68,7 @@
                     url: "{{ route('admin.users.index') }}",
                     data: function (d) {
                         d.search = $('input[name=search]').val();
+                        d.role = $('select[name=role]').val();
                     }
                 },
                 columns: [{
@@ -83,6 +91,10 @@
         drawTable();
         
         $('input[name=search]').keyup(function(){
+            drawTable();
+        });
+        
+        $('select[name=role]').change(function(){
             drawTable();
         });
         
