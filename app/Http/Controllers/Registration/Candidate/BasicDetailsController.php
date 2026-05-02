@@ -572,9 +572,19 @@ class BasicDetailsController extends Controller
                 $certificatePath = $request->file("education.{$index}.certificate")->store('candidate/qualifications', 'public');
             }
 
+            // Get all qualification levels
+            $level1 = $edu['level_1'] ?? null;
+            $level2 = $edu['level_2'] ?? null;
+            $level3 = $edu['level_3'] ?? null;
+            $qualificationId = $edu['qualification_id'] ?? null;
+
             \App\Models\CandidateQualification::create([
                 'user_id' => Auth::id(),
-                'qualification_id' => $edu['qualification_id'] ?? $edu['main_parent'] ?? null,
+                'qualification_id' => $qualificationId,
+                'level_1_qualification_id' => $level1,
+                'level_2_qualification_id' => $level2,
+                'level_3_qualification_id' => $level3,
+                'level_4_qualification_id' => $qualificationId, // Stream is the final level
                 'university' => $edu['university'] ?? '',
                 'institution' => $edu['institution'] ?? null,
                 'college' => $edu['college'] ?? null,
@@ -792,9 +802,19 @@ class BasicDetailsController extends Controller
                     $certificatePath = $request->file("education.{$index}.certificate")->store('candidate/qualifications', 'public');
                 }
 
+                // Get all qualification levels
+                $level1 = $edu['level_1'] ?? null;
+                $level2 = $edu['level_2'] ?? null;
+                $level3 = $edu['level_3'] ?? null;
+                $qualificationId = $edu['qualification_id'] ?? null;
+
                 CandidateQualification::create([
                     'user_id' => Auth::id(),
-                    'qualification_id' => $edu['qualification_id'],
+                    'qualification_id' => $qualificationId,
+                    'level_1_qualification_id' => $level1,
+                    'level_2_qualification_id' => $level2,
+                    'level_3_qualification_id' => $level3,
+                    'level_4_qualification_id' => $qualificationId, // Stream is the final level
                     'university' => $edu['university'],
                     'institution' => $edu['institution'] ?? null,
                     'college' => $edu['college'] ?? null,

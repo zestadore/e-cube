@@ -240,25 +240,31 @@
                                 </button>
                             </div>
                             <div class="row">
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-3 mb-3">
                                     <label class="form-label">Education Level <span class="text-danger">*</span></label>
                                     <select class="form-select edu-level-1" name="education[{{$index}}][level_1]" required onchange="loadEditLevel2(this)">
                                         <option value="">Select Education Level</option>
                                         @foreach($qualifications as $mainQual)
-                                            <option value="{{ $mainQual->id }}" {{$qual->qualification && $qual->qualification->parents->contains('id', $mainQual->id) ? 'selected' : ''}}>{{ $mainQual->degree }}</option>
+                                            <option value="{{ $mainQual->id }}" {{$qual->level_1_qualification_id == $mainQual->id ? 'selected' : ''}}>{{ $mainQual->degree }}</option>
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-3 mb-3">
                                     <label class="form-label">Intermediate Qualification <span class="text-danger">*</span></label>
                                     <select class="form-select edu-level-2" name="education[{{$index}}][level_2]" required disabled onchange="loadEditLevel3(this)">
-                                        <option value="">Select Level 1 First</option>
+                                        <option value="{{$qual->level_2_qualification_id}}">{{$qual->level2Qualification->degree ?? 'Select Level 1 First'}}</option>
                                     </select>
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-3 mb-3">
                                     <label class="form-label">Specific Qualification <span class="text-danger">*</span></label>
-                                    <select class="form-select edu-level-3" name="education[{{$index}}][qualification_id]" required disabled>
-                                        <option value="{{$qual->qualification_id}}">{{$qual->qualification->degree ?? 'Select'}}</option>
+                                    <select class="form-select edu-level-3" name="education[{{$index}}][level_3]" required disabled onchange="loadEditLevel4(this)">
+                                        <option value="{{$qual->level_3_qualification_id}}">{{$qual->level3Qualification->degree ?? 'Select Level 2 First'}}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Stream <span class="text-danger">*</span></label>
+                                    <select class="form-select edu-level-4" name="education[{{$index}}][qualification_id]" required disabled>
+                                        <option value="{{$qual->qualification_id}}">{{$qual->qualification->degree ?? 'Select Level 3 First'}}</option>
                                     </select>
                                 </div>
                             </div>
@@ -728,18 +734,21 @@ function loadEducationChildren(select) {
         });
 }
 
-// ==================== 3-LEVEL CASCADING DROPDOWN FUNCTIONS ====================
+// ==================== 4-LEVEL CASCADING DROPDOWN FUNCTIONS ====================
 function loadEditLevel2(select) {
     const parentId = select.value;
     const entry = select.closest('.education-entry');
     const level2Select = entry.querySelector('.edu-level-2');
     const level3Select = entry.querySelector('.edu-level-3');
+    const level4Select = entry.querySelector('.edu-level-4');
     
-    // Reset level 2 and 3
+    // Reset level 2, 3 and 4
     level2Select.innerHTML = '<option value="">Select Level 1 First</option>';
     level3Select.innerHTML = '<option value="">Select Level 2 First</option>';
+    level4Select.innerHTML = '<option value="">Select Level 3 First</option>';
     level2Select.disabled = true;
     level3Select.disabled = true;
+    level4Select.disabled = true;
     
     if (!parentId) {
         return;
@@ -763,9 +772,11 @@ function loadEditLevel2(select) {
                 // If no children at level 2, use level 1 itself as the final qualification
                 level2Select.innerHTML = `<option value="${parentId}">${select.options[select.selectedIndex].text}</option>`;
                 level2Select.disabled = false;
-                // Also enable level 3 with the same value
+                // Also enable level 3 and 4 with the same value
                 level3Select.innerHTML = `<option value="${parentId}" selected>${select.options[select.selectedIndex].text}</option>`;
                 level3Select.disabled = false;
+                level4Select.innerHTML = `<option value="${parentId}" selected>${select.options[select.selectedIndex].text}</option>`;
+                level4Select.disabled = false;
             }
         })
         .catch(error => {
@@ -778,10 +789,13 @@ function loadEditLevel3(select) {
     const parentId = select.value;
     const entry = select.closest('.education-entry');
     const level3Select = entry.querySelector('.edu-level-3');
+    const level4Select = entry.querySelector('.edu-level-4');
     
-    // Reset level 3
+    // Reset level 3 and 4
     level3Select.innerHTML = '<option value="">Select Level 2 First</option>';
+    level4Select.innerHTML = '<option value="">Select Level 3 First</option>';
     level3Select.disabled = true;
+    level4Select.disabled = true;
     
     if (!parentId) {
         return;
@@ -805,11 +819,53 @@ function loadEditLevel3(select) {
                 // If no children at level 3, use level 2 itself as the final qualification
                 level3Select.innerHTML = `<option value="${parentId}">${select.options[select.selectedIndex].text}</option>`;
                 level3Select.disabled = false;
+                // Also enable level 4 with the same value
+                level4Select.innerHTML = `<option value="${parentId}" selected>${select.options[select.selectedIndex].text}</option>`;
+                level4Select.disabled = false;
             }
         })
         .catch(error => {
             console.error('Error loading level 3 qualifications:', error);
             level3Select.innerHTML = '<option value="">Error loading options</option>';
+        });
+}
+
+function loadEditLevel4(select) {
+    const parentId = select.value;
+    const entry = select.closest('.education-entry');
+    const level4Select = entry.querySelector('.edu-level-4');
+    
+    // Reset level 4
+    level4Select.innerHTML = '<option value="">Select Level 3 First</option>';
+    level4Select.disabled = true;
+    
+    if (!parentId) {
+        return;
+    }
+
+    // Show loading
+    level4Select.innerHTML = '<option value="">Loading...</option>';
+
+    // AJAX call to get direct children only
+    fetch(`/api/qualifications/${parentId}/children`)
+        .then(res => res.json())
+        .then(data => {
+            level4Select.innerHTML = '<option value="">Select Stream</option>';
+            
+            if (data.length > 0) {
+                data.forEach(item => {
+                    level4Select.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+                });
+                level4Select.disabled = false;
+            } else {
+                // If no children at level 4, use level 3 itself as the final qualification
+                level4Select.innerHTML = `<option value="${parentId}">${select.options[select.selectedIndex].text}</option>`;
+                level4Select.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Error loading level 4 qualifications:', error);
+            level4Select.innerHTML = '<option value="">Error loading options</option>';
         });
 }
 
