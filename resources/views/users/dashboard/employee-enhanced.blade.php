@@ -730,7 +730,17 @@
                             @if(Auth::user()->qualifications->isNotEmpty())
                                 @foreach(Auth::user()->qualifications as $qualification)
                                     <div class="timeline-item">
-                                        <div class="timeline-title">{{$qualification->qualification->degree ?? 'Unknown'}}</div>
+                                        <div class="timeline-title">
+                                            @php
+                                                $qualParts = [];
+                                                if($qualification->level1Qualification) $qualParts[] = $qualification->level1Qualification->degree;
+                                                if($qualification->level2Qualification) $qualParts[] = $qualification->level2Qualification->degree;
+                                                if($qualification->level3Qualification) $qualParts[] = $qualification->level3Qualification->degree;
+                                                if($qualification->qualification) $qualParts[] = $qualification->qualification->degree;
+                                                $qualDisplay = !empty($qualParts) ? implode(' -> ', $qualParts) : 'Unknown';
+                                            @endphp
+                                            {{$qualDisplay}}
+                                        </div>
                                         <div class="timeline-subtitle">
                                             <i class="fas fa-university me-1"></i>{{$qualification->university}}
                                             <span class="mx-2">|</span>
@@ -788,7 +798,14 @@
                                     <div class="timeline-item">
                                         <div class="timeline-title">{{$experience->company}}</div>
                                         <div class="timeline-subtitle">
-                                            <i class="fas fa-industry me-1"></i>{{$experience->industry->industry_name ?? 'Unknown'}}
+                                            @php
+                                                $industryParts = [];
+                                                if($experience->industry) $industryParts[] = $experience->industry->industry_name;
+                                                if($experience->industryLevel2) $industryParts[] = $experience->industryLevel2->industry_name;
+                                                if($experience->industryLevel3) $industryParts[] = $experience->industryLevel3->industry_name;
+                                                $industryDisplay = !empty($industryParts) ? implode(' -> ', $industryParts) : 'Unknown';
+                                            @endphp
+                                            <i class="fas fa-industry me-1"></i>{{$industryDisplay}}
                                             <span class="mx-2">|</span>
                                             <i class="fas fa-calendar me-1"></i>{{$experience->from_year}} - {{$experience->to_year ?? 'Present'}}
                                         </div>
@@ -1129,15 +1146,23 @@
                             <div class="table-responsive">
                                 <table class="table table-sm table-borderless mb-0">
                                     <tbody>
-                                        ${qualifications.map(q => `
+                                        ${qualifications.map(q => {
+                                            const qualParts = [];
+                                            if(q.level1_qualification?.degree) qualParts.push(q.level1_qualification.degree);
+                                            if(q.level2_qualification?.degree) qualParts.push(q.level2_qualification.degree);
+                                            if(q.level3_qualification?.degree) qualParts.push(q.level3_qualification.degree);
+                                            if(q.qualification?.degree) qualParts.push(q.qualification.degree);
+                                            const qualDisplay = qualParts.length > 0 ? qualParts.join(' -> ') : 'N/A';
+                                            return `
                                             <tr>
-                                                <td><strong>${q.qualification?.degree || 'N/A'}</strong></td>
+                                                <td><strong>${qualDisplay}</strong></td>
                                                 <td>${q.university || '-'}</td>
                                                 <td>${q.institution || '-'}</td>
                                                 <td>${q.from_year} - ${q.to_year}</td>
                                                 <td>${q.percentage ? q.percentage + '%' : '-'}</td>
                                             </tr>
-                                        `).join('')}
+                                            `;
+                                        }).join('')}
                                     </tbody>
                                 </table>
                             </div>
@@ -1152,24 +1177,27 @@
                     <div class="card border-0 bg-light">
                         <div class="card-body">
                             <h6 class="fw-bold text-info mb-3"><i class="fas fa-briefcase me-2"></i>Work Experience</h6>
-                            ${experiences.map(exp => `
-                                <div class="mb-3 pb-3 border-bottom">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div>
-                                            <strong class="text-primary">${exp.company || 'N/A'}</strong>
-                                            <p class="mb-1 text-muted">${exp.industry?.industry_name || 'Unknown Industry'}</p>
-                                        </div>
-                                        <div class="text-end">
-                                            <span class="badge bg-info">${exp.from_year} - ${exp.to_year || 'Present'}</span>
-                                            ${exp.duration ? `<span class="badge bg-secondary ms-1">${exp.duration}</span>` : ''}
-                                        </div>
-                                    </div>
-                                    ${exp.responsibilities ? `<div class="mt-2"><strong>Responsibilities:</strong> ${exp.responsibilities}</div>` : ''}
-                                    ${exp.achievements ? `<div class="mt-1"><strong>Achievements:</strong> ${exp.achievements}</div>` : ''}
-                                    ${exp.present_salary ? `<span class="badge bg-warning text-dark me-1">Present: ₹${Number(exp.present_salary).toLocaleString()}</span>` : ''}
-                                    ${exp.expected_salary ? `<span class="badge bg-primary">Expected: ₹${Number(exp.expected_salary).toLocaleString()}</span>` : ''}
-                                </div>
-                            `).join('')}
+                            <div class="table-responsive">
+                                <table class="table table-sm table-borderless mb-0">
+                                    <tbody>
+                                        ${experiences.map(exp => {
+                                            const industryParts = [];
+                                            if(exp.industry?.industry_name) industryParts.push(exp.industry.industry_name);
+                                            if(exp.industry_level_2?.industry_name) industryParts.push(exp.industry_level_2.industry_name);
+                                            if(exp.industry_level_3?.industry_name) industryParts.push(exp.industry_level_3.industry_name);
+                                            const industryDisplay = industryParts.length > 0 ? industryParts.join(' -> ') : 'Unknown Industry';
+                                            return `
+                                            <tr>
+                                                <td><strong>${exp.company || 'N/A'}</strong><br><small class="text-muted">${industryDisplay}</small></td>
+                                                <td>${exp.from_year} - ${exp.to_year || 'Present'}</td>
+                                                <td>${exp.duration || '-'}</td>
+                                                <td>${exp.present_salary ? '₹' + Number(exp.present_salary).toLocaleString() : '-'}</td>
+                                            </tr>
+                                            `;
+                                        }).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>

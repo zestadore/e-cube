@@ -35,6 +35,7 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::get('/api/qualifications/{id}/children', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'getQualificationChildren']);
 Route::get('/api/qualifications/{id}/all-children', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'getAllQualificationChildren']);
 Route::get('/api/industries/{id}/roles', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'getIndustryRoles']);
+Route::get('/api/industries/{id}/children', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'getIndustryChildren']);
 Route::get('/api/industries/{id}/skills', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'getIndustrySkills']);
 
 Route::middleware(['auth'])->group(function () {

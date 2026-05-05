@@ -379,9 +379,22 @@ class BasicDetailsController extends Controller
         $basics = $user->basics;
         $presentAddress = $user->presentAddress;
         $permanentAddress = $user->permanentAddress;
-        $candidateQualifications = $user->qualifications;
+        $candidateQualifications = $user->qualifications()
+            ->with([
+                'qualification',
+                'level1Qualification',
+                'level2Qualification',
+                'level3Qualification'
+            ])
+            ->get();
         $candidateSkills = $user->skills;
-        $candidateExperiences = $user->experiences;
+        $candidateExperiences = $user->experiences()
+            ->with([
+                'industry',
+                'industryLevel2',
+                'industryLevel3'
+            ])
+            ->get();
         $hobbies = CandidateHobby::where('user_id', $user->id)->first();
 
         return view('users.profile.candidate-profile', compact(
@@ -399,9 +412,22 @@ class BasicDetailsController extends Controller
         $basics = $user->basics;
         $presentAddress = $user->presentAddress;
         $permanentAddress = $user->permanentAddress;
-        $candidateQualifications = $user->qualifications()->with('qualification')->get();
+        $candidateQualifications = $user->qualifications()
+            ->with([
+                'qualification',
+                'level1Qualification',
+                'level2Qualification',
+                'level3Qualification'
+            ])
+            ->get();
         $candidateSkills = $user->skills()->with('skill')->get();
-        $candidateExperiences = $user->experiences()->with('industry')->get();
+        $candidateExperiences = $user->experiences()
+            ->with([
+                'industry',
+                'industryLevel2',
+                'industryLevel3'
+            ])
+            ->get();
         $hobbies = CandidateHobby::where('user_id', $user->id)->first();
 
         return response()->json([
@@ -475,6 +501,20 @@ class BasicDetailsController extends Controller
         } catch (\Exception $e) {
             \Log::error('Error: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Get industry children for AJAX (Level by Level)
+     */
+    public function getIndustryChildren($id)
+    {
+        $industry = \App\Models\Industry::find($id);
+        if (!$industry) {
+            return response()->json([]);
+        }
+        
+        $children = $industry->children()->get(['industries.id', 'industries.industry_name as name']);
+        return response()->json($children);
     }
 
     /**
@@ -906,7 +946,14 @@ class BasicDetailsController extends Controller
                 CandidateExperience::create([
                     'user_id' => Auth::id(),
                     'industry_id' => $exp['industry_id'],
+                    'industry_level_1' => $exp['industry_level_1'] ?? null,
+                    'industry_level_2' => $exp['industry_level_2'] ?? null,
+                    'industry_level_3' => $exp['industry_level_3'] ?? null,
                     'role_ids' => json_encode([$exp['role_id'] ?? null]),
+                    'role_level_1' => $exp['role_level_1'] ?? null,
+                    'role_level_2' => $exp['role_level_2'] ?? null,
+                    'role_level_3' => $exp['role_level_3'] ?? null,
+                    'role_level_4' => $exp['role_id'] ?? null,
                     'company' => $exp['company'],
                     'location' => $exp['location'] ?? null,
                     'from_year' => $exp['from_year'],

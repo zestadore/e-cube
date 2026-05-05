@@ -303,7 +303,17 @@
                     @if(count($candidateQualifications) > 0)
                         @foreach($candidateQualifications as $qualification)
                         <div class="timeline-item">
-                            <div class="timeline-title">{{ $qualification->qualification->degree ?? 'Unknown' }}</div>
+                            <div class="timeline-title">
+                                @php
+                                    $qualParts = [];
+                                    if($qualification->level1Qualification) $qualParts[] = $qualification->level1Qualification->degree;
+                                    if($qualification->level2Qualification) $qualParts[] = $qualification->level2Qualification->degree;
+                                    if($qualification->level3Qualification) $qualParts[] = $qualification->level3Qualification->degree;
+                                    if($qualification->qualification) $qualParts[] = $qualification->qualification->degree;
+                                    $qualDisplay = !empty($qualParts) ? implode(' -> ', $qualParts) : 'Unknown';
+                                @endphp
+                                {{ $qualDisplay }}
+                            </div>
                             <div class="timeline-subtitle">
                                 {{ $qualification->university }} | {{ $qualification->from_year }} - {{ $qualification->to_year }}
                             </div>
@@ -331,7 +341,14 @@
                         <div class="timeline-item">
                             <div class="timeline-title">{{ $experience->company }}</div>
                             <div class="timeline-subtitle">
-                                {{ $experience->industry->industry_name ?? 'Unknown Industry' }} | 
+                                @php
+                                    $industryParts = [];
+                                    if($experience->industry) $industryParts[] = $experience->industry->industry_name;
+                                    if($experience->industryLevel2) $industryParts[] = $experience->industryLevel2->industry_name;
+                                    if($experience->industryLevel3) $industryParts[] = $experience->industryLevel3->industry_name;
+                                    $industryDisplay = !empty($industryParts) ? implode(' -> ', $industryParts) : 'Unknown Industry';
+                                @endphp
+                                {{ $industryDisplay }} | 
                                 {{ $experience->from_year }} - {{ $experience->to_year ?? 'Present' }}
                                 @if($experience->duration)
                                 <span class="badge bg-info ms-2">{{ $experience->duration }}</span>
