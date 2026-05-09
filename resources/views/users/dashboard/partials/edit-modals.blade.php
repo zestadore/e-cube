@@ -345,13 +345,17 @@
                                 </button>
                             </div>
                             <div class="row">
-                                <div class="col-md-5 mb-3">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Job Role <span class="text-danger">*</span></label>
+                                    <select class="form-select skill-role-select" name="skills[{{$index}}][role_id]" required onchange="loadSkillsForSkillEdit(this)">
+                                        <option value="">Select Job Role</option>
+                                        <!-- Job roles will be populated by JavaScript -->
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mb-3">
                                     <label class="form-label">Skill <span class="text-danger">*</span></label>
-                                    <select class="form-select" name="skills[{{$index}}][skill_id]" required>
-                                        <option value="">Select Skill</option>
-                                        @foreach($skillsList as $s)
-                                            <option value="{{ $s->id }}" {{$skill->skill_id == $s->id ? 'selected' : ''}}>{{ $s->skill }}</option>
-                                        @endforeach
+                                    <select class="form-select skill-select" name="skills[{{$index}}][skill_id]" required>
+                                        <option value="{{$skill->skill_id}}" selected>{{$skill->skill->skill ?? 'Select Job Role First'}}</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3 mb-3">
@@ -364,8 +368,8 @@
                                         <option value="Expert" {{$skill->proficiency == 'Expert' ? 'selected' : ''}}>Expert</option>
                                     </select>
                                 </div>
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">Certificate (Optional)</label>
+                                <div class="col-md-2 mb-3">
+                                    <label class="form-label">Certificate</label>
                                     <input type="file" class="form-control" name="skills[{{$index}}][certificate]" accept=".pdf,.jpg,.jpeg,.png">
                                     @if($skill->certificate)
                                         <small class="text-muted">Current: <a href="{{$skill->certificate}}" target="_blank">View</a></small>
@@ -411,7 +415,7 @@
                                 </button>
                             </div>
                             <div class="row">
-                                <div class="col-md-3 mb-3">
+                                <div class="col-md-4 mb-3">
                                     <label class="form-label">Industry Category <span class="text-danger">*</span></label>
                                     <select class="form-select exp-industry-1" name="experience[{{$index}}][industry_level_1]" required onchange="loadIndustryLevel2(this)">
                                         <option value="">Select Category</option>
@@ -420,56 +424,35 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-md-3 mb-3">
+                                <div class="col-md-4 mb-3">
                                     <label class="form-label">Industry Sector <span class="text-danger">*</span></label>
                                     <select class="form-select exp-industry-2" name="experience[{{$index}}][industry_level_2]" required disabled onchange="loadIndustryLevel3(this)">
                                         <option value="{{$exp->industry_level_2}}">{{$exp->industryLevel2->industry_name ?? 'Select Category First'}}</option>
                                     </select>
                                 </div>
-                                <div class="col-md-3 mb-3">
+                                <div class="col-md-4 mb-3">
                                     <label class="form-label">Industry Type <span class="text-danger">*</span></label>
                                     <select class="form-select exp-industry-3" name="experience[{{$index}}][industry_level_3]" required disabled onchange="loadIndustryLevel4(this)">
                                         <option value="{{$exp->industry_level_3}}">{{$exp->industryLevel3->industry_name ?? 'Select Sector First'}}</option>
                                     </select>
                                 </div>
-                                <div class="col-md-3 mb-3">
-                                    <label class="form-label">Area of Work <span class="text-danger">*</span></label>
-                                    <select class="form-select exp-industry-4" name="experience[{{$index}}][industry_id]" required disabled>
-                                        <option value="{{$exp->industry_id}}">{{$exp->industry->industry_name ?? 'Select Type First'}}</option>
-                                    </select>
-                                </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-3 mb-3">
-                                    <label class="form-label">Job Category <span class="text-danger">*</span></label>
-                                    <select class="form-select exp-role-1" name="experience[{{$index}}][role_level_1]" required onchange="loadRoleLevel2(this)">
-                                        <option value="">Select Category</option>
-                                        @foreach($industries as $industry)
-                                            <option value="{{ $industry->id }}" {{$exp->role_level_1 == $industry->id ? 'selected' : ''}}>{{ $industry->industry_name }}</option>
-                                        @endforeach
-                                    </select>
+                                <div class="col-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Area of Work <span class="text-danger">*</span></label>
+                                        <select class="form-select exp-industry-4" name="experience[{{$index}}][industry_id]" required disabled onchange="loadJobRoles(this)">
+                                            <option value="{{$exp->industry_id}}">{{$exp->industry->industry_name ?? 'Select Type First'}}</option>
+                                        </select>
+                                    </div>
                                 </div>
-                                <div class="col-md-3 mb-3">
-                                    <label class="form-label">Job Sector <span class="text-danger">*</span></label>
-                                    <select class="form-select exp-role-2" name="experience[{{$index}}][role_level_2]" required disabled onchange="loadRoleLevel3(this)">
-                                        <option value="{{$exp->role_level_2}}">{{$exp->roleLevel2->industry_name ?? 'Select Category First'}}</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <label class="form-label">Job Type <span class="text-danger">*</span></label>
-                                    <select class="form-select exp-role-3" name="experience[{{$index}}][role_level_3]" required disabled onchange="loadRoleLevel4(this)">
-                                        <option value="{{$exp->role_level_3}}">{{$exp->roleLevel3->industry_name ?? 'Select Sector First'}}</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <label class="form-label">Job Role <span class="text-danger">*</span></label>
-                                    <select class="form-select exp-role-4" name="experience[{{$index}}][role_id]" required disabled>
-                                        @php
-                                            $roleIds = json_decode($exp->role_ids ?? '[]', true);
-                                            $selectedRoleId = $roleIds[0] ?? null;
-                                        @endphp
-                                        <option value="{{$selectedRoleId}}">{{$exp->roleLevel4->industry_name ?? 'Select Type First'}}</option>
-                                    </select>
+                                <div class="col-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Job Role <span class="text-danger">*</span></label>
+                                        <select class="form-select exp-job-role" name="experience[{{$index}}][job_role_id]" required disabled>
+                                            <option value="{{$exp->job_role_id}}">{{$exp->jobRole->industry_name ?? 'Select Area of Work First'}}</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                             <div class="row">
@@ -515,12 +498,12 @@
                                 </div>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Key Responsibilities</label>
-                                <textarea class="form-control" name="experience[{{$index}}][responsibilities]" rows="3">{{$exp->responsibilities}}</textarea>
+                                <label class="form-label">Key Responsibilities <span class="text-danger">*</span></label>
+                                <textarea class="form-control summernote-responsibilities" name="experience[{{$index}}][responsibilities]" rows="4">{{$exp->responsibilities}}</textarea>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Achievements</label>
-                                <textarea class="form-control" name="experience[{{$index}}][achievements]" rows="2">{{$exp->achievements}}</textarea>
+                                <label class="form-label">Achievements (if any)</label>
+                                <textarea class="form-control summernote-achievements" name="experience[{{$index}}][achievements]" rows="3">{{$exp->achievements}}</textarea>
                             </div>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
@@ -936,6 +919,82 @@ function saveEducation() {
 // ==================== SKILLS FUNCTIONS ====================
 let skillCount = {{Auth::user()->skills->count()}};
 
+function getJobRolesFromExperienceEdit() {
+    const roles = [];
+    const experienceEntries = document.querySelectorAll('#editExperienceModal .experience-entry');
+    
+    experienceEntries.forEach(entry => {
+        // Look for job role dropdown (exp-job-role)
+        const jobRoleSelect = entry.querySelector('.exp-job-role');
+        if (jobRoleSelect) {
+            const selectedOption = jobRoleSelect.options[jobRoleSelect.selectedIndex];
+            if (selectedOption && selectedOption.value && selectedOption.value !== '') {
+                // Check if already added (avoid duplicates)
+                if (!roles.some(r => r.id === selectedOption.value)) {
+                    roles.push({
+                        id: selectedOption.value,
+                        name: selectedOption.text
+                    });
+                }
+            }
+        }
+    });
+    
+    return roles;
+}
+
+function populateJobRolesForSkillEdit(roleSelect) {
+    const roles = getJobRolesFromExperienceEdit();
+    
+    roleSelect.innerHTML = '<option value="">Select Job Role</option>';
+    
+    if (roles.length > 0) {
+        roles.forEach(role => {
+            roleSelect.innerHTML += `<option value="${role.id}">${role.name}</option>`;
+        });
+    } else {
+        roleSelect.innerHTML = '<option value="">No job roles found. Please add experience first.</option>';
+    }
+}
+
+function loadSkillsForSkillEdit(roleSelect) {
+    const roleId = roleSelect.value;
+    const entry = roleSelect.closest('.skill-entry');
+    const skillSelect = entry.querySelector('.skill-select');
+    
+    if (!roleId) {
+        skillSelect.innerHTML = '<option value="">Select Job Role First</option>';
+        skillSelect.disabled = true;
+        return;
+    }
+
+    // Show loading
+    skillSelect.innerHTML = '<option value="">Loading...</option>';
+    skillSelect.disabled = true;
+
+    // Fetch skills for this role
+    fetch(`/api/industries/${roleId}/skills`)
+        .then(res => res.json())
+        .then(data => {
+            skillSelect.innerHTML = '<option value="">Select Skill</option>';
+            
+            if (data.length > 0) {
+                data.forEach(skill => {
+                    skillSelect.innerHTML += `<option value="${skill.id}">${skill.name}</option>`;
+                });
+                skillSelect.disabled = false;
+            } else {
+                skillSelect.innerHTML = '<option value="">No skills available for this role</option>';
+                skillSelect.disabled = true;
+            }
+        })
+        .catch(error => {
+            console.error('Error loading skills:', error);
+            skillSelect.innerHTML = '<option value="">Error loading skills</option>';
+            skillSelect.disabled = true;
+        });
+}
+
 function addSkillEntry() {
     const template = `
         <div class="dynamic-entry skill-entry" data-index="${skillCount}">
@@ -946,13 +1005,16 @@ function addSkillEntry() {
                 </button>
             </div>
             <div class="row">
-                <div class="col-md-5 mb-3">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Job Role <span class="text-danger">*</span></label>
+                    <select class="form-select skill-role-select" name="skills[${skillCount}][role_id]" required onchange="loadSkillsForSkillEdit(this)">
+                        <option value="">Select Job Role</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
                     <label class="form-label">Skill <span class="text-danger">*</span></label>
-                    <select class="form-select" name="skills[${skillCount}][skill_id]" required>
-                        <option value="">Select Skill</option>
-                        @foreach($skillsList as $s)
-                            <option value="{{ $s->id }}">{{ $s->skill }}</option>
-                        @endforeach
+                    <select class="form-select skill-select" name="skills[${skillCount}][skill_id]" required disabled>
+                        <option value="">Select Job Role First</option>
                     </select>
                 </div>
                 <div class="col-md-3 mb-3">
@@ -965,8 +1027,8 @@ function addSkillEntry() {
                         <option value="Expert">Expert</option>
                     </select>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <label class="form-label">Certificate (Optional)</label>
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Certificate</label>
                     <input type="file" class="form-control" name="skills[${skillCount}][certificate]" accept=".pdf,.jpg,.jpeg,.png">
                 </div>
             </div>
@@ -975,12 +1037,43 @@ function addSkillEntry() {
     const container = document.getElementById('skills-container');
     const div = document.createElement('div');
     div.innerHTML = template;
-    container.appendChild(div.firstElementChild);
+    const entry = div.firstElementChild;
+    container.appendChild(entry);
+    
+    // Populate job roles for this entry
+    const roleSelect = entry.querySelector('.skill-role-select');
+    populateJobRolesForSkillEdit(roleSelect);
+    
     skillCount++;
 }
 
 function removeSkillEntry(btn) {
     btn.closest('.skill-entry').remove();
+}
+
+function populateAllSkillJobRoles() {
+    // Get all job roles from experience entries
+    const roles = getJobRolesFromExperienceEdit();
+    
+    // Populate all existing skill entry job role dropdowns
+    document.querySelectorAll('#editSkillsModal .skill-role-select').forEach(select => {
+        const currentValue = select.value;
+        select.innerHTML = '<option value="">Select Job Role</option>';
+        
+        if (roles.length > 0) {
+            roles.forEach(role => {
+                const option = document.createElement('option');
+                option.value = role.id;
+                option.textContent = role.name;
+                if (role.id === currentValue) {
+                    option.selected = true;
+                }
+                select.appendChild(option);
+            });
+        } else {
+            select.innerHTML = '<option value="">No job roles found. Please add experience first.</option>';
+        }
+    });
 }
 
 function saveSkills() {
@@ -1009,6 +1102,47 @@ function saveSkills() {
     });
 }
 
+// Populate job roles when skills modal is opened
+document.getElementById('editSkillsModal').addEventListener('shown.bs.modal', function () {
+    populateAllSkillJobRoles();
+});
+
+// Initialize Summernote for Experience modal
+document.getElementById('editExperienceModal').addEventListener('shown.bs.modal', function () {
+    // Initialize Summernote for existing entries
+    $(this).find('.summernote-responsibilities').each(function() {
+        if (!$(this).hasClass('summernote-initialized')) {
+            $(this).summernote({
+                height: 150,
+                toolbar: [
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['insert', ['link']],
+                    ['view', ['fullscreen', 'codeview']]
+                ],
+                placeholder: 'Describe your key responsibilities in this role...'
+            });
+            $(this).addClass('summernote-initialized');
+        }
+    });
+    
+    $(this).find('.summernote-achievements').each(function() {
+        if (!$(this).hasClass('summernote-initialized')) {
+            $(this).summernote({
+                height: 120,
+                toolbar: [
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['para', ['ul', 'ol']],
+                    ['insert', ['link']],
+                    ['view', ['fullscreen']]
+                ],
+                placeholder: 'List your achievements and accomplishments...'
+            });
+            $(this).addClass('summernote-initialized');
+        }
+    });
+});
+
 // ==================== EXPERIENCE FUNCTIONS ====================
 let experienceCount = {{Auth::user()->experiences->count()}};
 
@@ -1022,7 +1156,7 @@ function addExperienceEntry() {
                 </button>
             </div>
             <div class="row">
-                <div class="col-md-3 mb-3">
+                <div class="col-md-4 mb-3">
                     <label class="form-label">Industry Category <span class="text-danger">*</span></label>
                     <select class="form-select exp-industry-1" name="experience[${experienceCount}][industry_level_1]" required onchange="loadIndustryLevel2(this)">
                         <option value="">Select Category</option>
@@ -1031,51 +1165,30 @@ function addExperienceEntry() {
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-3 mb-3">
+                <div class="col-md-4 mb-3">
                     <label class="form-label">Industry Sector <span class="text-danger">*</span></label>
                     <select class="form-select exp-industry-2" name="experience[${experienceCount}][industry_level_2]" required disabled onchange="loadIndustryLevel3(this)">
                         <option value="">Select Category First</option>
                     </select>
                 </div>
-                <div class="col-md-3 mb-3">
+                <div class="col-md-4 mb-3">
                     <label class="form-label">Industry Type <span class="text-danger">*</span></label>
                     <select class="form-select exp-industry-3" name="experience[${experienceCount}][industry_level_3]" required disabled onchange="loadIndustryLevel4(this)">
                         <option value="">Select Sector First</option>
                     </select>
                 </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">Area of Work <span class="text-danger">*</span></label>
-                    <select class="form-select exp-industry-4" name="experience[${experienceCount}][industry_id]" required disabled>
-                        <option value="">Select Type First</option>
-                    </select>
-                </div>
             </div>
             <div class="row">
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">Job Category <span class="text-danger">*</span></label>
-                    <select class="form-select exp-role-1" name="experience[${experienceCount}][role_level_1]" required onchange="loadRoleLevel2(this)">
-                        <option value="">Select Category</option>
-                        @foreach($industries as $industry)
-                            <option value="{{ $industry->id }}">{{ $industry->industry_name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">Job Sector <span class="text-danger">*</span></label>
-                    <select class="form-select exp-role-2" name="experience[${experienceCount}][role_level_2]" required disabled onchange="loadRoleLevel3(this)">
-                        <option value="">Select Category First</option>
-                    </select>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">Job Type <span class="text-danger">*</span></label>
-                    <select class="form-select exp-role-3" name="experience[${experienceCount}][role_level_3]" required disabled onchange="loadRoleLevel4(this)">
-                        <option value="">Select Sector First</option>
-                    </select>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">Job Role <span class="text-danger">*</span></label>
-                    <select class="form-select exp-role-4" name="experience[${experienceCount}][role_id]" required disabled>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Area of Work <span class="text-danger">*</span></label>
+                    <select class="form-select exp-industry-4" name="experience[${experienceCount}][industry_id]" required disabled onchange="loadJobRoles(this)">
                         <option value="">Select Type First</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Job Role <span class="text-danger">*</span></label>
+                    <select class="form-select exp-job-role" name="experience[${experienceCount}][job_role_id]" required disabled>
+                        <option value="">Select Area of Work First</option>
                     </select>
                 </div>
             </div>
@@ -1119,12 +1232,12 @@ function addExperienceEntry() {
                 </div>
             </div>
             <div class="mb-3">
-                <label class="form-label">Key Responsibilities</label>
-                <textarea class="form-control" name="experience[${experienceCount}][responsibilities]" rows="3"></textarea>
+                <label class="form-label">Key Responsibilities <span class="text-danger">*</span></label>
+                <textarea class="form-control summernote-responsibilities" name="experience[${experienceCount}][responsibilities]" rows="4"></textarea>
             </div>
             <div class="mb-3">
-                <label class="form-label">Achievements</label>
-                <textarea class="form-control" name="experience[${experienceCount}][achievements]" rows="2"></textarea>
+                <label class="form-label">Achievements (if any)</label>
+                <textarea class="form-control summernote-achievements" name="experience[${experienceCount}][achievements]" rows="3"></textarea>
             </div>
             <div class="row">
                 <div class="col-md-6 mb-3">
@@ -1147,7 +1260,32 @@ function addExperienceEntry() {
     const container = document.getElementById('experience-container');
     const div = document.createElement('div');
     div.innerHTML = template;
-    container.appendChild(div.firstElementChild);
+    const entry = div.firstElementChild;
+    container.appendChild(entry);
+    
+    // Initialize Summernote for the new entry
+    $(entry).find('.summernote-responsibilities').summernote({
+        height: 150,
+        toolbar: [
+            ['style', ['bold', 'italic', 'underline', 'clear']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['insert', ['link']],
+            ['view', ['fullscreen', 'codeview']]
+        ],
+        placeholder: 'Describe your key responsibilities in this role...'
+    });
+    
+    $(entry).find('.summernote-achievements').summernote({
+        height: 120,
+        toolbar: [
+            ['style', ['bold', 'italic', 'underline', 'clear']],
+            ['para', ['ul', 'ol']],
+            ['insert', ['link']],
+            ['view', ['fullscreen']]
+        ],
+        placeholder: 'List your achievements and accomplishments...'
+    });
+    
     experienceCount++;
 }
 
@@ -1162,11 +1300,16 @@ function loadIndustryLevel2(select) {
     const level2Select = entry.querySelector('.exp-industry-2');
     const level3Select = entry.querySelector('.exp-industry-3');
     const level4Select = entry.querySelector('.exp-industry-4');
+    const jobRoleSelect = entry.querySelector('.exp-job-role');
     
-    // Reset level 2, 3 and 4
+    // Reset level 2, 3, 4 and job role
     level2Select.innerHTML = '<option value="">Select Category First</option>';
     level3Select.innerHTML = '<option value="">Select Sector First</option>';
     level4Select.innerHTML = '<option value="">Select Type First</option>';
+    if (jobRoleSelect) {
+        jobRoleSelect.innerHTML = '<option value="">Select Area of Work First</option>';
+        jobRoleSelect.disabled = true;
+    }
     level2Select.disabled = true;
     level3Select.disabled = true;
     level4Select.disabled = true;
@@ -1211,10 +1354,15 @@ function loadIndustryLevel3(select) {
     const entry = select.closest('.experience-entry');
     const level3Select = entry.querySelector('.exp-industry-3');
     const level4Select = entry.querySelector('.exp-industry-4');
+    const jobRoleSelect = entry.querySelector('.exp-job-role');
     
-    // Reset level 3 and 4
+    // Reset level 3, 4 and job role
     level3Select.innerHTML = '<option value="">Select Sector First</option>';
     level4Select.innerHTML = '<option value="">Select Type First</option>';
+    if (jobRoleSelect) {
+        jobRoleSelect.innerHTML = '<option value="">Select Area of Work First</option>';
+        jobRoleSelect.disabled = true;
+    }
     level3Select.disabled = true;
     level4Select.disabled = true;
     
@@ -1243,6 +1391,11 @@ function loadIndustryLevel3(select) {
                 // Also enable level 4 with the same value
                 level4Select.innerHTML = `<option value="${parentId}" selected>${select.options[select.selectedIndex].text}</option>`;
                 level4Select.disabled = false;
+                // Also prefill job role with the same value
+                if (jobRoleSelect) {
+                    jobRoleSelect.innerHTML = `<option value="${parentId}" selected>${select.options[select.selectedIndex].text}</option>`;
+                    jobRoleSelect.disabled = false;
+                }
             }
         })
         .catch(error => {
@@ -1255,9 +1408,14 @@ function loadIndustryLevel4(select) {
     const parentId = select.value;
     const entry = select.closest('.experience-entry');
     const level4Select = entry.querySelector('.exp-industry-4');
+    const jobRoleSelect = entry.querySelector('.exp-job-role');
     
-    // Reset level 4
+    // Reset level 4 and job role
     level4Select.innerHTML = '<option value="">Select Type First</option>';
+    if (jobRoleSelect) {
+        jobRoleSelect.innerHTML = '<option value="">Select Area of Work First</option>';
+        jobRoleSelect.disabled = true;
+    }
     level4Select.disabled = true;
     
     if (!parentId) {
@@ -1282,6 +1440,11 @@ function loadIndustryLevel4(select) {
                 // If no children at level 4, use level 3 itself as the final selection
                 level4Select.innerHTML = `<option value="${parentId}">${select.options[select.selectedIndex].text}</option>`;
                 level4Select.disabled = false;
+                // Also prefill job role with the same value
+                if (jobRoleSelect) {
+                    jobRoleSelect.innerHTML = `<option value="${parentId}" selected>${select.options[select.selectedIndex].text}</option>`;
+                    jobRoleSelect.disabled = false;
+                }
             }
         })
         .catch(error => {
@@ -1428,32 +1591,36 @@ function loadRoleLevel4(select) {
 function loadJobRoles(select) {
     const industryId = select.value;
     const entry = select.closest('.experience-entry');
-    const rolesSelect = entry.querySelector('.exp-roles');
+    const rolesSelect = entry.querySelector('.exp-job-role');
     
+    // Reset job role dropdown
     rolesSelect.innerHTML = '<option value="">Loading...</option>';
     rolesSelect.disabled = true;
     
     if (!industryId) {
-        rolesSelect.innerHTML = '<option value="">Select Industry First</option>';
+        rolesSelect.innerHTML = '<option value="">Select Area of Work First</option>';
         return;
     }
 
-    fetch(`/api/industries/${industryId}/roles`)
+    // Use the same API endpoint as other industry children
+    fetch(`/api/industries/${industryId}/children`)
         .then(res => res.json())
         .then(data => {
-            rolesSelect.innerHTML = '';
             if (data.length > 0) {
+                rolesSelect.innerHTML = '<option value="">Select Job Role</option>';
                 data.forEach(role => {
                     rolesSelect.innerHTML += `<option value="${role.id}">${role.name}</option>`;
                 });
                 rolesSelect.disabled = false;
             } else {
-                rolesSelect.innerHTML = '<option value="">No roles available</option>';
+                // If no children, use the area of work itself as the job role
+                rolesSelect.innerHTML = `<option value="${industryId}">${select.options[select.selectedIndex].text}</option>`;
+                rolesSelect.disabled = false;
             }
         })
         .catch(error => {
-            console.error('Error loading roles:', error);
-            rolesSelect.innerHTML = '<option value="">Error loading roles</option>';
+            console.error('Error loading job roles:', error);
+            rolesSelect.innerHTML = '<option value="">Error loading options</option>';
         });
 }
 

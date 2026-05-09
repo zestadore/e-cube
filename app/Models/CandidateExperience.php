@@ -55,4 +55,9 @@ class CandidateExperience extends Model
         return $this->belongsTo(Industry::class, 'role_level_4', 'id');
     }
 
+    public function jobRole()
+    {
+        return $this->belongsTo(Industry::class, 'job_role_id', 'id');
+    }
+
 }

@@ -812,25 +812,42 @@
                             </div>
                             
                             <div class="row">
-                                <!-- Industry Selection -->
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="form-label">Industry/Area of Work <span class="text-danger">*</span></label>
-                                        <select class="form-select exp-industry" name="experience[{index}][industry_id]" required onchange="loadJobRoles(this)">
-                                            <option value="">Select Industry</option>
-                                            @foreach($industries as $industry)
-                                                <option value="{{ $industry->id }}">{{ $industry->industry_name }}</option>
-                                            @endforeach
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Industry Category <span class="text-danger">*</span></label>
+                                    <select class="form-select exp-industry-1" name="experience[{index}][industry_level_1]" required onchange="loadIndustryLevel2(this)">
+                                        <option value="">Select Category</option>
+                                        @foreach($industries as $industry)
+                                            <option value="{{ $industry->id }}">{{ $industry->industry_name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Industry Sector <span class="text-danger">*</span></label>
+                                    <select class="form-select exp-industry-2" name="experience[{index}][industry_level_2]" required disabled onchange="loadIndustryLevel3(this)">
+                                        <option value="">Select Category First</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Industry Type <span class="text-danger">*</span></label>
+                                    <select class="form-select exp-industry-3" name="experience[{index}][industry_level_3]" required disabled onchange="loadIndustryLevel4(this)">
+                                        <option value="">Select Sector First</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Area of Work <span class="text-danger">*</span></label>
+                                        <select class="form-select exp-industry-4" name="experience[{index}][industry_id]" required disabled onchange="loadJobRoles(this)">
+                                            <option value="">Select Type First</option>
                                         </select>
                                     </div>
                                 </div>
-                                
-                                <!-- Job Roles (Single Select) -->
-                                <div class="col-md-6">
-                                    <div class="form-group">
+                                <div class="col-6">
+                                    <div class="form-group mb-3">
                                         <label class="form-label">Job Role <span class="text-danger">*</span></label>
-                                        <select class="form-select exp-roles" name="experience[{index}][role_id]" required disabled>
-                                            <option value="">Select Industry First</option>
+                                        <select class="form-select exp-job-role" name="experience[{index}][job_role_id]" required disabled>
+                                            <option value="">Select Area of Work First</option>
                                         </select>
                                     </div>
                                 </div>
@@ -1481,29 +1498,36 @@
     function loadJobRoles(select) {
         const industryId = select.value;
         const entry = select.closest('.experience-entry');
-        const rolesSelect = entry.querySelector('.exp-roles');
+        const rolesSelect = entry.querySelector('.exp-job-role');
         
+        // Reset job role dropdown
         rolesSelect.innerHTML = '<option value="">Loading...</option>';
+        rolesSelect.disabled = true;
         
         if (!industryId) {
-            rolesSelect.innerHTML = '<option value="">Select Industry First</option>';
-            rolesSelect.disabled = true;
+            rolesSelect.innerHTML = '<option value="">Select Area of Work First</option>';
             return;
         }
 
-        // AJAX call to get industry roles
-        fetch(`/api/industries/${industryId}/roles`)
+        // Use the same API endpoint as other industry children
+        fetch(`/api/industries/${industryId}/children`)
             .then(res => res.json())
             .then(data => {
-                rolesSelect.innerHTML = '<option value="">Select Job Role</option>';
                 if (data.length > 0) {
+                    rolesSelect.innerHTML = '<option value="">Select Job Role</option>';
                     data.forEach(role => {
                         rolesSelect.innerHTML += `<option value="${role.id}">${role.name}</option>`;
                     });
                     rolesSelect.disabled = false;
                 } else {
-                    rolesSelect.innerHTML = '<option value="">No roles available</option>';
+                    // If no children, use the area of work itself as the job role
+                    rolesSelect.innerHTML = `<option value="${industryId}">${select.options[select.selectedIndex].text}</option>`;
+                    rolesSelect.disabled = false;
                 }
+            })
+            .catch(error => {
+                console.error('Error loading job roles:', error);
+                rolesSelect.innerHTML = '<option value="">Error loading options</option>';
             });
     }
 
@@ -1528,6 +1552,165 @@
         }
     }
 
+    // ==================== 4-LEVEL CASCADING INDUSTRY DROPDOWNS ====================
+    function loadIndustryLevel2(select) {
+        const parentId = select.value;
+        const entry = select.closest('.experience-entry');
+        const level2Select = entry.querySelector('.exp-industry-2');
+        const level3Select = entry.querySelector('.exp-industry-3');
+        const level4Select = entry.querySelector('.exp-industry-4');
+        const jobRoleSelect = entry.querySelector('.exp-job-role');
+        
+        // Reset level 2, 3, 4 and job role
+        level2Select.innerHTML = '<option value="">Select Category First</option>';
+        level3Select.innerHTML = '<option value="">Select Sector First</option>';
+        level4Select.innerHTML = '<option value="">Select Type First</option>';
+        if (jobRoleSelect) {
+            jobRoleSelect.innerHTML = '<option value="">Select Area of Work First</option>';
+            jobRoleSelect.disabled = true;
+        }
+        level2Select.disabled = true;
+        level3Select.disabled = true;
+        level4Select.disabled = true;
+        
+        if (!parentId) {
+            return;
+        }
+
+        // Show loading
+        level2Select.innerHTML = '<option value="">Loading...</option>';
+
+        // AJAX call to get direct children only
+        fetch(`/api/industries/${parentId}/children`)
+            .then(res => res.json())
+            .then(data => {
+                level2Select.innerHTML = '<option value="">Select Industry Sector</option>';
+                
+                if (data.length > 0) {
+                    data.forEach(item => {
+                        level2Select.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+                    });
+                    level2Select.disabled = false;
+                } else {
+                    // If no children at level 2, use level 1 itself as the final selection
+                    level2Select.innerHTML = `<option value="${parentId}">${select.options[select.selectedIndex].text}</option>`;
+                    level2Select.disabled = false;
+                    // Also enable level 3 and 4 with the same value
+                    level3Select.innerHTML = `<option value="${parentId}" selected>${select.options[select.selectedIndex].text}</option>`;
+                    level3Select.disabled = false;
+                    level4Select.innerHTML = `<option value="${parentId}" selected>${select.options[select.selectedIndex].text}</option>`;
+                    level4Select.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading industry level 2:', error);
+                level2Select.innerHTML = '<option value="">Error loading options</option>';
+            });
+    }
+
+    function loadIndustryLevel3(select) {
+        const parentId = select.value;
+        const entry = select.closest('.experience-entry');
+        const level3Select = entry.querySelector('.exp-industry-3');
+        const level4Select = entry.querySelector('.exp-industry-4');
+        const jobRoleSelect = entry.querySelector('.exp-job-role');
+        
+        // Reset level 3, 4 and job role
+        level3Select.innerHTML = '<option value="">Select Sector First</option>';
+        level4Select.innerHTML = '<option value="">Select Type First</option>';
+        if (jobRoleSelect) {
+            jobRoleSelect.innerHTML = '<option value="">Select Area of Work First</option>';
+            jobRoleSelect.disabled = true;
+        }
+        level3Select.disabled = true;
+        level4Select.disabled = true;
+        
+        if (!parentId) {
+            return;
+        }
+
+        // Show loading
+        level3Select.innerHTML = '<option value="">Loading...</option>';
+
+        // AJAX call to get direct children only
+        fetch(`/api/industries/${parentId}/children`)
+            .then(res => res.json())
+            .then(data => {
+                level3Select.innerHTML = '<option value="">Select Industry Type</option>';
+                
+                if (data.length > 0) {
+                    data.forEach(item => {
+                        level3Select.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+                    });
+                    level3Select.disabled = false;
+                } else {
+                    // If no children at level 3, use level 2 itself as the final selection
+                    level3Select.innerHTML = `<option value="${parentId}">${select.options[select.selectedIndex].text}</option>`;
+                    level3Select.disabled = false;
+                    // Also enable level 4 with the same value
+                    level4Select.innerHTML = `<option value="${parentId}" selected>${select.options[select.selectedIndex].text}</option>`;
+                    level4Select.disabled = false;
+                    // Also prefill job role with the same value
+                    if (jobRoleSelect) {
+                        jobRoleSelect.innerHTML = `<option value="${parentId}" selected>${select.options[select.selectedIndex].text}</option>`;
+                        jobRoleSelect.disabled = false;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error loading industry level 3:', error);
+                level3Select.innerHTML = '<option value="">Error loading options</option>';
+            });
+    }
+
+    function loadIndustryLevel4(select) {
+        const parentId = select.value;
+        const entry = select.closest('.experience-entry');
+        const level4Select = entry.querySelector('.exp-industry-4');
+        const jobRoleSelect = entry.querySelector('.exp-job-role');
+        
+        // Reset level 4 and job role
+        level4Select.innerHTML = '<option value="">Select Type First</option>';
+        if (jobRoleSelect) {
+            jobRoleSelect.innerHTML = '<option value="">Select Area of Work First</option>';
+            jobRoleSelect.disabled = true;
+        }
+        level4Select.disabled = true;
+        
+        if (!parentId) {
+            return;
+        }
+
+        // Show loading
+        level4Select.innerHTML = '<option value="">Loading...</option>';
+
+        // AJAX call to get direct children only
+        fetch(`/api/industries/${parentId}/children`)
+            .then(res => res.json())
+            .then(data => {
+                level4Select.innerHTML = '<option value="">Select Area of Work</option>';
+                
+                if (data.length > 0) {
+                    data.forEach(item => {
+                        level4Select.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+                    });
+                    level4Select.disabled = false;
+                } else {
+                    // If no children at level 4, use level 3 itself as the final selection
+                    level4Select.innerHTML = `<option value="${parentId}">${select.options[select.selectedIndex].text}</option>`;
+                    level4Select.disabled = false;
+                    // Also prefill job role with the same value
+                    if (jobRoleSelect) {
+                        jobRoleSelect.innerHTML = `<option value="${parentId}" selected>${select.options[select.selectedIndex].text}</option>`;
+                        jobRoleSelect.disabled = false;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error loading industry level 4:', error);
+                level4Select.innerHTML = '<option value="">Error loading options</option>';
+            });
+    }
 
     // ==================== SKILLS FUNCTIONS ====================
     let skillCount = 0;
@@ -1537,11 +1720,12 @@
         const experienceEntries = document.querySelectorAll('.experience-entry');
         
         experienceEntries.forEach(entry => {
-            const roleSelectElement = entry.querySelector('.exp-roles');
-            if (roleSelectElement) {
-                const selectedOption = roleSelectElement.options[roleSelectElement.selectedIndex];
-                if (selectedOption && selectedOption.value) {
-                    // Check if already added
+            // Look for job role dropdown (exp-job-role)
+            const jobRoleSelect = entry.querySelector('.exp-job-role');
+            if (jobRoleSelect) {
+                const selectedOption = jobRoleSelect.options[jobRoleSelect.selectedIndex];
+                if (selectedOption && selectedOption.value && selectedOption.value !== '') {
+                    // Check if already added (avoid duplicates)
                     if (!roles.some(r => r.id === selectedOption.value)) {
                         roles.push({
                             id: selectedOption.value,

@@ -661,6 +661,10 @@ class BasicDetailsController extends Controller
             \App\Models\CandidateExperience::create([
                 'user_id' => Auth::id(),
                 'industry_id' => $exp['industry_id'],
+                'industry_level_1' => $exp['industry_level_1'] ?? null,
+                'industry_level_2' => $exp['industry_level_2'] ?? null,
+                'industry_level_3' => $exp['industry_level_3'] ?? null,
+                'job_role_id' => $exp['job_role_id'] ?? null,
                 'role_ids' => json_encode([$exp['role_id'] ?? null]),
                 'company' => $exp['company'],
                 'location' => $exp['location'] ?? null,
@@ -949,6 +953,7 @@ class BasicDetailsController extends Controller
                     'industry_level_1' => $exp['industry_level_1'] ?? null,
                     'industry_level_2' => $exp['industry_level_2'] ?? null,
                     'industry_level_3' => $exp['industry_level_3'] ?? null,
+                    'job_role_id' => $exp['job_role_id'] ?? null,
                     'role_ids' => json_encode([$exp['role_id'] ?? null]),
                     'role_level_1' => $exp['role_level_1'] ?? null,
                     'role_level_2' => $exp['role_level_2'] ?? null,
