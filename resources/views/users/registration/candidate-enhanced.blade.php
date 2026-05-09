@@ -814,12 +814,12 @@
                             <div class="row">
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Industry Category <span class="text-danger">*</span></label>
-                                    <select class="form-select exp-industry-1" name="experience[{index}][industry_level_1]" required onchange="loadIndustryLevel2(this)">
-                                        <option value="">Select Category</option>
-                                        @foreach($industries as $industry)
-                                            <option value="{{ $industry->id }}">{{ $industry->industry_name }}</option>
-                                        @endforeach
-                                    </select>
+                                        <select class="form-select exp-industry-1" name="experience[{index}][industry_level_1]" required onchange="loadIndustryLevel2(this)">
+                                            <option value="">Select Category</option>
+                                            @foreach($industries->filter(fn($i) => $i->parents->isEmpty()) as $industry)
+                                                <option value="{{ $industry->id }}">{{ $industry->industry_name }}</option>
+                                            @endforeach
+                                        </select>
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Industry Sector <span class="text-danger">*</span></label>
@@ -920,7 +920,7 @@
 
                             <!-- Salary Fields -->
                             <div class="row salary-fields">
-                                <div class="col-md-6">
+                                <div class="col-md-6 present-salary-field" style="display: none;">
                                     <div class="form-group">
                                         <label class="form-label">Present Salary (Annual)</label>
                                         <div class="input-group">
@@ -929,7 +929,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-6 expected-salary-field" style="display: none;">
                                     <div class="form-group">
                                         <label class="form-label">Expected Salary (Annual)</label>
                                         <div class="input-group">
@@ -1435,6 +1435,39 @@
     // ==================== EXPERIENCE FUNCTIONS ====================
     let experienceCount = 0;
 
+    function updateSalaryFieldsVisibility() {
+        const allEntries = document.querySelectorAll('.experience-entry');
+        
+        // Find the entry with "current" as to_year (present job)
+        let currentJobIndex = -1;
+        allEntries.forEach((entry, index) => {
+            const toYearSelect = entry.querySelector('.exp-to-year');
+            if (toYearSelect && toYearSelect.value === 'current') {
+                currentJobIndex = index;
+            }
+        });
+        
+        // If no current job found, use the last entry
+        if (currentJobIndex === -1 && allEntries.length > 0) {
+            currentJobIndex = allEntries.length - 1;
+        }
+        
+        allEntries.forEach((entry, index) => {
+            const presentSalaryField = entry.querySelector('.present-salary-field');
+            const expectedSalaryField = entry.querySelector('.expected-salary-field');
+            
+            // Show Present Salary for ALL entries
+            if (presentSalaryField) {
+                presentSalaryField.style.display = 'block';
+            }
+            
+            // Show Expected Salary only for the current job (where to_year is "Present")
+            if (expectedSalaryField) {
+                expectedSalaryField.style.display = index === currentJobIndex ? 'block' : 'none';
+            }
+        });
+    }
+
     function addExperienceEntry() {
         experienceCount++;
         const template = document.getElementById('experience-template').innerHTML;
@@ -1468,11 +1501,8 @@
             placeholder: 'List your achievements and accomplishments...'
         });
 
-        // Show salary fields for first entry only
-        const allEntries = document.querySelectorAll('.experience-entry');
-        if (allEntries.length === 1) {
-            entry.querySelector('.salary-fields').style.display = 'flex';
-        }
+        // Update salary fields visibility for all entries
+        updateSalaryFieldsVisibility();
         
         entry.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
@@ -1482,6 +1512,8 @@
         if (entries.length > 1) {
             btn.closest('.experience-entry').remove();
             reindexExperienceEntries();
+            // Update salary fields visibility after removal
+            updateSalaryFieldsVisibility();
         } else {
             alert('You must have at least one experience entry');
         }
@@ -1550,6 +1582,9 @@
                 durationField.value = '';
             }
         }
+        
+        // Update salary fields visibility when To Year changes
+        updateSalaryFieldsVisibility();
     }
 
     // ==================== 4-LEVEL CASCADING INDUSTRY DROPDOWNS ====================

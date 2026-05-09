@@ -419,7 +419,7 @@
                                     <label class="form-label">Industry Category <span class="text-danger">*</span></label>
                                     <select class="form-select exp-industry-1" name="experience[{{$index}}][industry_level_1]" required onchange="loadIndustryLevel2(this)">
                                         <option value="">Select Category</option>
-                                        @foreach($industries as $industry)
+                                        @foreach($industries->filter(fn($i) => $i->parents->isEmpty()) as $industry)
                                             <option value="{{ $industry->id }}" {{$exp->industry_level_1 == $industry->id ? 'selected' : ''}}>{{ $industry->industry_name }}</option>
                                         @endforeach
                                     </select>
@@ -505,15 +505,15 @@
                                 <label class="form-label">Achievements (if any)</label>
                                 <textarea class="form-control summernote-achievements" name="experience[{{$index}}][achievements]" rows="3">{{$exp->achievements}}</textarea>
                             </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
+                            <div class="row salary-fields">
+                                <div class="col-md-6 present-salary-field">
                                     <label class="form-label">Present Salary (Annual)</label>
                                     <div class="input-group">
                                         <span class="input-group-text">₹</span>
                                         <input type="number" class="form-control" name="experience[{{$index}}][present_salary]" value="{{$exp->present_salary}}">
                                     </div>
                                 </div>
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-6 expected-salary-field" style="display: {{$exp->to_year == null ? 'block' : 'none'}};">
                                     <label class="form-label">Expected Salary (Annual)</label>
                                     <div class="input-group">
                                         <span class="input-group-text">₹</span>
@@ -1109,6 +1109,9 @@ document.getElementById('editSkillsModal').addEventListener('shown.bs.modal', fu
 
 // Initialize Summernote for Experience modal
 document.getElementById('editExperienceModal').addEventListener('shown.bs.modal', function () {
+    // Initialize salary fields visibility
+    updateSalaryFieldsVisibilityEdit();
+    
     // Initialize Summernote for existing entries
     $(this).find('.summernote-responsibilities').each(function() {
         if (!$(this).hasClass('summernote-initialized')) {
@@ -1146,6 +1149,39 @@ document.getElementById('editExperienceModal').addEventListener('shown.bs.modal'
 // ==================== EXPERIENCE FUNCTIONS ====================
 let experienceCount = {{Auth::user()->experiences->count()}};
 
+function updateSalaryFieldsVisibilityEdit() {
+    const allEntries = document.querySelectorAll('#editExperienceModal .experience-entry');
+    
+    // Find the entry with "current" as to_year (present job)
+    let currentJobIndex = -1;
+    allEntries.forEach((entry, index) => {
+        const toYearSelect = entry.querySelector('.exp-to-year');
+        if (toYearSelect && toYearSelect.value === 'current') {
+            currentJobIndex = index;
+        }
+    });
+    
+    // If no current job found, use the last entry
+    if (currentJobIndex === -1 && allEntries.length > 0) {
+        currentJobIndex = allEntries.length - 1;
+    }
+    
+    allEntries.forEach((entry, index) => {
+        const presentSalaryField = entry.querySelector('.present-salary-field');
+        const expectedSalaryField = entry.querySelector('.expected-salary-field');
+        
+        // Show Present Salary for ALL entries
+        if (presentSalaryField) {
+            presentSalaryField.style.display = 'block';
+        }
+        
+        // Show Expected Salary only for the current job (where to_year is "Present")
+        if (expectedSalaryField) {
+            expectedSalaryField.style.display = index === currentJobIndex ? 'block' : 'none';
+        }
+    });
+}
+
 function addExperienceEntry() {
     const template = `
         <div class="dynamic-entry experience-entry" data-index="${experienceCount}">
@@ -1156,15 +1192,15 @@ function addExperienceEntry() {
                 </button>
             </div>
             <div class="row">
-                <div class="col-md-4 mb-3">
-                    <label class="form-label">Industry Category <span class="text-danger">*</span></label>
-                    <select class="form-select exp-industry-1" name="experience[${experienceCount}][industry_level_1]" required onchange="loadIndustryLevel2(this)">
-                        <option value="">Select Category</option>
-                        @foreach($industries as $industry)
-                            <option value="{{ $industry->id }}">{{ $industry->industry_name }}</option>
-                        @endforeach
-                    </select>
-                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Industry Category <span class="text-danger">*</span></label>
+                                    <select class="form-select exp-industry-1" name="experience[${experienceCount}][industry_level_1]" required onchange="loadIndustryLevel2(this)">
+                                        <option value="">Select Category</option>
+                                        @foreach($industries->filter(fn($i) => $i->parents->isEmpty()) as $industry)
+                                            <option value="{{ $industry->id }}">{{ $industry->industry_name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Industry Sector <span class="text-danger">*</span></label>
                     <select class="form-select exp-industry-2" name="experience[${experienceCount}][industry_level_2]" required disabled onchange="loadIndustryLevel3(this)">
@@ -1239,15 +1275,15 @@ function addExperienceEntry() {
                 <label class="form-label">Achievements (if any)</label>
                 <textarea class="form-control summernote-achievements" name="experience[${experienceCount}][achievements]" rows="3"></textarea>
             </div>
-            <div class="row">
-                <div class="col-md-6 mb-3">
+            <div class="row salary-fields">
+                <div class="col-md-6 present-salary-field" style="display: none;">
                     <label class="form-label">Present Salary (Annual)</label>
                     <div class="input-group">
                         <span class="input-group-text">₹</span>
                         <input type="number" class="form-control" name="experience[${experienceCount}][present_salary]">
                     </div>
                 </div>
-                <div class="col-md-6 mb-3">
+                <div class="col-md-6 expected-salary-field" style="display: none;">
                     <label class="form-label">Expected Salary (Annual)</label>
                     <div class="input-group">
                         <span class="input-group-text">₹</span>
@@ -1286,11 +1322,16 @@ function addExperienceEntry() {
         placeholder: 'List your achievements and accomplishments...'
     });
     
+    // Update salary fields visibility for all entries
+    updateSalaryFieldsVisibilityEdit();
+    
     experienceCount++;
 }
 
 function removeExperienceEntry(btn) {
     btn.closest('.experience-entry').remove();
+    // Update salary fields visibility after removal
+    updateSalaryFieldsVisibilityEdit();
 }
 
 // ==================== 4-LEVEL CASCADING INDUSTRY DROPDOWNS ====================
@@ -1641,6 +1682,9 @@ function calculateExpDuration(element) {
             durationField.value = '';
         }
     }
+    
+    // Update salary fields visibility when To Year changes
+    updateSalaryFieldsVisibilityEdit();
 }
 
 function saveExperience() {
