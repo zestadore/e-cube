@@ -980,12 +980,13 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-5">
                                     <div class="form-group mb-0">
-                                        <label class="form-label">Skill <span class="text-danger">*</span></label>
-                                        <select class="form-select skill-select" name="skills[{index}][skill_id]" required disabled>
-                                            <option value="">Select Job Role First</option>
-                                        </select>
+                                        <label class="form-label">Skills <span class="text-danger">*</span></label>
+                                        <div class="skill-checkboxes-container border rounded p-2" style="max-height: 150px; overflow-y: auto; background: #f8f9fa;">
+                                            <p class="text-muted mb-0 small">Select Job Role to see available skills</p>
+                                        </div>
+                                        <input type="hidden" class="skill-ids-hidden" name="skills[{index}][skill_ids]" value="">
                                     </div>
                                 </div>
                                 <div class="col-md-2">
@@ -1791,39 +1792,57 @@
     function loadSkillsForEntry(roleSelect) {
         const roleId = roleSelect.value;
         const entry = roleSelect.closest('.skill-entry');
-        const skillSelect = entry.querySelector('.skill-select');
+        const checkboxesContainer = entry.querySelector('.skill-checkboxes-container');
+        const hiddenInput = entry.querySelector('.skill-ids-hidden');
         
         if (!roleId) {
-            skillSelect.innerHTML = '<option value="">Select Job Role First</option>';
-            skillSelect.disabled = true;
+            checkboxesContainer.innerHTML = '<p class="text-muted mb-0 small">Select Job Role to see available skills</p>';
+            hiddenInput.value = '';
             return;
         }
 
         // Show loading
-        skillSelect.innerHTML = '<option value="">Loading...</option>';
-        skillSelect.disabled = true;
+        checkboxesContainer.innerHTML = '<p class="text-muted mb-0 small"><i class="fas fa-spinner fa-spin"></i> Loading skills...</p>';
 
         // Fetch skills for this role
         fetch(`/api/industries/${roleId}/skills`)
             .then(res => res.json())
             .then(data => {
-                skillSelect.innerHTML = '<option value="">Select Skill</option>';
-                
                 if (data.length > 0) {
+                    let html = '<div class="row g-2">';
                     data.forEach(skill => {
-                        skillSelect.innerHTML += `<option value="${skill.id}">${skill.name}</option>`;
+                        html += `
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input skill-checkbox" type="checkbox" value="${skill.id}" id="skill_${roleId}_${skill.id}" onchange="updateSkillIdsHidden(this)">
+                                    <label class="form-check-label small" for="skill_${roleId}_${skill.id}">
+                                        ${skill.name}
+                                    </label>
+                                </div>
+                            </div>
+                        `;
                     });
-                    skillSelect.disabled = false;
+                    html += '</div>';
+                    checkboxesContainer.innerHTML = html;
                 } else {
-                    skillSelect.innerHTML = '<option value="">No skills available for this role</option>';
-                    skillSelect.disabled = true;
+                    checkboxesContainer.innerHTML = '<p class="text-muted mb-0 small">No skills available for this role</p>';
                 }
+                hiddenInput.value = '';
             })
             .catch(error => {
                 console.error('Error loading skills:', error);
-                skillSelect.innerHTML = '<option value="">Error loading skills</option>';
-                skillSelect.disabled = true;
+                checkboxesContainer.innerHTML = '<p class="text-danger mb-0 small">Error loading skills</p>';
+                hiddenInput.value = '';
             });
+    }
+
+    function updateSkillIdsHidden(checkbox) {
+        const entry = checkbox.closest('.skill-entry');
+        const hiddenInput = entry.querySelector('.skill-ids-hidden');
+        const checkboxes = entry.querySelectorAll('.skill-checkbox:checked');
+        
+        const selectedIds = Array.from(checkboxes).map(cb => cb.value);
+        hiddenInput.value = selectedIds.join(',');
     }
 
     function addSkillEntry() {

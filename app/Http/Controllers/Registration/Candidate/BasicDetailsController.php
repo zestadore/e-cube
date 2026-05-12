@@ -701,12 +701,26 @@ class BasicDetailsController extends Controller
                 $certificatePath = $request->file("skills.{$index}.certificate")->store('candidate/skills', 'public');
             }
 
-            \App\Models\CandidateSkill::create([
-                'user_id' => Auth::id(),
-                'skill_id' => $skill['skill_id'],
-                'proficiency' => $skill['proficiency'] ?? 'Beginner',
-                'certificate' => $certificatePath,
-            ]);
+            // Handle multiple skill IDs from checkboxes (comma-separated)
+            $skillIds = [];
+            if (isset($skill['skill_ids']) && !empty($skill['skill_ids'])) {
+                $skillIds = explode(',', $skill['skill_ids']);
+            } elseif (isset($skill['skill_id']) && !empty($skill['skill_id'])) {
+                // Fallback to single skill_id if provided
+                $skillIds = [$skill['skill_id']];
+            }
+
+            // Create a skill entry for each selected skill
+            foreach ($skillIds as $skillId) {
+                if (!empty($skillId)) {
+                    \App\Models\CandidateSkill::create([
+                        'user_id' => Auth::id(),
+                        'skill_id' => $skillId,
+                        'proficiency' => $skill['proficiency'] ?? 'Beginner',
+                        'certificate' => $certificatePath,
+                    ]);
+                }
+            }
         }
     }
 
@@ -885,7 +899,7 @@ class BasicDetailsController extends Controller
         try {
             $request->validate([
                 'skills' => 'required|array|min:1',
-                'skills.*.skill_id' => 'required',
+                'skills.*.skill_ids' => 'required',
                 'skills.*.proficiency' => 'required',
             ]);
 
@@ -903,12 +917,26 @@ class BasicDetailsController extends Controller
                     $certificatePath = $request->file("skills.{$index}.certificate")->store('candidate/skills', 'public');
                 }
 
-                CandidateSkill::create([
-                    'user_id' => Auth::id(),
-                    'skill_id' => $skill['skill_id'],
-                    'proficiency' => $skill['proficiency'],
-                    'certificate' => $certificatePath,
-                ]);
+                // Handle multiple skill IDs from checkboxes (comma-separated)
+                $skillIds = [];
+                if (isset($skill['skill_ids']) && !empty($skill['skill_ids'])) {
+                    $skillIds = explode(',', $skill['skill_ids']);
+                } elseif (isset($skill['skill_id']) && !empty($skill['skill_id'])) {
+                    // Fallback to single skill_id if provided
+                    $skillIds = [$skill['skill_id']];
+                }
+
+                // Create a skill entry for each selected skill
+                foreach ($skillIds as $skillId) {
+                    if (!empty($skillId)) {
+                        CandidateSkill::create([
+                            'user_id' => Auth::id(),
+                            'skill_id' => $skillId,
+                            'proficiency' => $skill['proficiency'],
+                            'certificate' => $certificatePath,
+                        ]);
+                    }
+                }
             }
 
             DB::commit();

@@ -5,6 +5,8 @@
 
 @section('styles')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Summernote CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
     <style>
         :root {
             --primary-color: #4e73df;
@@ -982,6 +984,8 @@
 @endsection
 
 @section('scripts')
+<!-- Summernote JS -->
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
 <script>
     // Animate progress bar on load
     document.addEventListener('DOMContentLoaded', function() {

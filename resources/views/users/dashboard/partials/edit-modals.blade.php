@@ -352,11 +352,23 @@
                                         <!-- Job roles will be populated by JavaScript -->
                                     </select>
                                 </div>
-                                <div class="col-md-3 mb-3">
-                                    <label class="form-label">Skill <span class="text-danger">*</span></label>
-                                    <select class="form-select skill-select" name="skills[{{$index}}][skill_id]" required>
-                                        <option value="{{$skill->skill_id}}" selected>{{$skill->skill->skill ?? 'Select Job Role First'}}</option>
-                                    </select>
+                                <div class="col-md-5 mb-3">
+                                    <label class="form-label">Skills <span class="text-danger">*</span></label>
+                                    <div class="skill-checkboxes-container border rounded p-2" style="max-height: 150px; overflow-y: auto; background: #f8f9fa;">
+                                        @php
+                                            $userSkills = \App\Models\CandidateSkill::where('user_id', Auth::id())
+                                                ->where('skill_id', $skill->skill_id)
+                                                ->pluck('skill_id')
+                                                ->toArray();
+                                        @endphp
+                                        <div class="form-check">
+                                            <input class="form-check-input skill-checkbox" type="checkbox" value="{{$skill->skill_id}}" id="skill_edit_{{$skill->skill_id}}" checked onchange="updateSkillIdsHiddenEdit(this)">
+                                            <label class="form-check-label small" for="skill_edit_{{$skill->skill_id}}">
+                                                {{$skill->skill->skill ?? 'Skill'}}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" class="skill-ids-hidden" name="skills[{{$index}}][skill_ids]" value="{{$skill->skill_id}}">
                                 </div>
                                 <div class="col-md-3 mb-3">
                                     <label class="form-label">Proficiency <span class="text-danger">*</span></label>
@@ -441,7 +453,7 @@
                                 <div class="col-6">
                                     <div class="form-group mb-3">
                                         <label class="form-label">Area of Work <span class="text-danger">*</span></label>
-                                        <select class="form-select exp-industry-4" name="experience[{{$index}}][industry_id]" required disabled onchange="loadJobRoles(this)">
+                                        <select class="form-select exp-industry-4" name="experience[{{$index}}][industry_id]" required onchange="loadJobRoles(this)">
                                             <option value="{{$exp->industry_id}}">{{$exp->industry->industry_name ?? 'Select Type First'}}</option>
                                         </select>
                                     </div>
@@ -449,7 +461,7 @@
                                 <div class="col-6">
                                     <div class="form-group mb-3">
                                         <label class="form-label">Job Role <span class="text-danger">*</span></label>
-                                        <select class="form-select exp-job-role" name="experience[{{$index}}][job_role_id]" required disabled>
+                                        <select class="form-select exp-job-role" name="experience[{{$index}}][job_role_id]" required>
                                             <option value="{{$exp->job_role_id}}">{{$exp->jobRole->industry_name ?? 'Select Area of Work First'}}</option>
                                         </select>
                                     </div>
@@ -499,11 +511,11 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Key Responsibilities <span class="text-danger">*</span></label>
-                                <textarea class="form-control summernote-responsibilities" name="experience[{{$index}}][responsibilities]" rows="4">{{$exp->responsibilities}}</textarea>
+                                <textarea class="form-control summernote-responsibilities" name="experience[{{$index}}][responsibilities]" rows="4">{!! $exp->responsibilities !!}</textarea>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Achievements (if any)</label>
-                                <textarea class="form-control summernote-achievements" name="experience[{{$index}}][achievements]" rows="3">{{$exp->achievements}}</textarea>
+                                <textarea class="form-control summernote-achievements" name="experience[{{$index}}][achievements]" rows="3">{!! $exp->achievements !!}</textarea>
                             </div>
                             <div class="row salary-fields">
                                 <div class="col-md-6 present-salary-field">
@@ -960,39 +972,57 @@ function populateJobRolesForSkillEdit(roleSelect) {
 function loadSkillsForSkillEdit(roleSelect) {
     const roleId = roleSelect.value;
     const entry = roleSelect.closest('.skill-entry');
-    const skillSelect = entry.querySelector('.skill-select');
+    const checkboxesContainer = entry.querySelector('.skill-checkboxes-container');
+    const hiddenInput = entry.querySelector('.skill-ids-hidden');
     
     if (!roleId) {
-        skillSelect.innerHTML = '<option value="">Select Job Role First</option>';
-        skillSelect.disabled = true;
+        checkboxesContainer.innerHTML = '<p class="text-muted mb-0 small">Select Job Role to see available skills</p>';
+        hiddenInput.value = '';
         return;
     }
 
     // Show loading
-    skillSelect.innerHTML = '<option value="">Loading...</option>';
-    skillSelect.disabled = true;
+    checkboxesContainer.innerHTML = '<p class="text-muted mb-0 small"><i class="fas fa-spinner fa-spin"></i> Loading skills...</p>';
 
     // Fetch skills for this role
     fetch(`/api/industries/${roleId}/skills`)
         .then(res => res.json())
         .then(data => {
-            skillSelect.innerHTML = '<option value="">Select Skill</option>';
-            
             if (data.length > 0) {
+                let html = '<div class="row g-2">';
                 data.forEach(skill => {
-                    skillSelect.innerHTML += `<option value="${skill.id}">${skill.name}</option>`;
+                    html += `
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input skill-checkbox" type="checkbox" value="${skill.id}" id="skill_edit_${roleId}_${skill.id}" onchange="updateSkillIdsHiddenEdit(this)">
+                                <label class="form-check-label small" for="skill_edit_${roleId}_${skill.id}">
+                                    ${skill.name}
+                                </label>
+                            </div>
+                        </div>
+                    `;
                 });
-                skillSelect.disabled = false;
+                html += '</div>';
+                checkboxesContainer.innerHTML = html;
             } else {
-                skillSelect.innerHTML = '<option value="">No skills available for this role</option>';
-                skillSelect.disabled = true;
+                checkboxesContainer.innerHTML = '<p class="text-muted mb-0 small">No skills available for this role</p>';
             }
+            hiddenInput.value = '';
         })
         .catch(error => {
             console.error('Error loading skills:', error);
-            skillSelect.innerHTML = '<option value="">Error loading skills</option>';
-            skillSelect.disabled = true;
+            checkboxesContainer.innerHTML = '<p class="text-danger mb-0 small">Error loading skills</p>';
+            hiddenInput.value = '';
         });
+}
+
+function updateSkillIdsHiddenEdit(checkbox) {
+    const entry = checkbox.closest('.skill-entry');
+    const hiddenInput = entry.querySelector('.skill-ids-hidden');
+    const checkboxes = entry.querySelectorAll('.skill-checkbox:checked');
+    
+    const selectedIds = Array.from(checkboxes).map(cb => cb.value);
+    hiddenInput.value = selectedIds.join(',');
 }
 
 function addSkillEntry() {
@@ -1011,11 +1041,12 @@ function addSkillEntry() {
                         <option value="">Select Job Role</option>
                     </select>
                 </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">Skill <span class="text-danger">*</span></label>
-                    <select class="form-select skill-select" name="skills[${skillCount}][skill_id]" required disabled>
-                        <option value="">Select Job Role First</option>
-                    </select>
+                <div class="col-md-5 mb-3">
+                    <label class="form-label">Skills <span class="text-danger">*</span></label>
+                    <div class="skill-checkboxes-container border rounded p-2" style="max-height: 150px; overflow-y: auto; background: #f8f9fa;">
+                        <p class="text-muted mb-0 small">Select Job Role to see available skills</p>
+                    </div>
+                    <input type="hidden" class="skill-ids-hidden" name="skills[${skillCount}][skill_ids]" value="">
                 </div>
                 <div class="col-md-3 mb-3">
                     <label class="form-label">Proficiency <span class="text-danger">*</span></label>
