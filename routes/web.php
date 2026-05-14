@@ -104,6 +104,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('update-skills', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'updateSkills'])->name('update-skills');
         Route::post('update-experience', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'updateExperience'])->name('update-experience');
         Route::post('update-hobbies', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'updateHobbies'])->name('update-hobbies');
+        Route::post('update-profile-photo', [App\Http\Controllers\Registration\Candidate\BasicDetailsController::class, 'updateProfilePhoto'])->name('update-profile-photo');
         
         // Employee Payment History
         Route::get('payment-history', [App\Http\Controllers\PaymentHistoryController::class, 'employeeIndex'])->name('payment-history');

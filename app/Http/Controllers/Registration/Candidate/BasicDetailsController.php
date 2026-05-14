@@ -1030,4 +1030,53 @@ class BasicDetailsController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
+
+    /**
+     * Update profile photo
+     */
+    public function updateProfilePhoto(Request $request)
+    {
+        try {
+            $request->validate([
+                'profile_photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120', // max 5MB
+            ]);
+
+            $user = Auth::user();
+            
+            // Delete old profile photo if exists
+            if ($user->image) {
+                $oldPath = public_path('uploads/profiles/' . $user->image);
+                if (file_exists($oldPath)) {
+                    unlink($oldPath);
+                }
+            }
+
+            // Generate unique filename
+            $filename = 'profile_' . $user->id . '_' . time() . '.jpg';
+            
+            // Ensure directory exists
+            $directory = public_path('uploads/profiles');
+            if (!file_exists($directory)) {
+                mkdir($directory, 0755, true);
+            }
+
+            // Move uploaded file
+            $request->file('profile_photo')->move($directory, $filename);
+
+            // Update user record
+            $user->image = $filename;
+            $user->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Profile photo updated successfully',
+                'image_url' => asset('uploads/profiles/' . $filename)
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

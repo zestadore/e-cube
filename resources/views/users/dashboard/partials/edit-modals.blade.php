@@ -251,19 +251,19 @@
                                 </div>
                                 <div class="col-md-3 mb-3">
                                     <label class="form-label">Intermediate Qualification <span class="text-danger">*</span></label>
-                                    <select class="form-select edu-level-2" name="education[{{$index}}][level_2]" required disabled onchange="loadEditLevel3(this)">
+                                    <select class="form-select edu-level-2" name="education[{{$index}}][level_2]" required {{$qual->level_2_qualification_id ? '' : 'disabled'}} onchange="loadEditLevel3(this)">
                                         <option value="{{$qual->level_2_qualification_id}}">{{$qual->level2Qualification->degree ?? 'Select Level 1 First'}}</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3 mb-3">
                                     <label class="form-label">Specific Qualification <span class="text-danger">*</span></label>
-                                    <select class="form-select edu-level-3" name="education[{{$index}}][level_3]" required disabled onchange="loadEditLevel4(this)">
+                                    <select class="form-select edu-level-3" name="education[{{$index}}][level_3]" required {{$qual->level_3_qualification_id ? '' : 'disabled'}} onchange="loadEditLevel4(this)">
                                         <option value="{{$qual->level_3_qualification_id}}">{{$qual->level3Qualification->degree ?? 'Select Level 2 First'}}</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3 mb-3">
                                     <label class="form-label">Stream <span class="text-danger">*</span></label>
-                                    <select class="form-select edu-level-4" name="education[{{$index}}][qualification_id]" required disabled>
+                                    <select class="form-select edu-level-4" name="education[{{$index}}][qualification_id]" required {{$qual->qualification_id ? '' : 'disabled'}}>
                                         <option value="{{$qual->qualification_id}}">{{$qual->qualification->degree ?? 'Select Level 3 First'}}</option>
                                     </select>
                                 </div>
@@ -326,7 +326,7 @@
 
 <!-- Skills Modal -->
 <div class="modal fade" id="editSkillsModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg" style="max-width: 900px;">
+    <div class="modal-dialog modal-lg" style="max-width: 1000px;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><i class="fas fa-tools me-2"></i>Edit Skills & Expertise</h5>
@@ -336,64 +336,84 @@
                 <form id="editSkillsForm" enctype="multipart/form-data">
                     @csrf
                     <div id="skills-container">
-                        @foreach(Auth::user()->skills as $index => $skill)
-                        <div class="dynamic-entry skill-entry" data-index="{{$index}}">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h6 class="mb-0">Skill #{{$index + 1}}</h6>
-                                <button type="button" class="btn btn-danger btn-sm" onclick="removeSkillEntry(this)">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">Job Role <span class="text-danger">*</span></label>
-                                    <select class="form-select skill-role-select" name="skills[{{$index}}][role_id]" required onchange="loadSkillsForSkillEdit(this)">
-                                        <option value="">Select Job Role</option>
-                                        <!-- Job roles will be populated by JavaScript -->
-                                    </select>
+                        @php
+                            // Group skills by job role (industry_id)
+                            $userSkillsData = \App\Models\CandidateSkill::where('user_id', Auth::id())
+                                ->with(['skill.industry'])
+                                ->get();
+                            
+                            $groupedSkills = $userSkillsData->groupBy(function($item) {
+                                return $item->skill->industry_id ?? 'unknown';
+                            });
+                            
+                            $groupIndex = 0;
+                        @endphp
+                        
+                        @forelse($groupedSkills as $roleId => $skills)
+                            @php
+                                $roleName = $skills->first()->skill->industry->industry_name ?? 'Unknown Role';
+                                $roleProficiency = $skills->first()->proficiency;
+                                $roleCertificate = $skills->first()->certificate;
+                                $skillIds = $skills->pluck('skill_id')->toArray();
+                            @endphp
+                            <div class="dynamic-entry skill-entry" data-index="{{$groupIndex}}" data-role-id="{{$roleId}}">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="mb-0">Job Role: {{$roleName}}</h6>
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="removeSkillEntry(this)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </div>
-                                <div class="col-md-5 mb-3">
-                                    <label class="form-label">Skills <span class="text-danger">*</span></label>
-                                    <div class="skill-checkboxes-container border rounded p-2" style="max-height: 150px; overflow-y: auto; background: #f8f9fa;">
-                                        @php
-                                            $userSkills = \App\Models\CandidateSkill::where('user_id', Auth::id())
-                                                ->where('skill_id', $skill->skill_id)
-                                                ->pluck('skill_id')
-                                                ->toArray();
-                                        @endphp
-                                        <div class="form-check">
-                                            <input class="form-check-input skill-checkbox" type="checkbox" value="{{$skill->skill_id}}" id="skill_edit_{{$skill->skill_id}}" checked onchange="updateSkillIdsHiddenEdit(this)">
-                                            <label class="form-check-label small" for="skill_edit_{{$skill->skill_id}}">
-                                                {{$skill->skill->skill ?? 'Skill'}}
-                                            </label>
-                                        </div>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Job Role <span class="text-danger">*</span></label>
+                                        <select class="form-select skill-role-select" name="skills[{{$groupIndex}}][role_id]" required onchange="loadSkillsForSkillEdit(this)">
+                                            <option value="">Select Job Role</option>
+                                            <option value="{{$roleId}}" selected>{{$roleName}}</option>
+                                        </select>
                                     </div>
-                                    <input type="hidden" class="skill-ids-hidden" name="skills[{{$index}}][skill_ids]" value="{{$skill->skill_id}}">
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <label class="form-label">Proficiency <span class="text-danger">*</span></label>
-                                    <select class="form-select" name="skills[{{$index}}][proficiency]" required>
-                                        <option value="">Select</option>
-                                        <option value="Beginner" {{$skill->proficiency == 'Beginner' ? 'selected' : ''}}>Beginner</option>
-                                        <option value="Intermediate" {{$skill->proficiency == 'Intermediate' ? 'selected' : ''}}>Intermediate</option>
-                                        <option value="Advanced" {{$skill->proficiency == 'Advanced' ? 'selected' : ''}}>Advanced</option>
-                                        <option value="Expert" {{$skill->proficiency == 'Expert' ? 'selected' : ''}}>Expert</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-2 mb-3">
-                                    <label class="form-label">Certificate</label>
-                                    <input type="file" class="form-control" name="skills[{{$index}}][certificate]" accept=".pdf,.jpg,.jpeg,.png">
-                                    @if($skill->certificate)
-                                        <small class="text-muted">Current: <a href="{{$skill->certificate}}" target="_blank">View</a></small>
-                                    @endif
+                                    <div class="col-md-5 mb-3">
+                                        <label class="form-label">Skills <span class="text-danger">*</span></label>
+                                        <div class="skill-checkboxes-container border rounded p-2" style="max-height: 150px; overflow-y: auto; background: #f8f9fa;">
+                                            @foreach($skills as $skill)
+                                                <div class="form-check">
+                                                    <input class="form-check-input skill-checkbox" type="checkbox" value="{{$skill->skill_id}}" id="skill_edit_{{$roleId}}_{{$skill->skill_id}}" checked onchange="updateSkillIdsHiddenEdit(this)">
+                                                    <label class="form-check-label small" for="skill_edit_{{$roleId}}_{{$skill->skill_id}}">
+                                                        {{$skill->skill->skill ?? 'Skill'}}
+                                                    </label>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                        <input type="hidden" class="skill-ids-hidden" name="skills[{{$groupIndex}}][skill_ids]" value="{{implode(',', $skillIds)}}">
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label class="form-label">Proficiency <span class="text-danger">*</span></label>
+                                        <select class="form-select" name="skills[{{$groupIndex}}][proficiency]" required>
+                                            <option value="">Select</option>
+                                            <option value="Beginner" {{$roleProficiency == 'Beginner' ? 'selected' : ''}}>Beginner</option>
+                                            <option value="Intermediate" {{$roleProficiency == 'Intermediate' ? 'selected' : ''}}>Intermediate</option>
+                                            <option value="Advanced" {{$roleProficiency == 'Advanced' ? 'selected' : ''}}>Advanced</option>
+                                            <option value="Expert" {{$roleProficiency == 'Expert' ? 'selected' : ''}}>Expert</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label class="form-label">Certificate</label>
+                                        <input type="file" class="form-control" name="skills[{{$groupIndex}}][certificate]" accept=".pdf,.jpg,.jpeg,.png">
+                                        @if($roleCertificate)
+                                            <small class="text-muted">Current: <a href="{{$roleCertificate}}" target="_blank">View</a></small>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        @endforeach
+                            @php $groupIndex++; @endphp
+                        @empty
+                            <div class="text-center text-muted py-4">
+                                <p>No skills added yet. Click "Add Job Role" to add skills.</p>
+                            </div>
+                        @endforelse
                     </div>
                     <div class="text-center mt-3">
                         <button type="button" class="btn btn-outline-primary" onclick="addSkillEntry()">
-                            <i class="fas fa-plus me-2"></i>Add Skill
+                            <i class="fas fa-plus me-2"></i>Add Job Role
                         </button>
                     </div>
                 </form>
@@ -438,13 +458,13 @@
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Industry Sector <span class="text-danger">*</span></label>
-                                    <select class="form-select exp-industry-2" name="experience[{{$index}}][industry_level_2]" required disabled onchange="loadIndustryLevel3(this)">
+                                    <select class="form-select exp-industry-2" name="experience[{{$index}}][industry_level_2]" required {{$exp->industry_level_2 ? '' : 'disabled'}} onchange="loadIndustryLevel3(this)">
                                         <option value="{{$exp->industry_level_2}}">{{$exp->industryLevel2->industry_name ?? 'Select Category First'}}</option>
                                     </select>
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Industry Type <span class="text-danger">*</span></label>
-                                    <select class="form-select exp-industry-3" name="experience[{{$index}}][industry_level_3]" required disabled onchange="loadIndustryLevel4(this)">
+                                    <select class="form-select exp-industry-3" name="experience[{{$index}}][industry_level_3]" required {{$exp->industry_level_3 ? '' : 'disabled'}} onchange="loadIndustryLevel4(this)">
                                         <option value="{{$exp->industry_level_3}}">{{$exp->industryLevel3->industry_name ?? 'Select Sector First'}}</option>
                                     </select>
                                 </div>
@@ -453,7 +473,7 @@
                                 <div class="col-6">
                                     <div class="form-group mb-3">
                                         <label class="form-label">Area of Work <span class="text-danger">*</span></label>
-                                        <select class="form-select exp-industry-4" name="experience[{{$index}}][industry_id]" required onchange="loadJobRoles(this)">
+                                        <select class="form-select exp-industry-4" name="experience[{{$index}}][industry_id]" required {{$exp->industry_id ? '' : 'disabled'}} onchange="loadJobRoles(this)">
                                             <option value="{{$exp->industry_id}}">{{$exp->industry->industry_name ?? 'Select Type First'}}</option>
                                         </select>
                                     </div>
@@ -461,7 +481,7 @@
                                 <div class="col-6">
                                     <div class="form-group mb-3">
                                         <label class="form-label">Job Role <span class="text-danger">*</span></label>
-                                        <select class="form-select exp-job-role" name="experience[{{$index}}][job_role_id]" required>
+                                        <select class="form-select exp-job-role" name="experience[{{$index}}][job_role_id]" required {{$exp->job_role_id ? '' : 'disabled'}}>
                                             <option value="{{$exp->job_role_id}}">{{$exp->jobRole->industry_name ?? 'Select Area of Work First'}}</option>
                                         </select>
                                     </div>
@@ -663,19 +683,31 @@ function addEducationEntry() {
                 </button>
             </div>
             <div class="row">
-                <div class="col-md-6 mb-3">
+                <div class="col-md-3 mb-3">
                     <label class="form-label">Education Level <span class="text-danger">*</span></label>
-                    <select class="form-select edu-main-parent" name="education[${educationCount}][main_parent]" required onchange="loadEducationChildren(this)">
+                    <select class="form-select edu-level-1" name="education[${educationCount}][level_1]" required onchange="loadEditLevel2(this)">
                         <option value="">Select Education Level</option>
                         @foreach($qualifications as $mainQual)
                             <option value="{{ $mainQual->id }}">{{ $mainQual->degree }}</option>
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-6 mb-3">
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Intermediate Qualification <span class="text-danger">*</span></label>
+                    <select class="form-select edu-level-2" name="education[${educationCount}][level_2]" required disabled onchange="loadEditLevel3(this)">
+                        <option value="">Select Level 1 First</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
                     <label class="form-label">Specific Qualification <span class="text-danger">*</span></label>
-                    <select class="form-select edu-qualification" name="education[${educationCount}][qualification_id]" required disabled>
-                        <option value="">Select Education Level First</option>
+                    <select class="form-select edu-level-3" name="education[${educationCount}][level_3]" required disabled onchange="loadEditLevel4(this)">
+                        <option value="">Select Level 2 First</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Stream <span class="text-danger">*</span></label>
+                    <select class="form-select edu-level-4" name="education[${educationCount}][qualification_id]" required disabled>
+                        <option value="">Select Level 3 First</option>
                     </select>
                 </div>
             </div>
@@ -728,43 +760,6 @@ function addEducationEntry() {
 
 function removeEducationEntry(btn) {
     btn.closest('.education-entry').remove();
-}
-
-function loadEducationChildren(select) {
-    const parentId = select.value;
-    const entry = select.closest('.education-entry');
-    const qualSelect = entry.querySelector('.edu-qualification');
-    
-    qualSelect.innerHTML = '<option value="">Loading...</option>';
-    qualSelect.disabled = true;
-    
-    if (!parentId) {
-        qualSelect.innerHTML = '<option value="">Select Education Level First</option>';
-        return;
-    }
-
-    fetch(`/api/qualifications/${parentId}/all-children`)
-        .then(res => res.json())
-        .then(data => {
-            qualSelect.innerHTML = '<option value="">Select Specific Qualification</option>';
-            if (data.length > 0) {
-                data.forEach(item => {
-                    let prefix = '';
-                    for (let i = 0; i < item.level; i++) {
-                        prefix += '- ';
-                    }
-                    qualSelect.innerHTML += `<option value="${item.id}">${prefix}${item.name}</option>`;
-                });
-                qualSelect.disabled = false;
-            } else {
-                qualSelect.innerHTML = `<option value="${parentId}">${select.options[select.selectedIndex].text}</option>`;
-                qualSelect.disabled = false;
-            }
-        })
-        .catch(error => {
-            console.error('Error loading qualifications:', error);
-            qualSelect.innerHTML = '<option value="">Error loading options</option>';
-        });
 }
 
 // ==================== 4-LEVEL CASCADING DROPDOWN FUNCTIONS ====================

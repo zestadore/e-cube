@@ -1218,13 +1218,34 @@
         let isValid = true;
         
         requiredFields.forEach(field => {
-            if (!field.value.trim()) {
-                field.classList.add('is-invalid');
-                isValid = false;
+            // For checkboxes, check if checked
+            if (field.type === 'checkbox') {
+                if (!field.checked) {
+                    field.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    field.classList.remove('is-invalid');
+                }
             } else {
-                field.classList.remove('is-invalid');
+                // For other fields, check value
+                if (!field.value.trim()) {
+                    field.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    field.classList.remove('is-invalid');
+                }
             }
         });
+
+        // Special validation for terms checkbox on step 6
+        if (currentStep === 6) {
+            const termsCheckbox = document.getElementById('terms_agree');
+            if (!termsCheckbox.checked) {
+                termsCheckbox.classList.add('is-invalid');
+                alert('Please confirm that all information provided is true and accurate by checking the checkbox.');
+                return false;
+            }
+        }
 
         if (!isValid) {
             alert('Please fill in all required fields marked with *');
@@ -2040,6 +2061,15 @@
 
     // Form submission
     document.getElementById('btn-submit').addEventListener('click', function() {
+        // Validate terms checkbox
+        const termsCheckbox = document.getElementById('terms_agree');
+        if (!termsCheckbox.checked) {
+            termsCheckbox.classList.add('is-invalid');
+            alert('Please confirm that all information provided is true and accurate by checking the checkbox.');
+            termsCheckbox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+        
         // Get signature data based on type
         const sigType = document.querySelector('input[name="signature_type"]:checked').value;
         let signatureData = '';
@@ -2054,6 +2084,12 @@
             signatureData = document.getElementById('signature-text').value;
             if (!signatureData.trim()) {
                 alert('Please type your signature');
+                return;
+            }
+        } else if (sigType === 'upload') {
+            const uploadInput = document.getElementById('signature-upload');
+            if (!uploadInput.files || uploadInput.files.length === 0) {
+                alert('Please upload your signature image');
                 return;
             }
         }
