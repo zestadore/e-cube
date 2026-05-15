@@ -836,163 +836,279 @@
     }
 
     // Render Application Detail
-    function renderApplicationDetail(application) {
-        const candidate = application.user;
-        const job = application.job_post;
+    function renderApplicationDetail(app) {
+        const candidate = app.user;
+        const job = app.job_post;
+        const basics = app.basic_details || {};
+        const presentAddress = app.present_address || null;
+        const permanentAddress = app.permanent_address || null;
+        const hobbies = app.hobbies || null;
         
-        // Get candidate info
-        const fullName = candidate ? candidate.full_name : 'Unknown';
-        const email = candidate ? candidate.email : 'N/A';
-        const mobile = candidate ? candidate.mobile : 'N/A';
-        const avatar = candidate && candidate.image_path 
-            ? `<img src="${candidate.image_path}" class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover; border: 3px solid #667eea;" onerror="this.src='{{ asset('assets/images/default-avatar.png') }}'; this.onerror=null;">`
-            : `<div class="rounded-circle mb-3 d-flex align-items-center justify-content-center" 
-                   style="width: 100px; height: 100px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 40px; margin: 0 auto;">
-                 <i class="fas fa-user"></i>
-               </div>`;
+        // Status class
+        const statusClass = `status-${app.status}`;
         
-        // Get qualifications
-        let qualificationsHtml = '';
-        if (candidate && candidate.candidate_qualifications && candidate.candidate_qualifications.length > 0) {
-            qualificationsHtml = candidate.candidate_qualifications.map(q => `
-                <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded">
-                    <div>
-                        <strong>${q.qualification?.degree || 'N/A'}</strong>
-                        ${q.university ? `<br><small class="text-muted">${q.university}</small>` : ''}
-                    </div>
-                    ${q.percentage ? `<span class="badge bg-primary">${q.percentage}%</span>` : ''}
-                </div>
-            `).join('');
-        } else {
-            qualificationsHtml = '<p class="text-muted">No qualifications listed</p>';
-        }
-        
-        // Get experiences
-        let experiencesHtml = '';
-        if (candidate && candidate.candidate_experiences && candidate.candidate_experiences.length > 0) {
-            experiencesHtml = candidate.candidate_experiences.map(exp => `
-                <div class="mb-2 p-2 bg-light rounded">
-                    <div class="d-flex justify-content-between">
-                        <strong>${exp.industry?.industry_name || 'N/A'}</strong>
-                        <small class="text-muted">${exp.from_year} - ${exp.to_year || 'Present'}</small>
-                    </div>
-                    ${exp.company ? `<small class="text-muted">${exp.company}</small>` : ''}
-                    ${exp.years_of_experience ? `<br><small class="text-info">${exp.years_of_experience} years experience</small>` : ''}
-                </div>
-            `).join('');
-        } else {
-            experiencesHtml = '<p class="text-muted">No experience listed</p>';
-        }
-        
-        // Status badge
-        let statusBadge = '';
-        let statusClass = '';
-        switch(application.status) {
-            case 'pending':
-                statusBadge = 'Pending';
-                statusClass = 'bg-warning text-dark';
-                break;
-            case 'shortlisted':
-                statusBadge = 'Shortlisted';
-                statusClass = 'bg-info';
-                break;
-            case 'hired':
-                statusBadge = 'Hired';
-                statusClass = 'bg-success';
-                break;
-            case 'rejected':
-                statusBadge = 'Rejected';
-                statusClass = 'bg-danger';
-                break;
-            default:
-                statusBadge = application.status;
-                statusClass = 'bg-secondary';
-        }
-        
-        // Applied date
-        const appliedDate = application.applied_at 
-            ? new Date(application.applied_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-            : 'N/A';
-        
-        // Cover letter
-        const coverLetterHtml = application.cover_letter 
-            ? `<div class="card border-0 bg-light mb-3">
-                 <div class="card-body">
-                     <h6 class="fw-bold text-dark mb-2"><i class="fas fa-file-alt me-2"></i>Cover Letter</h6>
-                     <p class="mb-0" style="white-space: pre-wrap;">${application.cover_letter}</p>
-                 </div>
-               </div>`
-            : '';
-        
-        // Employer notes
-        const notesHtml = application.employer_notes 
-            ? `<div class="card border-0 bg-light">
-                 <div class="card-body">
-                     <h6 class="fw-bold text-warning mb-2"><i class="fas fa-sticky-note me-2"></i>Your Notes</h6>
-                     <p class="mb-0">${application.employer_notes}</p>
-                 </div>
-               </div>`
-            : '';
-        
-        // Generate full HTML
-        const html = `
+        let html = `
             <div class="row">
-                <!-- Candidate Profile Card -->
-                <div class="col-md-4 text-center mb-4">
-                    <div class="card border-0 shadow-sm h-100">
-                        <div class="card-body p-4">
-                            ${avatar}
-                            <h4 class="fw-bold mb-1">${fullName}</h4>
-                            <p class="text-muted mb-2">
-                                <i class="fas fa-envelope me-1"></i>${email}
-                            </p>
-                            <p class="text-muted mb-3">
-                                <i class="fas fa-phone me-1"></i>${mobile}
-                            </p>
-                            <span class="badge ${statusClass} fs-6 px-3 py-2">${statusBadge}</span>
-                            
-                            <hr class="my-3">
-                            
-                            <div class="text-start">
-                                <small class="text-muted d-block mb-1"><i class="fas fa-calendar me-1"></i>Applied: ${appliedDate}</small>
+                <!-- Profile Header -->
+                <div class="col-12 text-center mb-4">
+                    ${candidate.image_path ? 
+                        `<img src="${candidate.image_path}" class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover; border: 4px solid #4e73df;" onerror="this.src='{{ asset('assets/images/default-avatar.png') }}'; this.onerror=null;">` :
+                        `<div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" 
+                             style="width: 100px; height: 100px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 40px;">
+                            <i class="fas fa-user"></i>
+                        </div>`
+                    }
+                    <h4 class="fw-bold mb-1">${candidate.full_name || 'Unknown'}</h4>
+                    <p class="text-muted mb-2"><i class="fas fa-envelope me-1"></i>${candidate.email || 'N/A'}</p>
+                    <p class="text-muted mb-2"><i class="fas fa-phone me-1"></i>${candidate.mobile || 'N/A'}</p>
+                    ${basics?.profession ? `<span class="badge bg-success">${basics.profession}</span>` : ''}
+                </div>
+                
+                <!-- Applied Position -->
+                <div class="col-12 mb-3">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="fw-bold text-primary mb-2"><i class="fas fa-briefcase me-2"></i>Applied Position</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Position:</strong> ${job.industry?.industry_name || 'N/A'}</p>
+                                    <p class="small text-muted mb-0">${job.description || ''}</p>
+                                </div>
+                                <div class="col-md-6 text-md-end">
+                                    <span class="status-badge ${statusClass}">${app.status.charAt(0).toUpperCase() + app.status.slice(1)}</span>
+                                    <p class="small text-muted mt-2 mb-0">Applied: ${app.applied_at ? new Date(app.applied_at).toLocaleDateString() : 'N/A'}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Details Column -->
-                <div class="col-md-8">
-                    <!-- Job Info -->
-                    <div class="card border-0 bg-light mb-3">
+                <!-- Basic Information -->
+                <div class="col-md-6 mb-3">
+                    <div class="card border-0 bg-light h-100">
                         <div class="card-body">
-                            <h6 class="fw-bold text-primary mb-2"><i class="fas fa-briefcase me-2"></i>Applied Position</h6>
-                            <p class="mb-1 fw-semibold">${job.industry?.industry_name || 'N/A'}</p>
-                            <p class="small text-muted mb-0">${job.description}</p>
+                            <h6 class="fw-bold text-primary mb-3"><i class="fas fa-user me-2"></i>Basic Information</h6>
+                            <div class="mb-2"><strong>Date of Birth:</strong> ${basics?.dob || 'Not provided'}</div>
+                            <div class="mb-2"><strong>Gender:</strong> ${basics?.gender || 'Not provided'}</div>
+                            <div class="mb-2"><strong>Aadhar:</strong> ${basics?.aadhar_number || 'Not provided'}</div>
+                            <div class="mb-2"><strong>PAN:</strong> ${basics?.pan_number || 'Not provided'}</div>
+                            <div class="mb-2"><strong>Passport:</strong> ${basics?.passport_number || 'Not provided'}</div>
+                            <div class="mb-2"><strong>Job Type:</strong> ${basics?.Job_type || basics?.job_type || 'Not specified'}</div>
+                            <div class="mb-0"><strong>Experience:</strong> ${basics?.experience || 'Not specified'}</div>
                         </div>
                     </div>
-                    
-                    <!-- Qualifications -->
-                    <div class="card border-0 bg-light mb-3">
-                        <div class="card-body">
-                            <h6 class="fw-bold text-success mb-2"><i class="fas fa-graduation-cap me-2"></i>Qualifications</h6>
-                            ${qualificationsHtml}
-                        </div>
-                    </div>
-                    
-                    <!-- Experience -->
-                    <div class="card border-0 bg-light mb-3">
-                        <div class="card-body">
-                            <h6 class="fw-bold text-info mb-2"><i class="fas fa-briefcase me-2"></i>Experience</h6>
-                            ${experiencesHtml}
-                        </div>
-                    </div>
-                    
-                    <!-- Cover Letter -->
-                    ${coverLetterHtml}
-                    
-                    <!-- Employer Notes -->
-                    ${notesHtml}
                 </div>
+                
+                <!-- Contact Details -->
+                <div class="col-md-6 mb-3">
+                    <div class="card border-0 bg-light h-100">
+                        <div class="card-body">
+                            <h6 class="fw-bold text-info mb-3"><i class="fas fa-address-book me-2"></i>Contact Details</h6>
+                            <div class="mb-2"><strong>Email:</strong> ${candidate.email || 'N/A'}</div>
+                            <div class="mb-2"><strong>Mobile:</strong> ${candidate.mobile || 'N/A'}</div>
+                            <div class="mb-2"><strong>Alt. Mobile:</strong> ${basics?.alternate_mobile_number || 'Not provided'}</div>
+                            <div class="mb-2"><strong>WhatsApp:</strong> ${basics?.whatsapp_number || 'Not provided'}</div>
+                            <div class="mb-0"><strong>Alt. Email:</strong> ${basics?.alternate_email_id || 'Not provided'}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Present Address -->
+                <div class="col-md-6 mb-3">
+                    <div class="card border-0 bg-light h-100">
+                        <div class="card-body">
+                            <h6 class="fw-bold text-success mb-3"><i class="fas fa-map-marker-alt me-2"></i>Present Address</h6>
+                            ${presentAddress ? `
+                                <p class="mb-1">${presentAddress.address_1 || ''} ${presentAddress.address_2 || ''}</p>
+                                <p class="mb-1">${presentAddress.city || ''}, ${presentAddress.state || ''} - ${presentAddress.zip || ''}</p>
+                                <p class="mb-1">${presentAddress.country || ''}</p>
+                                <p class="mb-0"><strong>Police Station:</strong> ${presentAddress.police_station || 'N/A'}</p>
+                            ` : '<p class="text-muted">No address added</p>'}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Permanent Address -->
+                <div class="col-md-6 mb-3">
+                    <div class="card border-0 bg-light h-100">
+                        <div class="card-body">
+                            <h6 class="fw-bold text-warning mb-3"><i class="fas fa-home me-2"></i>Permanent Address</h6>
+                            ${permanentAddress ? `
+                                <p class="mb-1">${permanentAddress.address_1 || ''} ${permanentAddress.address_2 || ''}</p>
+                                <p class="mb-1">${permanentAddress.city || ''}, ${permanentAddress.state || ''} - ${permanentAddress.zip || ''}</p>
+                                <p class="mb-1">${permanentAddress.country || ''}</p>
+                                <p class="mb-0"><strong>Police Station:</strong> ${permanentAddress.police_station || 'N/A'}</p>
+                            ` : '<p class="text-muted">No address added</p>'}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Education & Qualifications -->
+                ${app.candidate_qualifications?.length > 0 ? `
+                <div class="col-12 mb-3">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="fw-bold text-success mb-3"><i class="fas fa-graduation-cap me-2"></i>Education & Qualifications</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-borderless mb-0">
+                                    <tbody>
+                                        ${app.candidate_qualifications.map(q => {
+                                            const qualParts = [];
+                                            if(q.level1_qualification?.degree) qualParts.push(q.level1_qualification.degree);
+                                            if(q.level2_qualification?.degree) qualParts.push(q.level2_qualification.degree);
+                                            if(q.level3_qualification?.degree) qualParts.push(q.level3_qualification.degree);
+                                            if(q.qualification?.degree) qualParts.push(q.qualification.degree);
+                                            const qualDisplay = qualParts.length > 0 ? qualParts.join(' -> ') : 'N/A';
+                                            return `
+                                            <tr>
+                                                <td><strong>${qualDisplay}</strong></td>
+                                                <td>${q.university || '-'}</td>
+                                                <td>${q.institution || '-'}</td>
+                                                <td>${q.from_year} - ${q.to_year}</td>
+                                                <td>${q.percentage ? q.percentage + '%' : '-'}</td>
+                                            </tr>
+                                            `;
+                                        }).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+                
+                <!-- Work Experience -->
+                ${app.candidate_experiences?.length > 0 ? `
+                <div class="col-12 mb-3">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="fw-bold text-info mb-3"><i class="fas fa-briefcase me-2"></i>Work Experience</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-borderless mb-0">
+                                    <tbody>
+                                        ${app.candidate_experiences.map(exp => {
+                                            const industryParts = [];
+                                            if(exp.industry?.industry_name) industryParts.push(exp.industry.industry_name);
+                                            if(exp.industry_level_2?.industry_name) industryParts.push(exp.industry_level_2.industry_name);
+                                            if(exp.industry_level_3?.industry_name) industryParts.push(exp.industry_level_3.industry_name);
+                                            const industryDisplay = industryParts.length > 0 ? industryParts.join(' -> ') : 'Unknown Industry';
+                                            return `
+                                            <tr>
+                                                <td><strong>${exp.company || 'N/A'}</strong><br><small class="text-muted">${industryDisplay}</small></td>
+                                                <td>${exp.from_year} - ${exp.to_year || 'Present'}</td>
+                                                <td>${exp.duration || '-'}</td>
+                                                <td>${exp.present_salary ? '₹' + Number(exp.present_salary).toLocaleString() : '-'}</td>
+                                            </tr>
+                                            `;
+                                        }).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+                
+                <!-- Skills & Expertise - Grouped by Job Role -->
+                ${app.candidate_skills?.length > 0 ? `
+                <div class="col-12 mb-3">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="fw-bold text-dark mb-3"><i class="fas fa-tools me-2"></i>Skills & Expertise</h6>
+                            ${(() => {
+                                // Group skills by industry_id (job role)
+                                const groupedSkills = app.candidate_skills.reduce((acc, skill) => {
+                                    const roleId = skill.skill?.industry_id || 'unknown';
+                                    if (!acc[roleId]) {
+                                        acc[roleId] = [];
+                                    }
+                                    acc[roleId].push(skill);
+                                    return acc;
+                                }, {});
+                                
+                                return Object.entries(groupedSkills).map(([roleId, roleSkills], index, arr) => {
+                                    const roleName = roleSkills[0]?.skill?.industry?.industry_name || 'Unknown Role';
+                                    const proficiency = roleSkills[0]?.proficiency || '';
+                                    const isLast = index === arr.length - 1;
+                                    
+                                    return `
+                                    <div class="${!isLast ? 'mb-3 pb-3 border-bottom' : ''}">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="mb-0 fw-bold text-primary" style="font-size: 14px;">
+                                                <i class="fas fa-briefcase me-2"></i>${roleName}
+                                            </h6>
+                                            ${proficiency ? `<span class="badge bg-primary" style="font-size: 11px;">${proficiency}</span>` : ''}
+                                        </div>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            ${roleSkills.map(s => `
+                                                <span class="badge bg-success" style="font-size: 12px; padding: 6px 12px;">
+                                                    ${s.skill?.skill || 'Unknown'}
+                                                </span>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                    `;
+                                }).join('');
+                            })()}
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+                
+                <!-- Hobbies & Interests -->
+                ${hobbies ? `
+                <div class="col-12 mb-3">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="fw-bold text-danger mb-3"><i class="fas fa-heart me-2"></i>Hobbies & Interests</h6>
+                            ${hobbies.description ? `<div class="mb-2">${hobbies.description}</div>` : ''}
+                            ${hobbies.interests ? `
+                                <div class="d-flex flex-wrap gap-2">
+                                    ${hobbies.interests.split(',').map(i => `
+                                        <span class="badge bg-danger" style="font-size: 12px;">${i.trim()}</span>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+                
+                <!-- Cover Letter -->
+                ${app.cover_letter ? `
+                <div class="col-12 mb-3">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="fw-bold text-dark mb-2"><i class="fas fa-file-alt me-2"></i>Cover Letter</h6>
+                            <p class="mb-0">${app.cover_letter}</p>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+                
+                <!-- Digital Signature -->
+                ${candidate.signature_image ? `
+                <div class="col-12 mb-3">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body text-center">
+                            <h6 class="fw-bold text-secondary mb-3"><i class="fas fa-signature me-2"></i>Digital Signature</h6>
+                            <img src="${candidate.signature_image}" alt="Signature" style="max-width: 300px; border: 1px solid #ddd; padding: 10px; background: #fff;">
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+                
+                <!-- Employer Notes -->
+                ${app.employer_notes ? `
+                <div class="col-12 mb-3">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="fw-bold text-warning mb-2"><i class="fas fa-sticky-note me-2"></i>Your Notes</h6>
+                            <p class="mb-0">${app.employer_notes}</p>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
             </div>
         `;
         

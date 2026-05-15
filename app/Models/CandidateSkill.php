@@ -11,6 +11,6 @@ class CandidateSkill extends Model
 
     public function skill()
     {
-        return $this->belongsTo(ComputerAndOtherSkill::class, 'skill_id', 'id');
+        return $this->belongsTo(ComputerAndOtherSkill::class, 'skill_id', 'id')->with('industry');
     }
 }

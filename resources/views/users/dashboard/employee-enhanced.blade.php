@@ -772,11 +772,32 @@
                         </div>
                         <div class="timeline-card-body">
                             @if(Auth::user()->skills->isNotEmpty())
-                                <div class="skill-tags">
-                                    @foreach(Auth::user()->skills as $skill)
-                                        <span class="skill-tag">{{$skill->skill->skill ?? 'Unknown'}} ({{$skill->proficiency}})</span>
-                                    @endforeach
-                                </div>
+                                @php
+                                    // Group skills by job role (industry_id)
+                                    $groupedSkills = Auth::user()->skills->groupBy(function($item) {
+                                        return $item->skill->industry_id ?? 'unknown';
+                                    });
+                                @endphp
+                                
+                                @foreach($groupedSkills as $roleId => $skills)
+                                    @php
+                                        $roleName = $skills->first()->skill->industry->industry_name ?? 'Unknown Role';
+                                        $proficiency = $skills->first()->proficiency;
+                                    @endphp
+                                    <div class="mb-3 pb-3 {{ !$loop->last ? 'border-bottom' : '' }}">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="mb-0 fw-bold text-primary">
+                                                <i class="fas fa-briefcase me-2"></i>{{ $roleName }}
+                                            </h6>
+                                            <span class="badge-custom badge-primary">{{ $proficiency }}</span>
+                                        </div>
+                                        <div class="skill-tags">
+                                            @foreach($skills as $skill)
+                                                <span class="skill-tag">{{ $skill->skill->skill ?? 'Unknown' }}</span>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endforeach
                             @else
                                 <div class="empty-state">
                                     <i class="fas fa-tools"></i>
@@ -1212,14 +1233,42 @@
                 <div class="col-12 mb-3">
                     <div class="card border-0 bg-light">
                         <div class="card-body">
-                            <h6 class="fw-bold text-dark mb-3"><i class="fas fa-tools me-2"></i>Skills</h6>
-                            <div class="d-flex flex-wrap gap-2">
-                                ${skills.map(s => `
-                                    <span class="badge bg-success" style="font-size: 14px; padding: 8px 15px;">
-                                        ${s.skill?.skill || 'Unknown'} ${s.proficiency ? `(${s.proficiency})` : ''}
-                                    </span>
-                                `).join('')}
-                            </div>
+                            <h6 class="fw-bold text-dark mb-3"><i class="fas fa-tools me-2"></i>Skills & Expertise</h6>
+                            ${(() => {
+                                // Group skills by industry_id
+                                const groupedSkills = skills.reduce((acc, skill) => {
+                                    const roleId = skill.skill?.industry_id || 'unknown';
+                                    if (!acc[roleId]) {
+                                        acc[roleId] = [];
+                                    }
+                                    acc[roleId].push(skill);
+                                    return acc;
+                                }, {});
+                                
+                                return Object.entries(groupedSkills).map(([roleId, roleSkills], index, arr) => {
+                                    const roleName = roleSkills[0]?.skill?.industry?.industry_name || 'Unknown Role';
+                                    const proficiency = roleSkills[0]?.proficiency || '';
+                                    const isLast = index === arr.length - 1;
+                                    
+                                    return `
+                                    <div class="${!isLast ? 'mb-3 pb-3 border-bottom' : ''}">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="mb-0 fw-bold text-primary">
+                                                <i class="fas fa-briefcase me-2"></i>${roleName}
+                                            </h6>
+                                            ${proficiency ? `<span class="badge-custom badge-primary">${proficiency}</span>` : ''}
+                                        </div>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            ${roleSkills.map(s => `
+                                                <span class="badge bg-success" style="font-size: 14px; padding: 8px 15px;">
+                                                    ${s.skill?.skill || 'Unknown'}
+                                                </span>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                    `;
+                                }).join('');
+                            })()}
                         </div>
                     </div>
                 </div>

@@ -827,18 +827,53 @@ class JobPostController extends Controller
             'jobPost.industry', 
             'jobPost.qualification', 
             'user.basicDetails', 
+            'user.presentAddress',
+            'user.permanentAddress',
+            'user.candidateHobby',
             'user.candidateQualifications.qualification',
+            'user.candidateQualifications.level1Qualification',
+            'user.candidateQualifications.level2Qualification',
+            'user.candidateQualifications.level3Qualification',
             'user.candidateExperiences.industry',
-            'user.candidateSkills.skill'
+            'user.candidateExperiences.industryLevel2',
+            'user.candidateExperiences.industryLevel3',
+            'user.candidateSkills.skill.industry'
         ])
             ->whereHas('jobPost', function($q) {
                 $q->where('user_id', Auth::id());
             })
             ->findOrFail($applicationId);
 
-        return response()->json([
-            'application' => $application,
-        ]);
+        // Format the response to match employee dashboard structure
+        $response = [
+            'application' => [
+                'id' => $application->id,
+                'status' => $application->status,
+                'cover_letter' => $application->cover_letter,
+                'employer_notes' => $application->employer_notes,
+                'applied_at' => $application->applied_at,
+                'job_post' => $application->jobPost,
+                'user' => [
+                    'id' => $application->user->id,
+                    'first_name' => $application->user->first_name,
+                    'last_name' => $application->user->last_name,
+                    'full_name' => $application->user->first_name . ' ' . $application->user->last_name,
+                    'email' => $application->user->email,
+                    'mobile' => $application->user->mobile,
+                    'image_path' => $application->user->image_path,
+                    'signature_image' => $application->user->signature_image,
+                ],
+                'basic_details' => $application->user->basicDetails,
+                'present_address' => $application->user->presentAddress,
+                'permanent_address' => $application->user->permanentAddress,
+                'hobbies' => $application->user->candidateHobby,
+                'candidate_qualifications' => $application->user->candidateQualifications,
+                'candidate_experiences' => $application->user->candidateExperiences,
+                'candidate_skills' => $application->user->candidateSkills,
+            ],
+        ];
+
+        return response()->json($response);
     }
 
     /**
