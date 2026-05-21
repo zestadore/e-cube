@@ -10,7 +10,7 @@
                     <div class="card">
                         <div class="card-header d-flex justify-content-between">
                             <div class="header-title">
-                                <h4 class="card-title">Users</h4>
+                                <h4 class="card-title">Employers</h4>
                             </div>
                         </div>
                         <div class="card-body px-0">
@@ -18,15 +18,8 @@
                                 <form id="filterfordatatable" style="padding: 5px;" class="form-horizontal" onsubmit="event.preventDefault();">
                                     <div class="row ">
                                         <div class="col-md-4">
-                                            <input type="text" name="search" class="form-control" placeholder="Search with name">
+                                            <input type="text" name="search" class="form-control" placeholder="Search with name or email">
                                         </div>
-                                        {{-- <div class="col-md-4">
-                                            <select name="role" class="form-select">
-                                                <option value="">All Users</option>
-                                                <option value="employee">Employee</option>
-                                                <option value="employer">Employer</option>
-                                            </select>
-                                        </div> --}}
                                     </div>
                                 </form><br>
                                 <table id="item-table" class="table table-striped" role="grid" data-bs-toggle="data-table">
@@ -36,7 +29,7 @@
                                             <th>User</th>
                                             <th>Email</th>
                                             <th>Mobile</th>
-                                            {{-- <th>Role</th> --}}
+                                            <th>Status</th>
                                             <th style="min-width: 100px">Action</th>
                                         </tr>
                                     </thead>
@@ -65,10 +58,9 @@
                 "pagingType": "full_numbers",
                 "dom": "<'row'<'col-sm-12 col-md-12 right'B>><'row'<'col-sm-12'tr>><'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
                 ajax: {
-                    url: "{{ route('admin.users.index') }}",
+                    url: "{{ route('admin.users.employers') }}",
                     data: function (d) {
                         d.search = $('input[name=search]').val();
-                        d.role = $('select[name=role]').val();
                     }
                 },
                 columns: [{
@@ -78,7 +70,7 @@
                     {data: 'user', name: 'user'},
                     {data: 'email_field',name: 'email_field'},
                     {data: 'mobile_field',name: 'mobile_field'},
-                    // {data: 'role_field',name: 'role_field'},
+                    {data: 'status_field',name: 'status_field'},
                     {data: 'action', name: 'action', orderable: false, searchable: false},
                 ],
                 'aoColumnDefs': [{
@@ -91,10 +83,6 @@
         drawTable();
         
         $('input[name=search]').keyup(function(){
-            drawTable();
-        });
-        
-        $('select[name=role]').change(function(){
             drawTable();
         });
         
@@ -122,6 +110,71 @@
                             Swal.fire({
                                 title: "Updated!",
                                 text: "Data has been updated.",
+                                icon: "success"
+                            });
+                            drawTable();
+                        }
+                    });
+                }
+            })
+        }
+
+        function toggleStatus(id){
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to change the user status?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, Change Status!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var url = "{{route('admin.users.toggle-status',':id')}}";
+                    url = url.replace(':id', id);
+                    $.ajax({
+                        url: url,
+                        type: "POST",
+                        data: {
+                            "_token": "{{ csrf_token() }}"
+                        },
+                        success: function (data) {
+                            Swal.fire({
+                                title: "Updated!",
+                                text: "User status has been changed.",
+                                icon: "success"
+                            });
+                            drawTable();
+                        }
+                    });
+                }
+            })
+        }
+
+        function deleteUser(id){
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this! This will permanently delete the user.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, Delete User!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var url = "{{route('admin.users.destroy',':id')}}";
+                    url = url.replace(':id', id);
+                    $.ajax({
+                        url: url,
+                        type: "POST",
+                        data: {
+                            "_token": "{{ csrf_token() }}",
+                            "_method": "DELETE"
+                        },
+                        success: function (data) {
+                            Swal.fire({
+                                title: "Deleted!",
+                                text: "User has been deleted.",
                                 icon: "success"
                             });
                             drawTable();

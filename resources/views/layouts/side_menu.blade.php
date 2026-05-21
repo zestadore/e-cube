@@ -31,7 +31,7 @@
                 </li>
                 @can('isAdmin')
                     <li class="nav-item">
-                        <a class="nav-link {{ (request()->is('admin/users*'))? 'active' : '' }}" aria-current="page" href="{{ route('admin.users.index') }}">
+                        <a class="nav-link {{ (request()->is('admin/users/employees*'))? 'active' : '' }}" aria-current="page" href="{{ route('admin.users.employees') }}">
                             <i class="icon">
                                 <svg width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-20">
                                     <path opacity="0.4" d="M9.15257 21.5584C9.15257 21.5584 9.15257 21.5584 9.15257 21.5584C6.19502 21.5584 3.80029 19.1637 3.80029 16.2061V15.2717C3.80029 14.3844 4.46589 13.6046 5.34602 13.5053C6.81876 13.3379 8.53702 13.1779 9.15257 13.1779C9.76812 13.1779 11.4864 13.3379 12.9591 13.5053C13.8392 13.6046 14.5048 14.3844 14.5048 15.2717V16.2061C14.5048 19.1637 12.1101 21.5584 9.15257 21.5584Z" fill="currentColor"></path>
@@ -40,7 +40,20 @@
                                     <path d="M16.1486 13.0475C17.6392 13.0475 18.8476 11.8391 18.8476 10.3485C18.8476 8.85789 17.6392 7.64947 16.1486 7.64947C14.658 7.64947 13.4496 8.85789 13.4496 10.3485C13.4496 11.8391 14.658 13.0475 16.1486 13.0475Z" fill="currentColor"></path>
                                 </svg>
                             </i>
-                            <span class="item-name">Users</span>
+                            <span class="item-name">Employees</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ (request()->is('admin/users/employers*'))? 'active' : '' }}" aria-current="page" href="{{ route('admin.users.employers') }}">
+                            <i class="icon">
+                                <svg width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-20">
+                                    <path opacity="0.4" d="M12 2L2 7V9H22V7L12 2Z" fill="currentColor"></path>
+                                    <path d="M4 10V19C4 20.1046 4.89543 21 6 21H9V14H15V21H18C19.1046 21 20 20.1046 20 19V10H4Z" fill="currentColor"></path>
+                                    <path d="M9 16H11V21H9V16Z" fill="currentColor"></path>
+                                    <path d="M13 16H15V21H13V16Z" fill="currentColor"></path>
+                                </svg>
+                            </i>
+                            <span class="item-name">Employers</span>
                         </a>
                     </li>
                     <li class="nav-item">

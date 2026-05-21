@@ -9,6 +9,10 @@ use App\Models\BackGroundQuestion;
 use App\Models\BackgroundQuestionAnswer;
 use App\Models\PaymentMethod;
 use App\Models\SubscriptionPackage;
+use App\Models\User;
+use App\Models\JobPost;
+use App\Models\JobApplication;
+use App\Models\PaymentHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -51,7 +55,100 @@ class HomeController extends Controller
     }
 
     public function adminDashboard(){
-        return view('admin.dashboard.index');
+        // Get live statistics
+        $totalEmployees = User::where('role', 'employee')->count();
+        $totalEmployers = User::where('role', 'employer')->count();
+        $totalJobPosts = JobPost::count();
+        $totalApplications = JobApplication::count();
+        $totalRevenue = PaymentHistory::where('status', 'completed')->sum('amount');
+        $recentApplications = JobApplication::with(['user', 'jobPost'])->latest()->take(5)->get();
+        
+        // Monthly data for charts (last 6 months)
+        $months = [];
+        $employeeData = [];
+        $employerData = [];
+        $jobPostData = [];
+        $applicationData = [];
+        $revenueData = [];
+        
+        for ($i = 5; $i >= 0; $i--) {
+            $month = now()->subMonths($i);
+            $months[] = $month->format('M Y');
+            
+            $employeeData[] = User::where('role', 'employee')
+                ->whereYear('created_at', $month->year)
+                ->whereMonth('created_at', $month->month)
+                ->count();
+                
+            $employerData[] = User::where('role', 'employer')
+                ->whereYear('created_at', $month->year)
+                ->whereMonth('created_at', $month->month)
+                ->count();
+                
+            $jobPostData[] = JobPost::whereYear('created_at', $month->year)
+                ->whereMonth('created_at', $month->month)
+                ->count();
+                
+            $applicationData[] = JobApplication::whereYear('created_at', $month->year)
+                ->whereMonth('created_at', $month->month)
+                ->count();
+                
+            $revenueData[] = PaymentHistory::where('status', 'completed')
+                ->whereYear('created_at', $month->year)
+                ->whereMonth('created_at', $month->month)
+                ->sum('amount');
+        }
+        
+        // Application status distribution
+        $applicationStatusData = [
+            'pending' => JobApplication::where('status', 'pending')->count(),
+            'shortlisted' => JobApplication::where('status', 'shortlisted')->count(),
+            'rejected' => JobApplication::where('status', 'rejected')->count(),
+            'hired' => JobApplication::where('status', 'hired')->count(),
+        ];
+        
+        // Top industries by job posts
+        $topIndustries = \DB::table('job_posts')
+            ->join('industries', 'job_posts.industry_id', '=', 'industries.id')
+            ->select('industries.industry_name', \DB::raw('count(*) as total'))
+            ->groupBy('industries.industry_name')
+            ->orderByDesc('total')
+            ->take(5)
+            ->get();
+        
+        // Recent users (last 5)
+        $recentUsers = User::whereIn('role', ['employee', 'employer'])
+            ->latest()
+            ->take(5)
+            ->get();
+        
+        // Today's stats
+        $todayEmployees = User::where('role', 'employee')->whereDate('created_at', today())->count();
+        $todayEmployers = User::where('role', 'employer')->whereDate('created_at', today())->count();
+        $todayApplications = JobApplication::whereDate('created_at', today())->count();
+        $todayRevenue = PaymentHistory::where('status', 'completed')->whereDate('created_at', today())->sum('amount');
+        
+        return view('admin.dashboard.index', compact(
+            'totalEmployees',
+            'totalEmployers',
+            'totalJobPosts',
+            'totalApplications',
+            'totalRevenue',
+            'recentApplications',
+            'months',
+            'employeeData',
+            'employerData',
+            'jobPostData',
+            'applicationData',
+            'revenueData',
+            'applicationStatusData',
+            'topIndustries',
+            'recentUsers',
+            'todayEmployees',
+            'todayEmployers',
+            'todayApplications',
+            'todayRevenue'
+        ));
     }
 
     public function chooseType(){

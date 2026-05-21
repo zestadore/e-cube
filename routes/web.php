@@ -83,7 +83,12 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('sliders', App\Http\Controllers\Admin\SliderController::class);
         Route::resource('events', App\Http\Controllers\Admin\EventController::class);
         Route::resource('reviews', App\Http\Controllers\Admin\ReviewController::class);
-        Route::resource('users', App\Http\Controllers\Admin\UserController::class);
+        Route::get('users/employees', [App\Http\Controllers\Admin\UserController::class, 'employees'])->name('users.employees');
+        Route::get('users/employers', [App\Http\Controllers\Admin\UserController::class, 'employers'])->name('users.employers');
+        Route::get('users/{id}', [App\Http\Controllers\Admin\UserController::class, 'show'])->name('users.show');
+        Route::put('users/{id}', [App\Http\Controllers\Admin\UserController::class, 'update'])->name('users.update');
+        Route::post('users/{id}/toggle-status', [App\Http\Controllers\Admin\UserController::class, 'toggleStatus'])->name('users.toggle-status');
+        Route::delete('users/{id}', [App\Http\Controllers\Admin\UserController::class, 'destroy'])->name('users.destroy');
         // Admin Payment History
         Route::get('payment-history', [App\Http\Controllers\PaymentHistoryController::class, 'adminIndex'])->name('payment-history');
         
