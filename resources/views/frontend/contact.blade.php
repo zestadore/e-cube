@@ -40,7 +40,7 @@
 
                             <div class="row">
                                 <!-- Contact Info Cards -->
-                                <div class="col-lg-4 col-md-6 mb-4">
+                                {{-- <div class="col-lg-4 col-md-6 mb-4">
                                     <div class="contact-info-card p-4 border rounded shadow-sm h-100">
                                         <div class="contact-icon mb-3">
                                             <i class="fa fa-user text-primary fs-2"></i>
@@ -49,9 +49,9 @@
                                         <p class="mb-0">BASIL SKARIA<br>
                                         <small class="text-muted">CEO, E Cube Career Solutions</small></p>
                                     </div>
-                                </div>
+                                </div> --}}
 
-                                <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="col-lg-6 col-md-6 mb-4">
                                     <div class="contact-info-card p-4 border rounded shadow-sm h-100">
                                         <div class="contact-icon mb-3">
                                             <i class="fa fa-map text-primary fs-2"></i>
@@ -61,7 +61,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="col-lg-6 col-md-6 mb-4">
                                     <div class="contact-info-card p-4 border rounded shadow-sm h-100">
                                         <div class="contact-icon mb-3">
                                             <i class="fa fa-phone text-primary fs-2"></i>

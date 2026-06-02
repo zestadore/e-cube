@@ -73,6 +73,8 @@
                                 <option value="">Select type</option>
                                 <option value="employee">Employee</option>
                                 <option value="employer">Employer</option>
+                                <option value="profile_download">Profile Download</option>
+                                <option value="candidate_view">Candidate View</option>
                             </select>
                         </div>
                         <x-InputBox class="form-control {{ $errors->has('duration') ? ' is-invalid' : '' }}" title="Duration(in months)" name="duration" id="duration" type="text" required="True"/>

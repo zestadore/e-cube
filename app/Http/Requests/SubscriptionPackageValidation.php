@@ -27,7 +27,7 @@ class SubscriptionPackageValidation extends FormRequest
             'original_price' => 'nullable|numeric',
             'duration' => 'required|numeric',
             'id' => 'nullable|exists:subscription_packages,id',
-            'type' => 'required|in:employee,employer',
+            'type' => 'required|in:employee,employer,profile_download,candidate_view',
         ];
     }
 }

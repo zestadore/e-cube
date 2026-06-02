@@ -118,6 +118,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('find-jobs', [App\Http\Controllers\JobPostController::class, 'findJobs'])->name('find-jobs');
         Route::get('job/{id}', [App\Http\Controllers\JobPostController::class, 'showJobForEmployee'])->name('job.show');
         Route::post('job/{id}/apply', [App\Http\Controllers\JobPostController::class, 'applyForJob'])->name('job.apply');
+        
+        // Profile Download Routes
+        Route::get('profile-download/check-status', [App\Http\Controllers\ProfileDownloadController::class, 'checkStatus'])->name('profile-download.check-status');
+        Route::post('profile-download/initiate-payment', [App\Http\Controllers\ProfileDownloadController::class, 'initiatePayment'])->name('profile-download.initiate-payment');
+        Route::post('profile-download/test-payment', [App\Http\Controllers\ProfileDownloadController::class, 'testPayment'])->name('profile-download.test-payment');
+        Route::get('profile-download/download', [App\Http\Controllers\ProfileDownloadController::class, 'downloadProfile'])->name('profile-download.download');
     });
     // Employer routes that require auth but NOT email verification (for initial registration flow)
     Route::group(['as'=>'employer.','prefix' => 'employer', 'middleware' => 'auth'], function () {
@@ -170,6 +176,10 @@ Route::middleware(['auth'])->group(function () {
 // Paytm Callback Routes - Must be outside auth middleware (Paytm sends POST back)
 Route::post('/paytm/candidate-view-callback', [App\Http\Controllers\JobPostController::class, 'handleCandidateViewCallback'])->name('paytm.candidate-view-callback');
 Route::get('/paytm/candidate-view-callback', [App\Http\Controllers\JobPostController::class, 'handleCandidateViewCallback']); // Handle GET as well
+
+// Profile Download Callback Routes
+Route::post('/paytm/profile-download-callback', [App\Http\Controllers\ProfileDownloadController::class, 'handleCallback'])->name('paytm.profile-download-callback');
+Route::get('/paytm/profile-download-callback', [App\Http\Controllers\ProfileDownloadController::class, 'handleCallback']);
 
 // Public Payment Status Page (no auth required)
 Route::get('/payment/status', [App\Http\Controllers\JobPostController::class, 'paymentStatus'])->name('payment.status');

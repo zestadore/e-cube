@@ -873,6 +873,9 @@
                             <a href="{{route('employee.payment-history')}}" class="btn btn-outline-info w-100 mb-3">
                                 <i class="fas fa-history me-2"></i>Payment History
                             </a>
+                            <button class="btn btn-outline-danger w-100 mb-3" onclick="checkProfileDownloadStatus()">
+                                <i class="fas fa-file-pdf me-2"></i>Download Profile
+                            </button>
                             <a href="{{route('change.password')}}" class="btn btn-outline-secondary w-100">
                                 <i class="fas fa-lock me-2"></i>Change Password
                             </a>
@@ -980,9 +983,9 @@
                         </div>
                     </div>
                     <div class="modal-footer border-0 px-4 pb-4">
-                        <a href="{{route('candidate.profile')}}" class="btn btn-primary">
-                            <i class="fas fa-external-link-alt me-2"></i>View Full Page
-                        </a>
+                        {{-- <a href="{{route('candidate.profile')}}" class="btn btn-primary">
+                            <i class="fas fa-external-link-alt me-2"></i>View Full Pages
+                        </a> --}}
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 8px;">
                             <i class="fas fa-times me-2"></i>Close
                         </button>
@@ -990,6 +993,85 @@
                 </div>
             </div>
         </div>
+
+        <!-- Profile Download Payment Modal -->
+        <div class="modal fade" id="profileDownloadModal" tabindex="-1" aria-labelledby="profileDownloadModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content" style="border-radius: 15px;">
+                    <div class="modal-header" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);">
+                        <h5 class="modal-title text-white" id="profileDownloadModalLabel">
+                            <i class="fas fa-file-pdf me-2"></i>Download Profile PDF
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div class="text-center mb-4">
+                            <div class="position-relative d-inline-block mb-3">
+                                <i class="fas fa-file-pdf fa-3x text-danger"></i>
+                            </div>
+                            <h5 class="fw-bold">Download Your Profile</h5>
+                            <p class="text-muted small">Get your complete profile as a PDF document</p>
+                        </div>
+                        
+                        <div class="card bg-light border-0 mb-4">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span>Profile Download Fee</span>
+                                    <span class="fw-bold" id="profileDownloadPrice">₹--</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span>GST (18%)</span>
+                                    <span>₹0</span>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">Total Amount</span>
+                                    <span class="fw-bold text-success fs-5" id="profileDownloadTotal">₹--</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="profileDownloadPaymentOptions">
+                            <p class="text-muted small mb-3">Click below to proceed with payment:</p>
+                            
+                            <button type="button" id="profileDownloadPayBtn" class="btn btn-danger w-100 mb-2 d-flex align-items-center justify-content-center" onclick="initiateProfileDownloadPayment()">
+                                <i class="fas fa-credit-card me-2"></i>Pay Now - <span id="profileDownloadBtnPrice">₹--</span>
+                            </button>
+                            
+                            <p class="text-muted small text-center mb-0">
+                                <i class="fas fa-shield-alt me-1"></i>Secure payment powered by Paytm
+                            </p>
+                        </div>
+                        
+                        <div id="profileDownloadTestOptions" style="display: none;">
+                            <div class="alert alert-info">
+                                <i class="fas fa-vial me-2"></i>Test Mode - Select payment result:
+                            </div>
+                            <button type="button" class="btn btn-success w-100 mb-2" onclick="processProfileDownloadTestPayment('success')">
+                                <i class="fas fa-check me-2"></i>Simulate Successful Payment
+                            </button>
+                            <button type="button" class="btn btn-danger w-100 mb-2" onclick="processProfileDownloadTestPayment('failure')">
+                                <i class="fas fa-times me-2"></i>Simulate Failed Payment
+                            </button>
+                        </div>
+                        
+                        <div id="profileDownloadProcessing" style="display: none;">
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-primary mb-3" role="status">
+                                    <span class="visually-hidden">Processing...</span>
+                                </div>
+                                <p class="text-muted">Processing your payment...</p>
+                                <p class="small text-muted">Please do not close this window</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hidden Form for Paytm Submission -->
+        <form id="profileDownloadPaytmForm" method="POST" action="" style="display: none;">
+        </form>
 
         <!-- Edit Modals -->
         @include('users.dashboard.partials.edit-modals')
@@ -1312,6 +1394,144 @@
 
     // Handle modal close - clean up backdrops
     document.getElementById('viewProfileModal').addEventListener('hidden.bs.modal', function () {
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('overflow');
+        document.body.style.removeProperty('padding-right');
+    });
+
+    // Profile Download Functions
+    let profileDownloadOrderId = null;
+    let profileDownloadPrice = 0;
+
+    function checkProfileDownloadStatus() {
+        fetch('{{ route("employee.profile-download.check-status") }}')
+            .then(response => response.json())
+            .then(data => {
+                if (data.has_paid) {
+                    // User has already paid, download directly
+                    window.location.href = '{{ route("employee.profile-download.download") }}';
+                } else {
+                    // Show payment modal
+                    profileDownloadPrice = data.download_price;
+                    document.getElementById('profileDownloadPrice').textContent = '₹' + parseFloat(profileDownloadPrice).toFixed(2);
+                    document.getElementById('profileDownloadTotal').textContent = '₹' + parseFloat(profileDownloadPrice).toFixed(2);
+                    document.getElementById('profileDownloadBtnPrice').textContent = '₹' + parseFloat(profileDownloadPrice).toFixed(2);
+                    
+                    // Reset modal state
+                    document.getElementById('profileDownloadPaymentOptions').style.display = 'block';
+                    document.getElementById('profileDownloadTestOptions').style.display = 'none';
+                    document.getElementById('profileDownloadProcessing').style.display = 'none';
+                    
+                    const modal = new bootstrap.Modal(document.getElementById('profileDownloadModal'));
+                    modal.show();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to check payment status. Please try again.');
+            });
+    }
+
+    function initiateProfileDownloadPayment() {
+        document.getElementById('profileDownloadPaymentOptions').style.display = 'none';
+        document.getElementById('profileDownloadProcessing').style.display = 'block';
+
+        fetch('{{ route("employee.profile-download.initiate-payment") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.already_paid) {
+                // Already paid, close modal and download
+                bootstrap.Modal.getInstance(document.getElementById('profileDownloadModal')).hide();
+                window.location.href = '{{ route("employee.profile-download.download") }}';
+                return;
+            }
+
+            if (data.test_mode) {
+                // In test mode, show test options
+                profileDownloadOrderId = data.order_id;
+                document.getElementById('profileDownloadProcessing').style.display = 'none';
+                document.getElementById('profileDownloadTestOptions').style.display = 'block';
+            } else if (data.success && data.paytmParams) {
+                // Production mode - redirect to Paytm
+                const form = document.getElementById('profileDownloadPaytmForm');
+                form.innerHTML = '';
+                form.action = data.paytm_url;
+
+                for (const key in data.paytmParams) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    input.value = data.paytmParams[key];
+                    form.appendChild(input);
+                }
+
+                const checksumInput = document.createElement('input');
+                checksumInput.type = 'hidden';
+                checksumInput.name = 'CHECKSUMHASH';
+                checksumInput.value = data.checksum;
+                form.appendChild(checksumInput);
+
+                form.submit();
+            } else {
+                alert('Failed to initiate payment. Please try again.');
+                document.getElementById('profileDownloadProcessing').style.display = 'none';
+                document.getElementById('profileDownloadPaymentOptions').style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to initiate payment. Please try again.');
+            document.getElementById('profileDownloadProcessing').style.display = 'none';
+            document.getElementById('profileDownloadPaymentOptions').style.display = 'block';
+        });
+    }
+
+    function processProfileDownloadTestPayment(status) {
+        if (!profileDownloadOrderId) {
+            alert('Order ID not found. Please try again.');
+            return;
+        }
+
+        document.getElementById('profileDownloadTestOptions').style.display = 'none';
+        document.getElementById('profileDownloadProcessing').style.display = 'block';
+
+        fetch('{{ route("employee.profile-download.test-payment") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ order_id: profileDownloadOrderId, status: status })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                bootstrap.Modal.getInstance(document.getElementById('profileDownloadModal')).hide();
+                window.location.href = '{{ route("employee.profile-download.download") }}';
+            } else {
+                alert('Payment failed: ' + (data.message || 'Unknown error'));
+                document.getElementById('profileDownloadProcessing').style.display = 'none';
+                document.getElementById('profileDownloadPaymentOptions').style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Payment processing failed. Please try again.');
+            document.getElementById('profileDownloadProcessing').style.display = 'none';
+            document.getElementById('profileDownloadPaymentOptions').style.display = 'block';
+        });
+    }
+
+    // Handle profile download modal close
+    document.getElementById('profileDownloadModal').addEventListener('hidden.bs.modal', function () {
         const backdrops = document.querySelectorAll('.modal-backdrop');
         backdrops.forEach(backdrop => backdrop.remove());
         document.body.classList.remove('modal-open');

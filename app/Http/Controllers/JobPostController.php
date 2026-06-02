@@ -9,6 +9,7 @@ use App\Models\CompanyProfile;
 use App\Models\CandidateViewPayment;
 use App\Models\BackGroundQuestion;
 use App\Models\JobApplication;
+use App\Models\SubscriptionPackage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -207,6 +208,18 @@ class JobPostController extends Controller
     }
 
     /**
+     * Get candidate view price from subscription packages
+     */
+    private function getCandidateViewPrice()
+    {
+        $package = SubscriptionPackage::where('type', 'candidate_view')
+            ->orderBy('price', 'asc')
+            ->first();
+        
+        return $package ? $package->price : 10.00;
+    }
+
+    /**
      * Find talent - list candidates under employer's industry
      */
     public function findTalent(Request $request)
@@ -300,7 +313,7 @@ class JobPostController extends Controller
         return response()->json([
             'candidate' => $candidate,
             'has_paid' => $hasPaid,
-            'view_price' => 10.00,
+            'view_price' => $this->getCandidateViewPrice(),
             'background_questions' => $backgroundQuestions,
         ]);
     }
@@ -314,7 +327,7 @@ class JobPostController extends Controller
         
         return response()->json([
             'has_paid' => $hasPaid,
-            'view_price' => 10.00,
+            'view_price' => $this->getCandidateViewPrice(),
         ]);
     }
 
@@ -329,6 +342,9 @@ class JobPostController extends Controller
 
         $candidateId = $request->candidate_id;
         $employerId = Auth::id();
+        
+        // Get the dynamic price from subscription packages
+        $amount = $this->getCandidateViewPrice();
         
         // Check if already paid (completed status)
         $existingPayment = CandidateViewPayment::where('employer_id', $employerId)
@@ -349,11 +365,11 @@ class JobPostController extends Controller
             $existingPayment->update([
                 'order_id' => $orderId,
                 'status' => 'pending',
+                'amount' => $amount, // Update amount in case it changed
             ]);
         } else {
             // Create new payment record
             $orderId = 'CAND_VIEW_' . time() . '_' . $employerId . '_' . $candidateId;
-            $amount = 10.00;
             
             CandidateViewPayment::create([
                 'employer_id' => $employerId,
@@ -363,8 +379,6 @@ class JobPostController extends Controller
                 'status' => 'pending',
             ]);
         }
-
-        $amount = 10.00;
 
         // Check if test mode is enabled
         if (config('services.paytm.test_mode', false)) {

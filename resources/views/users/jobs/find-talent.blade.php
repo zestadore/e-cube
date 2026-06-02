@@ -390,7 +390,7 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <span>Profile Unlock Fee</span>
-                            <span class="fw-bold">₹10.00</span>
+                            <span class="fw-bold" id="paymentModalPrice">₹--</span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <span>GST (18%)</span>
@@ -399,7 +399,7 @@
                         <hr>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="fw-bold">Total Amount</span>
-                            <span class="fw-bold text-success fs-5">₹10.00</span>
+                            <span class="fw-bold text-success fs-5" id="paymentModalTotal">₹--</span>
                         </div>
                     </div>
                 </div>
@@ -409,7 +409,7 @@
                     
                     <!-- Payment Button - Automatically handles test/production mode -->
                     <button type="button" id="payNowBtn" class="btn btn-success w-100 mb-2 d-flex align-items-center justify-content-center" onclick="processPayment()">
-                        <i class="fas fa-lock-open me-2"></i>Pay Now - ₹10.00
+                        <i class="fas fa-lock-open me-2"></i>Pay Now - <span id="paymentBtnPrice">₹--</span>
                     </button>
                     
                     <p class="text-muted small text-center mb-0">
@@ -1035,10 +1035,16 @@
         if (!currentCandidateData) return;
         
         const candidate = currentCandidateData.candidate;
+        const viewPrice = currentCandidateData.view_price || 10.00;
         
         // Set candidate info in payment modal
         document.getElementById('paymentCandidateName').textContent = candidate.full_name;
         document.getElementById('paymentCandidatePhoto').src = candidate.image_path || '/assets/images/default-avatar.png';
+        
+        // Update price display in payment modal
+        document.getElementById('paymentModalPrice').textContent = '₹' + parseFloat(viewPrice).toFixed(2);
+        document.getElementById('paymentModalTotal').textContent = '₹' + parseFloat(viewPrice).toFixed(2);
+        document.getElementById('paymentBtnPrice').textContent = '₹' + parseFloat(viewPrice).toFixed(2);
         
         // Reset payment modal state
         showPaymentOptions();
