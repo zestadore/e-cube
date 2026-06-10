@@ -874,7 +874,7 @@
                                 <i class="fas fa-history me-2"></i>Payment History
                             </a>
                             <button class="btn btn-outline-danger w-100 mb-3" onclick="checkProfileDownloadStatus()">
-                                <i class="fas fa-file-pdf me-2"></i>Download Profile
+                                <i class="fas fa-file-pdf me-2"></i>Download your Stunning CV
                             </button>
                             <a href="{{route('change.password')}}" class="btn btn-outline-secondary w-100">
                                 <i class="fas fa-lock me-2"></i>Change Password

@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             '/paytm/callback',
             '/paytm/candidate-view-callback',
+            '/paytm/profile-download-callback',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

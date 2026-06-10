@@ -51,7 +51,7 @@
                                     </div>
                                 </div> --}}
 
-                                <div class="col-lg-6 col-md-6 mb-4">
+                                {{-- <div class="col-lg-6 col-md-6 mb-4">
                                     <div class="contact-info-card p-4 border rounded shadow-sm h-100">
                                         <div class="contact-icon mb-3">
                                             <i class="fa fa-map text-primary fs-2"></i>
@@ -59,9 +59,9 @@
                                         <h5 class="fw-bold mb-2">Our Office Address</h5>
                                         <p class="mb-0">VANAKUDIYIL,<br>NELLAD P.O.,<br>MAZHUVANNOOR,<br>ERNAKULAM<br>KERALA 686669</p>
                                     </div>
-                                </div>
+                                </div> --}}
 
-                                <div class="col-lg-6 col-md-6 mb-4">
+                                {{-- <div class="col-lg-6 col-md-6 mb-4">
                                     <div class="contact-info-card p-4 border rounded shadow-sm h-100">
                                         <div class="contact-icon mb-3">
                                             <i class="fa fa-phone text-primary fs-2"></i>
@@ -70,15 +70,16 @@
                                         <p class="mb-0">9961637624<br>
                                         <small class="text-muted">Available during business hours</small></p>
                                     </div>
-                                </div>
+                                </div> --}}
 
                                 <div class="col-lg-4 col-md-6 mb-4">
                                     <div class="contact-info-card p-4 border rounded shadow-sm h-100">
                                         <div class="contact-icon mb-3">
                                             <i class="fa fa-envelope text-primary fs-2"></i>
                                         </div>
-                                        <h5 class="fw-bold mb-2">Email</h5>
-                                        <p class="mb-0">ecubecareers@gmail.com<br>
+                                        <h5 class="fw-bold mb-2">Contact</h5>
+                                        <p class="mb-0">Email : ecubecareers@gmail.com<br>
+                                        Phone : +91 8590737624<br>
                                         <small class="text-muted">For inquiries, support, or partnership requests</small></p>
                                     </div>
                                 </div>
