@@ -88,10 +88,6 @@
                             <small class="text-muted">{{ $job->industry->industry_name ?? 'N/A' }}</small>
                         </div>
                         <div class="d-flex align-items-center mb-2">
-                            <i class="fas fa-graduation-cap text-info me-2" style="width: 20px;"></i>
-                            <small class="text-muted">{{ $job->qualification->degree ?? 'N/A' }}</small>
-                        </div>
-                        <div class="d-flex align-items-center mb-2">
                             <i class="fas fa-calendar-check text-success me-2" style="width: 20px;"></i>
                             <small class="text-muted">Apply: {{ $job->application_start_date->format('d M Y') }} - {{ $job->application_end_date->format('d M Y') }}</small>
                         </div>
@@ -179,34 +175,6 @@
                             @enderror
                         </div>
                         
-                        <div class="col-md-6 mb-3">
-                            <label for="parent_qualification_id" class="form-label fw-semibold">Qualification Category <span class="text-danger">*</span></label>
-                            <select class="form-select @error('parent_qualification_id') is-invalid @enderror" 
-                                    id="parent_qualification_id" name="parent_qualification_id" required style="border-radius: 8px;">
-                                <option value="">Select Category</option>
-                                @foreach($parentQualifications as $parentQualification)
-                                    <option value="{{ $parentQualification->id }}" {{ old('parent_qualification_id') == $parentQualification->id ? 'selected' : '' }}>
-                                        {{ $parentQualification->degree }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('parent_qualification_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        
-                        <div class="col-md-6 mb-3">
-                            <label for="qualification_id" class="form-label fw-semibold">Specific Qualification <span class="text-danger">*</span></label>
-                            <select class="form-select @error('qualification_id') is-invalid @enderror" 
-                                    id="qualification_id" name="qualification_id" required style="border-radius: 8px;">
-                                <option value="">Select Qualification</option>
-                            </select>
-                            @error('qualification_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                            <small id="qualification_help" class="text-muted">Select a category first</small>
-                        </div>
-                        
                         <div class="col-md-4 mb-3">
                             <label for="application_start_date" class="form-label fw-semibold">Start Date <span class="text-danger">*</span></label>
                             <input type="date" class="form-control @error('application_start_date') is-invalid @enderror" 
@@ -275,11 +243,6 @@
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-semibold text-muted">Job Role</label>
                         <p class="fw-semibold"><i class="fas fa-industry text-primary me-2"></i><span id="view_industry"></span></p>
-                    </div>
-                    
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold text-muted">Required Qualification</label>
-                        <p class="fw-semibold"><i class="fas fa-graduation-cap text-info me-2"></i><span id="view_qualification"></span></p>
                     </div>
                     
                     <div class="col-md-4 mb-3">
@@ -389,24 +352,6 @@
                             <textarea class="form-control" id="edit_description" name="description" rows="4" required style="border-radius: 8px;"></textarea>
                         </div>
                         
-                        <div class="col-md-6 mb-3">
-                            <label for="edit_parent_qualification_id" class="form-label fw-semibold">Qualification Category <span class="text-danger">*</span></label>
-                            <select class="form-select" id="edit_parent_qualification_id" name="parent_qualification_id" required style="border-radius: 8px;">
-                                <option value="">Select Category</option>
-                                @foreach($parentQualifications as $parentQualification)
-                                    <option value="{{ $parentQualification->id }}">{{ $parentQualification->degree }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        
-                        <div class="col-md-6 mb-3">
-                            <label for="edit_qualification_id" class="form-label fw-semibold">Specific Qualification <span class="text-danger">*</span></label>
-                            <select class="form-select" id="edit_qualification_id" name="qualification_id" required style="border-radius: 8px;">
-                                <option value="">Select Qualification</option>
-                            </select>
-                            <small id="edit_qualification_help" class="text-muted">Select a category first</small>
-                        </div>
-                        
                         <div class="col-md-4 mb-3">
                             <label for="edit_application_start_date" class="form-label fw-semibold">Start Date <span class="text-danger">*</span></label>
                             <input type="date" class="form-control" id="edit_application_start_date" name="application_start_date" required style="border-radius: 8px;">
@@ -476,85 +421,6 @@
 
 @section('scripts')
 <script>
-    // Qualifications data for cascading dropdowns
-    const qualificationsData = @json($allQualifications);
-    
-    // Function to collect all children recursively from a qualification with depth tracking
-    function collectAllChildrenWithDepth(qualificationId, visited = new Set(), depth = 0) {
-        const allChildren = [];
-        const qualification = qualificationsData.find(q => q.id == qualificationId);
-        
-        if (!qualification || !qualification.children || visited.has(qualificationId)) {
-            return allChildren;
-        }
-        
-        visited.add(qualificationId);
-        
-        qualification.children.forEach(child => {
-            allChildren.push({
-                ...child,
-                depth: depth
-            });
-            // Recursively collect child's children with increased depth
-            const grandChildren = collectAllChildrenWithDepth(child.id, visited, depth + 1);
-            allChildren.push(...grandChildren);
-        });
-        
-        return allChildren;
-    }
-    
-    // Function to populate child qualifications dropdown
-    function populateChildQualifications(parentSelectId, childSelectId, helpTextId, selectedChildId = null) {
-        const parentId = document.getElementById(parentSelectId).value;
-        const childSelect = document.getElementById(childSelectId);
-        const helpText = document.getElementById(helpTextId);
-        
-        // Clear existing options
-        childSelect.innerHTML = '<option value="">Select Qualification</option>';
-        
-        if (!parentId) {
-            childSelect.disabled = true;
-            helpText.textContent = 'Select a category first';
-            return;
-        }
-        
-        // Collect all children recursively with depth (including nested children)
-        const allChildren = collectAllChildrenWithDepth(parentId);
-        
-        if (allChildren.length === 0) {
-            childSelect.disabled = true;
-            helpText.textContent = 'No qualifications available for this category';
-        } else {
-            childSelect.disabled = false;
-            helpText.textContent = 'Select a specific qualification';
-            
-            allChildren.forEach(child => {
-                const option = document.createElement('option');
-                option.value = child.id;
-                // Add "— " prefix based on depth for hierarchical display
-                option.textContent = '— '.repeat(child.depth + 1) + child.degree;
-                if (selectedChildId && child.id == selectedChildId) {
-                    option.selected = true;
-                }
-                childSelect.appendChild(option);
-            });
-        }
-    }
-    
-    // Add Job Modal - Parent Qualification Change
-    document.getElementById('parent_qualification_id').addEventListener('change', function() {
-        populateChildQualifications('parent_qualification_id', 'qualification_id', 'qualification_help');
-    });
-    
-    // Edit Job Modal - Parent Qualification Change
-    document.getElementById('edit_parent_qualification_id').addEventListener('change', function() {
-        populateChildQualifications('edit_parent_qualification_id', 'edit_qualification_id', 'edit_qualification_help');
-    });
-    
-    // Initialize child dropdowns as disabled
-    document.getElementById('qualification_id').disabled = true;
-    document.getElementById('edit_qualification_id').disabled = true;
-
     // Set minimum date for end date and expiry date based on start date
     document.getElementById('application_start_date').addEventListener('change', function() {
         var startDate = this.value;
@@ -566,11 +432,6 @@
     @if($errors->any())
         var addJobModal = new bootstrap.Modal(document.getElementById('addJobModal'));
         addJobModal.show();
-        // Populate child qualifications if parent was selected
-        @if(old('parent_qualification_id'))
-            populateChildQualifications('parent_qualification_id', 'qualification_id', 'qualification_help', {{ old('qualification_id') }});
-            document.getElementById('qualification_id').disabled = false;
-        @endif
     @endif
 
     // View Job Function
@@ -584,8 +445,7 @@
                 document.getElementById('view_industry').textContent = industryName;
                 
                 document.getElementById('view_description').textContent = data.description;
-                document.getElementById('view_qualification').textContent = data.qualification ? data.qualification.degree : 'N/A';
-                
+
                 // Status badge styling
                 const statusBadge = document.getElementById('view_job_status');
                 statusBadge.textContent = data.status.charAt(0).toUpperCase() + data.status.slice(1);
@@ -749,18 +609,7 @@
                 // Fill form fields
                 document.getElementById('edit_industry_id').value = job.industry_id;
                 document.getElementById('edit_description').value = job.description;
-                
-                // Set parent qualification and populate children
-                if (job.parent_qualification_id) {
-                    document.getElementById('edit_parent_qualification_id').value = job.parent_qualification_id;
-                    populateChildQualifications('edit_parent_qualification_id', 'edit_qualification_id', 'edit_qualification_help', job.qualification_id);
-                } else {
-                    document.getElementById('edit_parent_qualification_id').value = '';
-                    document.getElementById('edit_qualification_id').innerHTML = '<option value="">Select Qualification</option>';
-                    document.getElementById('edit_qualification_id').disabled = true;
-                    document.getElementById('edit_qualification_help').textContent = 'Select a category first';
-                }
-                
+
                 // Format dates to YYYY-MM-DD for date input
                 document.getElementById('edit_application_start_date').value = formatDateForInput(job.application_start_date);
                 document.getElementById('edit_application_end_date').value = formatDateForInput(job.application_end_date);

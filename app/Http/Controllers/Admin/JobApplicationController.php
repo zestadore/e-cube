@@ -69,7 +69,6 @@ class JobApplicationController extends Controller
         $application = JobApplication::with([
             'jobPost.industry',
             'jobPost.user.companyProfile',
-            'jobPost.qualification',
             'user.basicDetails',
             'user.candidateQualifications.qualification',
             'user.candidateExperiences.industry',

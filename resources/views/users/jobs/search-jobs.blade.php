@@ -118,13 +118,6 @@
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm p-3 text-center" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-radius: 12px;">
-                <i class="fas fa-graduation-cap fa-2x mb-2 opacity-75"></i>
-                <h4 class="mb-0">{{ count($qualifications) }}</h4>
-                <small class="opacity-75">Qualifications</small>
-            </div>
-        </div>
-        <div class="col-md-3">
             <div class="card border-0 shadow-sm p-3 text-center" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border-radius: 12px;">
                 <i class="fas fa-check-circle fa-2x mb-2 opacity-75"></i>
                 <h4 class="mb-0">{{ $activeJobs }}</h4>
@@ -149,19 +142,6 @@
                             @foreach($availableIndustries as $industry)
                                 <option value="{{ $industry['id'] }}" {{ request('industry_id') == $industry['id'] ? 'selected' : '' }}>
                                     {{ $industry['name'] }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <!-- Qualification Filter -->
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Qualification</label>
-                        <select name="qualification_id" class="form-select">
-                            <option value="">All Qualifications</option>
-                            @foreach($qualifications as $qualification)
-                                <option value="{{ $qualification->id }}" {{ request('qualification_id') == $qualification->id ? 'selected' : '' }}>
-                                    {{ $qualification->degree }}
                                 </option>
                             @endforeach
                         </select>
@@ -228,16 +208,6 @@
                                 <p class="text-muted mb-3" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
                                     {{ Str::limit($job->description, 150) }}
                                 </p>
-
-                                <!-- Qualifications -->
-                                <div class="mb-3">
-                                    @if($job->parentQualification)
-                                        <span class="badge bg-info text-dark me-1">{{ $job->parentQualification->degree }}</span>
-                                    @endif
-                                    @if($job->qualification)
-                                        <span class="badge bg-secondary">{{ $job->qualification->degree }}</span>
-                                    @endif
-                                </div>
 
                                 <!-- Application Dates -->
                                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -481,21 +451,6 @@
                         <div class="card-body">
                             <h6 class="fw-bold text-primary mb-2"><i class="fas fa-align-left me-2"></i>Job Description</h6>
                             <p class="mb-0">${job.description}</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Qualifications -->
-                    <div class="card border-0 bg-light mb-3">
-                        <div class="card-body">
-                            <h6 class="fw-bold text-success mb-2"><i class="fas fa-graduation-cap me-2"></i>Required Qualifications</h6>
-                            <div>
-                                ${job.parent_qualification ? `
-                                    <span class="badge bg-info text-dark me-2">${job.parent_qualification.degree}</span>
-                                ` : ''}
-                                ${job.qualification ? `
-                                    <span class="badge bg-secondary">${job.qualification.degree}</span>
-                                ` : '<span class="text-muted">No specific qualification required</span>'}
-                            </div>
                         </div>
                     </div>
                     

@@ -28,7 +28,6 @@ class JobPostController extends Controller
     public function index()
     {
         $jobPosts = JobPost::where('user_id', Auth::id())
-                          ->with(['qualification', 'parentQualification'])
                           ->orderBy('created_at', 'desc')
                           ->get();
         
@@ -45,13 +44,7 @@ class JobPostController extends Controller
             }
         }
 
-        // Get parent qualifications (qualifications without parents)
-        $parentQualifications = Qualification::whereDoesntHave('parents')->get();
-        
-        // Get all qualifications with their children for JavaScript
-        $allQualifications = Qualification::with('children')->get();
-        
-        return view('users.jobs.index', compact('jobPosts', 'jobIndustries', 'parentQualifications', 'allQualifications'));
+        return view('users.jobs.index', compact('jobPosts', 'jobIndustries'));
     }
 
     /**
@@ -83,8 +76,7 @@ class JobPostController extends Controller
      */
     public function create()
     {
-        $qualifications = Qualification::all();
-        return view('users.jobs.create', compact('qualifications'));
+        return view('users.jobs.create');
     }
 
     /**
@@ -95,8 +87,6 @@ class JobPostController extends Controller
         $request->validate([
             'industry_id' => 'required|exists:industries,id',
             'description' => 'required|string',
-            'parent_qualification_id' => 'required|exists:qualifications,id',
-            'qualification_id' => 'required|exists:qualifications,id',
             'application_start_date' => 'required|date',
             'application_end_date' => 'required|date|after_or_equal:application_start_date',
             'expiry_date' => 'required|date|after_or_equal:application_start_date',
@@ -106,8 +96,6 @@ class JobPostController extends Controller
             'user_id' => Auth::id(),
             'industry_id' => $request->industry_id,
             'description' => $request->description,
-            'parent_qualification_id' => $request->parent_qualification_id,
-            'qualification_id' => $request->qualification_id,
             'application_start_date' => $request->application_start_date,
             'application_end_date' => $request->application_end_date,
             'expiry_date' => $request->expiry_date,
@@ -128,7 +116,7 @@ class JobPostController extends Controller
         }
         
         // Load job with applications and candidate details
-        $job->load(['qualification', 'parentQualification', 'industry', 'applications' => function($query) {
+        $job->load(['industry', 'applications' => function($query) {
             $query->with(['user' => function($q) {
                 $q->with(['basicDetails', 'candidateQualifications.qualification']);
             }])->orderBy('applied_at', 'desc');
@@ -147,13 +135,8 @@ class JobPostController extends Controller
             abort(403, 'Unauthorized action.');
         }
         
-        $qualifications = Qualification::all();
-        $parentQualifications = Qualification::whereDoesntHave('parents')->get();
-        
         return response()->json([
             'job' => $job,
-            'qualifications' => $qualifications,
-            'parentQualifications' => $parentQualifications
         ]);
     }
 
@@ -170,8 +153,6 @@ class JobPostController extends Controller
         $request->validate([
             'industry_id' => 'required|exists:industries,id',
             'description' => 'required|string',
-            'parent_qualification_id' => 'required|exists:qualifications,id',
-            'qualification_id' => 'required|exists:qualifications,id',
             'application_start_date' => 'required|date',
             'application_end_date' => 'required|date|after_or_equal:application_start_date',
             'expiry_date' => 'required|date|after_or_equal:application_start_date',
@@ -181,8 +162,6 @@ class JobPostController extends Controller
         $job->update([
             'industry_id' => $request->industry_id,
             'description' => $request->description,
-            'parent_qualification_id' => $request->parent_qualification_id,
-            'qualification_id' => $request->qualification_id,
             'application_start_date' => $request->application_start_date,
             'application_end_date' => $request->application_end_date,
             'expiry_date' => $request->expiry_date,
@@ -633,23 +612,15 @@ class JobPostController extends Controller
         $industryIds = array_column($availableIndustries, 'id');
         
         // Build query for job posts
-        $query = JobPost::with(['user.companyProfile', 'industry', 'qualification', 'parentQualification'])
+        $query = JobPost::with(['user.companyProfile', 'industry'])
             ->whereIn('industry_id', $industryIds)
             ->where('status', '!=', 'expired');
-        
+
         // Filter by industry if selected
         if ($request->filled('industry_id')) {
             $query->where('industry_id', $request->industry_id);
         }
-        
-        // Filter by qualification if selected
-        if ($request->filled('qualification_id')) {
-            $query->where(function($q) use ($request) {
-                $q->where('qualification_id', $request->qualification_id)
-                  ->orWhere('parent_qualification_id', $request->qualification_id);
-            });
-        }
-        
+
         // Filter by status if selected
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -670,10 +641,7 @@ class JobPostController extends Controller
             ->where('status', 'active')
             ->count();
         
-        // Get qualifications for filter
-        $qualifications = Qualification::all();
-        
-        return view('users.jobs.search-jobs', compact('jobPosts', 'availableIndustries', 'qualifications', 'activeJobs'));
+        return view('users.jobs.search-jobs', compact('jobPosts', 'availableIndustries', 'activeJobs'));
     }
 
     /**
@@ -681,7 +649,7 @@ class JobPostController extends Controller
      */
     public function showJobForEmployee($id)
     {
-        $job = JobPost::with(['user.companyProfile.industry', 'industry', 'qualification', 'parentQualification'])
+        $job = JobPost::with(['user.companyProfile.industry', 'industry'])
             ->findOrFail($id);
         
         // Check if user has already applied
@@ -755,7 +723,7 @@ class JobPostController extends Controller
      */
     public function getEmployerApplications(Request $request)
     {
-        $query = JobApplication::with(['jobPost.industry', 'jobPost.qualification', 'user.basicDetails', 'user.candidateQualifications.qualification'])
+        $query = JobApplication::with(['jobPost.industry', 'user.basicDetails', 'user.candidateQualifications.qualification'])
             ->whereHas('jobPost', function($q) {
                 $q->where('user_id', Auth::id());
             });
@@ -838,9 +806,8 @@ class JobPostController extends Controller
     public function getApplicationDetails($applicationId)
     {
         $application = JobApplication::with([
-            'jobPost.industry', 
-            'jobPost.qualification', 
-            'user.basicDetails', 
+            'jobPost.industry',
+            'user.basicDetails',
             'user.presentAddress',
             'user.permanentAddress',
             'user.candidateHobby',
