@@ -187,7 +187,7 @@
             </div>
             <div class="col-md-3 text-end">
                 <div class="btn-group-vertical">
-                    <a href="{{ route('register-as-job-seeker') }}" class="btn btn-light mb-2">
+                    <a href="{{ route('jobseeker.register') }}" class="btn btn-light mb-2">
                         <i class="fas fa-edit me-2"></i>Edit Profile
                     </a>
                     <a href="{{ route('employee.dashboard') }}" class="btn btn-outline-light">
@@ -205,7 +205,7 @@
             <div class="section-card">
                 <div class="section-header">
                     <h3 class="section-title"><i class="fas fa-user me-2"></i>Basic Information</h3>
-                    <a href="{{ route('register-as-job-seeker') }}" class="btn btn-sm btn-primary">Edit</a>
+                    <a href="{{ route('jobseeker.register') }}" class="btn btn-sm btn-primary">Edit</a>
                 </div>
                 <div class="section-body">
                     <div class="info-row">
@@ -239,7 +239,7 @@
             <div class="section-card">
                 <div class="section-header">
                     <h3 class="section-title"><i class="fas fa-address-book me-2"></i>Contact Details</h3>
-                    <a href="{{ route('register-as-job-seeker') }}" class="btn btn-sm btn-primary">Edit</a>
+                    <a href="{{ route('jobseeker.register') }}" class="btn btn-sm btn-primary">Edit</a>
                 </div>
                 <div class="section-body">
                     <div class="info-row">
@@ -269,7 +269,7 @@
             <div class="section-card">
                 <div class="section-header">
                     <h3 class="section-title"><i class="fas fa-map-marker-alt me-2"></i>Address</h3>
-                    <a href="{{ route('register-as-job-seeker') }}" class="btn btn-sm btn-primary">Edit</a>
+                    <a href="{{ route('jobseeker.register') }}" class="btn btn-sm btn-primary">Edit</a>
                 </div>
                 <div class="section-body">
                     <h6 class="text-primary mb-3">Present Address</h6>
@@ -297,7 +297,7 @@
             <div class="section-card">
                 <div class="section-header">
                     <h3 class="section-title"><i class="fas fa-graduation-cap me-2"></i>Education</h3>
-                    <a href="{{ route('register-as-job-seeker') }}" class="btn btn-sm btn-primary">Edit</a>
+                    <a href="{{ route('jobseeker.register') }}" class="btn btn-sm btn-primary">Edit</a>
                 </div>
                 <div class="section-body">
                     @if(count($candidateQualifications) > 0)
@@ -333,7 +333,7 @@
             <div class="section-card">
                 <div class="section-header">
                     <h3 class="section-title"><i class="fas fa-briefcase me-2"></i>Work Experience</h3>
-                    <a href="{{ route('register-as-job-seeker') }}" class="btn btn-sm btn-primary">Edit</a>
+                    <a href="{{ route('jobseeker.register') }}" class="btn btn-sm btn-primary">Edit</a>
                 </div>
                 <div class="section-body">
                     @if(count($candidateExperiences) > 0)
@@ -394,7 +394,7 @@
             <div class="section-card">
                 <div class="section-header">
                     <h3 class="section-title"><i class="fas fa-tools me-2"></i>Skills</h3>
-                    <a href="{{ route('register-as-job-seeker') }}" class="btn btn-sm btn-primary">Edit</a>
+                    <a href="{{ route('jobseeker.register') }}" class="btn btn-sm btn-primary">Edit</a>
                 </div>
                 <div class="section-body">
                     @if(count($candidateSkills) > 0)
@@ -417,7 +417,7 @@
             <div class="section-card">
                 <div class="section-header">
                     <h3 class="section-title"><i class="fas fa-heart me-2"></i>Hobbies & Interests</h3>
-                    <a href="{{ route('register-as-job-seeker') }}" class="btn btn-sm btn-primary">Edit</a>
+                    <a href="{{ route('jobseeker.register') }}" class="btn btn-sm btn-primary">Edit</a>
                 </div>
                 <div class="section-body">
                     @if($hobbies->description)
@@ -452,7 +452,7 @@
 
 <!-- Floating Action Buttons -->
 <div class="action-buttons">
-    <a href="{{ route('register-as-job-seeker') }}" class="btn btn-primary action-btn" title="Edit Profile">
+    <a href="{{ route('jobseeker.register') }}" class="btn btn-primary action-btn" title="Edit Profile">
         <i class="fas fa-edit fa-lg"></i>
     </a>
     <a href="{{ route('employee.dashboard') }}" class="btn btn-success action-btn" title="Dashboard">

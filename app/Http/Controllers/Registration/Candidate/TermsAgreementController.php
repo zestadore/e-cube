@@ -39,7 +39,7 @@ class TermsAgreementController extends Controller
             ->exists();
 
         if ($hasAgreed) {
-            return redirect()->route('register-as-job-seeker');
+            return redirect()->route('jobseeker.register');
         }
 
         return view('users.registration.guidelines.experience');
@@ -92,6 +92,6 @@ class TermsAgreementController extends Controller
             ]
         );
 
-        return redirect()->route('register-as-job-seeker');
+        return redirect()->route('jobseeker.register');
     }
 }

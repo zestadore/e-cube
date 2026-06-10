@@ -7,7 +7,7 @@ use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\Request;
 
 class RegisterController extends Controller
 {
@@ -55,6 +55,7 @@ class RegisterController extends Controller
             'mobile' => ['required', 'numeric', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'role' => ['required', 'in:employee,employer'],
         ]);
     }
 
@@ -66,17 +67,30 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        $user = User::create([
+        // The Registered event (verification email) is fired by the
+        // RegistersUsers trait after this method returns — don't fire it here.
+        return User::create([
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
             'email' => $data['email'],
             'mobile' => $data['mobile'],
             'password' => Hash::make($data['password']),
+            'role' => $data['role'],
         ]);
+    }
 
-        // 🔥 Recommended way
-        event(new Registered($user));
-
-        return $user;
+    /**
+     * Send the newly registered user straight into the profile builder
+     * that matches the type they chose, instead of the generic /home.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    protected function registered(Request $request, $user)
+    {
+        return $user->role === 'employer'
+            ? redirect()->route('recruiter.register')
+            : redirect()->route('jobseeker.register');
     }
 }

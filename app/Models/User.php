@@ -25,6 +25,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'role',
         'image',
+        'signature_image',
+        'profile_completed_at',
         'mobile_verified_at',
         'validity',
     ];
@@ -50,6 +52,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return [
             'email_verified_at' => 'datetime',
+            'profile_completed_at' => 'datetime',
             'password' => 'hashed',
         ];
     }

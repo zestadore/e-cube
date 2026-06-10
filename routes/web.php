@@ -130,12 +130,14 @@ Route::middleware(['auth'])->group(function () {
         // Industry selection - available before email verification
         Route::get('select-industry', [App\Http\Controllers\Registration\Company\CompanyProfileController::class, 'selectIndustry'])->name('select_industry');
         Route::post('save-industry', [App\Http\Controllers\Registration\Company\CompanyProfileController::class, 'saveIndustry'])->name('save_industry');
+        // Company profile form - part of the initial registration flow, so it must be
+        // reachable before email verification (saveIndustry() redirects back here).
+        Route::get('company-profile', [App\Http\Controllers\Registration\Company\CompanyProfileController::class, 'index'])->name('company_profile');
     });
-    
+
     // Employer routes that require email verification
     Route::group(['as'=>'employer.','prefix' => 'employer', 'middleware' => 'verified'], function () {
         Route::get('/', [App\Http\Controllers\HomeController::class, 'employerDashboard'])->name('dashboard');
-        Route::get('company-profile', [App\Http\Controllers\Registration\Company\CompanyProfileController::class, 'index'])->name('company_profile');
         Route::resource('jobs', App\Http\Controllers\JobPostController::class);
         Route::get('find-talent', [App\Http\Controllers\JobPostController::class, 'findTalent'])->name('find-talent');
         // Employer Payment History

@@ -15,6 +15,26 @@
                             <p class="text-center">Just a step away.</p>
                             <form action="{{ route('register') }}" method="POST">@csrf
                                 <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="form-group">
+                                            <label class="form-label d-block">I want to register as</label>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <input type="radio" class="btn-check" name="role" id="role_employee" value="employee" {{ old('role', 'employee') == 'employee' ? 'checked' : '' }} required>
+                                                    <label class="btn btn-outline-primary w-100" for="role_employee">Job Seeker</label>
+                                                </div>
+                                                <div class="col-6">
+                                                    <input type="radio" class="btn-check" name="role" id="role_employer" value="employer" {{ old('role') == 'employer' ? 'checked' : '' }}>
+                                                    <label class="btn btn-outline-primary w-100" for="role_employer">Employer</label>
+                                                </div>
+                                            </div>
+                                            @error('role')
+                                                <span class="invalid-feedback d-block" role="alert">
+                                                    <strong>{{ $message }}</strong>
+                                                </span>
+                                            @enderror
+                                        </div>
+                                    </div>
                                     <div class="col-lg-6">
                                         <div class="form-group">
                                             <label for="first_name" class="form-label">First name</label>

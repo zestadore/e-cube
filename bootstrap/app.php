@@ -16,6 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
             '/paytm/candidate-view-callback',
             '/paytm/profile-download-callback',
         ]);
+
+        // Gate employees with an incomplete profile out of every screen,
+        // sending them to the profile-completion flow first.
+        $middleware->appendToGroup('web', \App\Http\Middleware\EnsureEmployeeProfileComplete::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
